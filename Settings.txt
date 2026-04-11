@@ -1,0 +1,11 @@
+device name: lf-hthon
+username: lf
+password: singtel
+
+WiFi: Deco Ong
+Password: KCJ-Ong/57!
+
+keyring password: hackthon
+
+raspi set up w
+1. mqtt (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)

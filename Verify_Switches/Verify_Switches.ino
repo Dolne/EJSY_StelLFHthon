@@ -1,6 +1,6 @@
 #define LED_PIN 26
 #define VIBRATION_PIN 27
-#define SW1_PIN 22
+#define SW1_PIN 22 //pull-up, connect other end of switch to ground
 
 void setup() {
   // put your setup code here, to run once:
