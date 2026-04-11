@@ -59,11 +59,13 @@ void setup() {
   //***************************INITIALISATION***************************
   audioModule.setVolume(30);
   Serial.begin(115200);
+
+  OptionsGenerator(String("0110111110"));
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (digitalRead(SW1_PIN) == 1) {
+  /*if (digitalRead(SW1_PIN) == 1) {
     audioModule.playTrackInFolder(1, 1);
     digitalWrite(LED_PIN, 1);
     digitalWrite(VIBRATION_PIN, 0);
@@ -83,10 +85,84 @@ void loop() {
     while (digitalRead(SW1_PIN) == 0) { //stops repeated setting of GPIO & MP3
       delay(10);
     }
-  }
+  }*/
 }
 
-void debugMessage(char* message){ //Send a debugging message out, for now via USB Serial only
+//***************************DEBUG & ERROR***************************
+void debugMessage(char* message) { //Send a debugging message out, for now via USB Serial only
   Serial.println(message);
 }
+
+void debugMessage(const char* message) { //Send a debugging message out, for now via USB Serial only
+  Serial.println(message);
+}
+
+void errorMessage(char* message) { //Send an error message out, for now via USB Serial only
+  Serial.println(message);
+}
+
+void errorMessage(const char* message) { //Send an error message out, for now via USB Serial only
+  Serial.println(message);
+}
+
+
+//***************************OPTIONS & DIFFICULTY***************************
+//Option Generator
+/*Option format: [
+  Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
+  1 <colour diff>
+  2 <shape diff>
+  3 <size diff>
+  4 <pitch diff>
+  5 <loudness diff>
+  6 <timbre diff>
+  7 <left vs right diff (0 is left, 9 is right)>
+  8 <texture diff>
+  9 <temp diff>]
+*/
+
+/*Difficulty format: [
+  Index 0 <number from 0 to 2, with 0 being the easiest and 2 the hardest>
+  1 <colour diff>
+  2 <shape diff>
+  3 <size diff>
+  4 <pitch diff>
+  5 <loudness diff>
+  6 <timbre diff>
+  7 <left vs right diff (0 is left, 9 is right)>
+  8 <texture diff>
+  9 <temp diff>]
+*/
+
+String *OptionsGenerator(String difficulty) { //Returns a 3 element array with first dimension being the options, and second dimension being the details defining each option  
+  //* is the pointer to where the data is actually located
+  //TOADD: >3 options
+  //TOADD: difficulty >0
+  if (difficulty.length() != 10) { //difficulty String must be 10 char
+    errorMessage(String(String("OptionsGenerator input not 10 char: ") + difficulty).c_str());
+  }
+
+  String resultOptions[3];
+  int differentOptionIndex = random(0, 2);
+  debugMessage(String(String("different option (0-2): ") + differentOptionIndex).c_str());
+
+  //deep copy the difficulty into all 3 options
+  for (int i = 0; i <= 2; i++) {
+    resultOptions[i] = String(difficulty);
+  }
+  
+  //modify the first character of each sub-array to fit that of the option format (only difference between option and difficulty format is the first character: difficulty vs variant)
+  for (int i = 0; i <= 2; i++) {
+    if (i == differentOptionIndex) {
+      resultOptions[differentOptionIndex].setCharAt(0, '9'); //Change the different option's variant
+    }
+    else { //The "normal" options
+      resultOptions[i].setCharAt(0, '0'); //TOADD: For now will always be 0, in future should depend on difficulty
+    }
+    debugMessage(String(String("Option ") + i + String("=") + resultOptions[i]).c_str()); //Cannot "+"" char[] and numbers
+  }
+  
+  return resultOptions;
+}
+
 

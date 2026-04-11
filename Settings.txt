@@ -8,4 +8,4 @@ Password: KCJ-Ong/57!
 keyring password: hackthon
 
 raspi set up w
-1. mqtt (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
+1. mosquito mqtt broker (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
