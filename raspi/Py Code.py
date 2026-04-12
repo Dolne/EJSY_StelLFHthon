@@ -9,7 +9,10 @@ import time
 #matplotlib.use('QtAgg')
 
 #create 3 subplots under one plot
-fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+fig, ((sel1, sel2, sel3),(ax1, ax2, ax3)) = plt.subplots(2,3)
+sel1.axis('off')
+sel2.axis('off')
+sel3.axis('off')
 ax1.axis('off')
 ax2.axis('off')
 ax3.axis('off')
@@ -17,6 +20,8 @@ ax3.axis('off')
 #load images
 circle = img.imread("SmallBlueCircle.jpg")
 triangle = img.imread("BigOrangeTriangle.jpg")
+arrow = img.imread("arrow.jpg")
+blank = img.imread("blank.jpg")
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -32,18 +37,35 @@ plt.ion()
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
-    if int(msg.payload) == 1:
+    character = str(msg.payload)[2]
+
+    # edit options
+    if str(character) == '1':
         ax1.imshow(triangle)
         ax2.imshow(circle)
         ax3.imshow(circle)
-    if int(msg.payload) == 2:
+    if str(character) == '2':
         ax1.imshow(circle)
         ax2.imshow(triangle)
         ax3.imshow(circle)
-    if int(msg.payload) == 3:
+    if str(character) == '3':
         ax1.imshow(circle)
         ax2.imshow(circle)
         ax3.imshow(triangle)
+
+    #edit whats being scanned
+    if str(character) == 'a':
+        sel1.imshow(arrow)
+        sel2.imshow(blank)
+        sel3.imshow(blank)
+    if str(character) == 'b':
+        sel1.imshow(blank)
+        sel2.imshow(arrow)
+        sel3.imshow(blank)
+    if str(character) == 'c':
+        sel1.imshow(blank)
+        sel2.imshow(blank)
+        sel3.imshow(arrow)
     
     plt.show()
     plt.pause(2)
