@@ -9,3 +9,7 @@ keyring password: hackthon
 
 raspi set up w
 1. mosquito mqtt broker (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
+
+raspi ip address: 192.168.0.112
+
+Code must be uploaded using the "ESP32 Dev Module" board, not anything else (e.g. "ESP32-WROOM-DA Module")

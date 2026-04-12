@@ -6,7 +6,7 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
 
-//***************************PIN DEFINITIONS***************************
+//***************************SETTINGS/GPIO ASSIGNMENT***************************
 
 //LED - Relay Ch1: 3.3V NO; input high --> close
 //3.3V --> 18Ohm R --> LED --> Gnd
@@ -23,24 +23,33 @@
 #define AUDIO_UART_RX 16 //Orange jumper
 #define AUDIO_UART_TX 17 //White jumper
 
+//WiFI settings
+const char *hostname = "hthon_ESP";
+const char *ssid = "TP-Link_8E20"; //WiFi SSID
+const char *password = "P@ssw0rd123"; //WiFi password
+
+//MQTT settings
+const char *clientID = "hthon_ESP";
+const char *mqttServerIP = "192.168.1.101"; //MQTT server IP address e.g. 192.168.18.3
+
+//MQTT TOPIC NAMES 
+const char* debug_topic = "debugMessage";
+const char* error_topic = "errorMessage";
+const char* display_topic = "display";
+const char* settings_topic = "settings";
+
+
 //***************************DECLARATIONS***************************
 //Audio Module
 YX5300_ESP32 audioModule; //Audio Module Object
 
-//***************************MQTT TOPIC NAMES***************************
-//MQTT topic names for lift adapter
-const char* liftAdapter_nextMessageToFleet_topic = "lift_adapter_transceiver/next_message_to_fleet";
-const char* liftAdapter_messageSentCfm_topic = "lift_adapter_transceiver/message_sent";
-const char* liftAdapter_messageFromFleet_topic = "lift_adapter_transceiver/message_from_fleet";
-const char* liftAdapter_tellDoorState_topic = "lift_adapter_transceiver/door_state";
-//MQTT topic names for fleet adapter 
-const char* fleetAdapter_nextMessageToLift_topic = "fleet_adapter_transceiver/next_message_to_lift";
-const char* fleetAdapter_messageSentCfm_topic = "fleet_adapter_transceiver/message_sent";
-const char* fleetAdapter_messageFromLift_topic = "fleet_adapter_transceiver/message_from_lift";
-const char* fleetAdapter_tellDoorState_topic = "fleet_adapter_transceiver/door_state";
-//MQTT topic names for lift sim
-const char* liftSim_doorState_topic = "lift_sim/door_state"; //Subscribed to by both
-const char* liftSim_currentLevel_topic = "lift_sim/curr_level"; //Subscrived to by fleet adapter
+//WiFi & MQTT objects
+WiFiClient WiFiC; //WiFiClient derived from ESP32's WiFi connection
+static PubSubClient MQTTclient(WiFiC); //Initial partial configuration of PubSubClient
+
+//For multi-core utilisation
+TaskHandle_t MQTTloopTask = NULL;
+TaskHandle_t mainTask = NULL;
 
 //******************************************************CODE******************************************************
 
@@ -163,6 +172,85 @@ class gameOverall { //Stores multiple game rounds
     //TOADD: Keeping score
 };
 
+//***************************WiFi & MQTT***************************
+
+void setupWIFI() {
+  WiFi.setHostname(hostname);
+  Serial.print("Hostname: ");
+  Serial.println(hostname);
+
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void setupMQTT() { //Also subscribes to the appropriate MQTT topics for fleet or lift adapters
+  //Config MQTT
+  MQTTclient.setServer(mqttServerIP, 1883); //mqtt_server IP address
+  MQTTclient.setCallback(receiveMQTTCallback);
+
+  //Connect to MQTT server
+  Serial.print("Trying to connect to MQTT server");
+  while (!MQTTclient.connected()) {
+    Serial.print(".");
+    MQTTclient.connect(clientID);
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("Connected to MQTT Server on ");
+  Serial.println(mqttServerIP);
+  
+  //Subscriptions
+  MQTTclient.subscribe(settings_topic);
+  //MQTTclient.loop();
+}
+
+void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do the messages receive end in null?
+  Serial.println("****received MQTT transmission****");
+  //Copy in the MQTT message
+  char messageTemp[256] = {NULL};
+  for (int i = 0; i < length; i++) {
+    messageTemp[i] = (char)message[i];
+  }
+  //Print to serial
+  Serial.print("Topic: ");
+  Serial.println(topic);
+  Serial.print("Message: ");
+  Serial.println(messageTemp);
+}
+
+void MQTTpublishWithSerial(const char* topic, const char* payload) {
+  Serial.println("----publishing MQTT transmission----");
+  Serial.print("topic: ");
+  Serial.println(topic);
+  Serial.print("payload: ");
+  Serial.println(payload);
+  MQTTclient.publish(topic, payload);
+}
+
+void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly checks for received MQTT posts
+  while(true) {
+    if (!MQTTclient.connected()) {
+      setupMQTT();
+    }
+
+    //Run the loop to ensure messages are received
+    MQTTclient.loop();
+    delay(100); //Delay is needed else this task interferes with IR transmitting
+  }
+}
+
 void setup() {
   //***************************CONSTRUCTORS***************************
   //Audio Module
@@ -181,6 +269,10 @@ void setup() {
   audioModule.setVolume(30);
   Serial.begin(115200);
 
+  setupWIFI();
+  setupMQTT();
+  //MQTTclient.loop();
+
   //OptionsGenerator(String("0110111110"));
   /*gameRound firstGame = gameRound(String("0110111110"));
   debugMessage(firstGame.options[0].c_str());
@@ -191,6 +283,8 @@ void setup() {
   }*/
 
   gameOverall game = gameOverall("0110111110");
+
+  xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
 }
 
 void loop() {
