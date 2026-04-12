@@ -53,6 +53,10 @@ void debugMessage(const char* message) { //Send a debugging message out, for now
   Serial.println(message);
 }
 
+void debugMessage(String message) { //Send a debugging message out, for now via USB Serial only
+  Serial.println(message.c_str());
+}
+
 void errorMessage(char* message) { //Send an error message out, for now via USB Serial only
   Serial.println(message);
 }
@@ -121,23 +125,43 @@ void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places opt
 }
 
 //***************************ROUNDS***************************
-class gameRound {
+class gameRound { //Stores one round (ie one choice)
   private:
   public:
-    String difficulty;
-    String options[3]; //3 element array of
+    bool isInitialised = false;
+    String difficulty = String();
+    String options[3] = {String(), String(), String()}; //3 element array of the options in the relevant format
     int optionChosen = NULL;
 
     gameRound(String passedInDifficulty) {
-      difficulty = String(passedInDifficulty);
+      difficulty = String(passedInDifficulty); //Deep copy because OptionsGenerator (next line) will modify the String object to "return" the output
       OptionsGenerator(difficulty, options);
+      isInitialised = true;
 
       /*debugMessage(options[0].c_str());
       debugMessage(options[1].c_str());
       debugMessage(options[2].c_str());*/
     }
+    gameRound() {}
 };
 
+class gameOverall { //Stores multiple game rounds
+  //TOADD: More than 4 game rouns
+  private:
+  public:
+    String arrayOfDifficulties[4];
+    gameRound arrayOfRounds[4];
+
+    gameOverall(String initialDifficulty) {
+      for (int i = 0; i<4; i++) {
+        arrayOfDifficulties[i] = String(initialDifficulty); //Go back and check if rly need this deep copy
+        debugMessage(String("Round" + String(i) + "difficulty: " + arrayOfDifficulties[i]));
+        arrayOfRounds[i] = gameRound();
+      }
+    }
+
+    //TOADD: Keeping score
+};
 
 void setup() {
   //***************************CONSTRUCTORS***************************
@@ -158,13 +182,15 @@ void setup() {
   Serial.begin(115200);
 
   //OptionsGenerator(String("0110111110"));
-  gameRound firstGame = gameRound(String("0110111110"));
+  /*gameRound firstGame = gameRound(String("0110111110"));
   debugMessage(firstGame.options[0].c_str());
   debugMessage(firstGame.options[1].c_str());
   debugMessage(firstGame.options[2].c_str());
   if (firstGame.optionChosen == NULL) {
     debugMessage("No option chosen yet");
-  }
+  }*/
+
+  gameOverall game = gameOverall("0110111110");
 }
 
 void loop() {
