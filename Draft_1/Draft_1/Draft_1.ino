@@ -42,51 +42,7 @@ const char* fleetAdapter_tellDoorState_topic = "fleet_adapter_transceiver/door_s
 const char* liftSim_doorState_topic = "lift_sim/door_state"; //Subscribed to by both
 const char* liftSim_currentLevel_topic = "lift_sim/curr_level"; //Subscrived to by fleet adapter
 
-void setup() {
-  //***************************CONSTRUCTORS***************************
-  //Audio Module
-  audioModule = YX5300_ESP32(Serial2, AUDIO_UART_RX, AUDIO_UART_TX);
-  // put your setup code here, to run once:
-
-  //***************************GPIO SETTING***************************  
-  //LED
-  pinMode(LED_PIN, OUTPUT);
-  //Vibration Motor
-  pinMode(VIBRATION_PIN, OUTPUT);
-  //Switch
-  pinMode(SW1_PIN, INPUT_PULLUP);
-
-  //***************************INITIALISATION***************************
-  audioModule.setVolume(30);
-  Serial.begin(115200);
-
-  OptionsGenerator(String("0110111110"));
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  /*if (digitalRead(SW1_PIN) == 1) {
-    audioModule.playTrackInFolder(1, 1);
-    digitalWrite(LED_PIN, 1);
-    digitalWrite(VIBRATION_PIN, 0);
-    debugMessage("Sw On");
-
-    while (digitalRead(SW1_PIN) == 1) { //stops repeated setting of GPIO & MP3
-      delay(10);
-    }
-  }
-
-  else {
-    audioModule.playTrackInFolder(6, 2);
-    digitalWrite(LED_PIN, 0);
-    digitalWrite(VIBRATION_PIN, 1);
-    debugMessage("Sw Off");
-
-    while (digitalRead(SW1_PIN) == 0) { //stops repeated setting of GPIO & MP3
-      delay(10);
-    }
-  }*/
-}
+//******************************************************CODE******************************************************
 
 //***************************DEBUG & ERROR***************************
 void debugMessage(char* message) { //Send a debugging message out, for now via USB Serial only
@@ -104,7 +60,6 @@ void errorMessage(char* message) { //Send an error message out, for now via USB 
 void errorMessage(const char* message) { //Send an error message out, for now via USB Serial only
   Serial.println(message);
 }
-
 
 //***************************OPTIONS & DIFFICULTY***************************
 //Option Generator
@@ -134,7 +89,7 @@ void errorMessage(const char* message) { //Send an error message out, for now vi
   9 <temp diff>]
 */
 
-String *OptionsGenerator(String difficulty) { //Returns a 3 element array with first dimension being the options, and second dimension being the details defining each option  
+void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places options in resultOptions, a 3 element array with first dimension being the options, and second dimension being the details defining each option  
   //* is the pointer to where the data is actually located
   //TOADD: >3 options
   //TOADD: difficulty >0
@@ -142,8 +97,8 @@ String *OptionsGenerator(String difficulty) { //Returns a 3 element array with f
     errorMessage(String(String("OptionsGenerator input not 10 char: ") + difficulty).c_str());
   }
 
-  String resultOptions[3];
-  int differentOptionIndex = random(0, 2);
+  //String resultOptions[3];
+  int differentOptionIndex = random(0, 3); //Random int from 0 to 2 (function returns 0<=x<3)
   debugMessage(String(String("different option (0-2): ") + differentOptionIndex).c_str());
 
   //deep copy the difficulty into all 3 options
@@ -162,7 +117,77 @@ String *OptionsGenerator(String difficulty) { //Returns a 3 element array with f
     debugMessage(String(String("Option ") + i + String("=") + resultOptions[i]).c_str()); //Cannot "+"" char[] and numbers
   }
   
-  return resultOptions;
+  //return resultOptions;
 }
 
+//***************************ROUNDS***************************
+class gameRound {
+  private:
+  public:
+    String difficulty;
+    String options[3]; //3 element array of
+    int optionChosen = NULL;
 
+    gameRound(String passedInDifficulty) {
+      difficulty = String(passedInDifficulty);
+      OptionsGenerator(difficulty, options);
+
+      /*debugMessage(options[0].c_str());
+      debugMessage(options[1].c_str());
+      debugMessage(options[2].c_str());*/
+    }
+};
+
+
+void setup() {
+  //***************************CONSTRUCTORS***************************
+  //Audio Module
+  audioModule = YX5300_ESP32(Serial2, AUDIO_UART_RX, AUDIO_UART_TX);
+  // put your setup code here, to run once:
+
+  //***************************GPIO SETTING***************************  
+  //LED
+  pinMode(LED_PIN, OUTPUT);
+  //Vibration Motor
+  pinMode(VIBRATION_PIN, OUTPUT);
+  //Switch
+  pinMode(SW1_PIN, INPUT_PULLUP);
+
+  //***************************INITIALISATION***************************
+  audioModule.setVolume(30);
+  Serial.begin(115200);
+
+  //OptionsGenerator(String("0110111110"));
+  gameRound firstGame = gameRound(String("0110111110"));
+  debugMessage(firstGame.options[0].c_str());
+  debugMessage(firstGame.options[1].c_str());
+  debugMessage(firstGame.options[2].c_str());
+  if (firstGame.optionChosen == NULL) {
+    debugMessage("No option chosen yet");
+  }
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  /*if (digitalRead(SW1_PIN) == 1) {
+    audioModule.playTrackInFolder(1, 1);
+    digitalWrite(LED_PIN, 1);String("0110111110")
+    digitalWrite(VIBRATION_PIN, 0);
+    debugMessage("Sw On");
+
+    while (digitalRead(SW1_PIN) == 1) { //stops repeated setting of GPIO & MP3
+      delay(10);
+    }
+  }
+
+  else {
+    audioModule.playTrackInFolder(6, 2);
+    digitalWrite(LED_PIN, 0);
+    digitalWrite(VIBRATION_PIN, 1);
+    debugMessage("Sw Off");
+
+    while (digitalRead(SW1_PIN) == 0) { //stops repeated setting of GPIO & MP3
+      delay(10);
+    }
+  }*/
+}
