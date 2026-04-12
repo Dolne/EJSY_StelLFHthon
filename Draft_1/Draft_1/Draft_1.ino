@@ -56,22 +56,27 @@ TaskHandle_t mainTask = NULL;
 //***************************DEBUG & ERROR***************************
 void debugMessage(char* message) { //Send a debugging message out, for now via USB Serial only
   Serial.println(message);
+  MQTTpublishWithSerial(debug_topic, message);
 }
 
 void debugMessage(const char* message) { //Send a debugging message out, for now via USB Serial only
   Serial.println(message);
+  MQTTpublishWithSerial(debug_topic, message);
 }
 
 void debugMessage(String message) { //Send a debugging message out, for now via USB Serial only
   Serial.println(message.c_str());
+  MQTTpublishWithSerial(debug_topic, message.c_str());
 }
 
 void errorMessage(char* message) { //Send an error message out, for now via USB Serial only
   Serial.println(message);
+  MQTTpublishWithSerial(error_topic, message);
 }
 
 void errorMessage(const char* message) { //Send an error message out, for now via USB Serial only
   Serial.println(message);
+  MQTTpublishWithSerial(error_topic, message);
 }
 
 //***************************OPTIONS & DIFFICULTY***************************
