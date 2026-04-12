@@ -81,8 +81,8 @@ void errorMessage(const char* message) { //Send an error message out, for now vi
 
 //***************************OPTIONS & DIFFICULTY***************************
 //Option Generator
-/*Option format: [
-  Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
+/*Option format:
+  [Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
   1 <colour diff>
   2 <shape diff>
   3 <size diff>
@@ -138,7 +138,7 @@ void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places opt
   //return resultOptions;
 }
 
-//***************************ROUNDS***************************
+//***************************GAME***************************
 class gameRound { //Stores one round (ie one choice)
   private:
   public:
@@ -276,7 +276,6 @@ void setup() {
 
   setupWIFI();
   setupMQTT();
-  //MQTTclient.loop();
 
   //OptionsGenerator(String("0110111110"));
   /*gameRound firstGame = gameRound(String("0110111110"));
