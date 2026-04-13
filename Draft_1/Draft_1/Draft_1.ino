@@ -17,9 +17,9 @@
 
 //Switches
 #define SW1_PIN 22 //pull-up, connect other end of switch to ground
-#define SW2_PIN 22 //pull-up, connect other end of switch to ground
-#define SW3_PIN 22 //pull-up, connect other end of switch to ground
-#define SW4_PIN 22 //pull-up, connect other end of switch to ground
+#define SW2_PIN 4 //pull-up, connect other end of switch to ground
+#define SW3_PIN 12 //pull-up, connect other end of switch to ground
+#define SW4_PIN 13 //pull-up, connect other end of switch to ground //This is slower for some reason
 
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
@@ -57,6 +57,9 @@ static PubSubClient MQTTclient(WiFiC); //Initial partial configuration of PubSub
 TaskHandle_t MQTTloopTask = NULL;
 TaskHandle_t mainTask = NULL;
 
+//***************************GLOBAL VAIRABLES***************************
+int buttonFlags[4] = {0, 0, 0, 0}; //1 indicates button got pressed, -1 indicates released
+
 //******************************************************CODE******************************************************
 
 //***************************DEBUG & ERROR***************************
@@ -90,26 +93,30 @@ void errorMessage(const char* message) { //Send an error message out via MQTT & 
 void ledStrip(bool onOff) { //Turn the LED Strip on or off
   digitalWrite(LED_PIN, onOff);
     if (onOff) {
-      debugMessage(String("LED Strip on"))
+      digitalWrite(LED_PIN, 1);
+      debugMessage(String("LED Strip on"));
     }
     if (onOff == false) {
-      debugMessage(String("LED Strip off"))
+      digitalWrite(LED_PIN, 0);
+      debugMessage(String("LED Strip off"));
     }
 }
 
 void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=on
   digitalWrite(VIBRATION_PIN, onOff);
   if (onOff) {
-    debugMessage(String("Vibration motor on"))
+    digitalWrite(VIBRATION_PIN, 1);
+    debugMessage(String("Vibration motor on"));
   }
   if (onOff == false) {
-    debugMessage(String("Vibration motor off"))
+    digitalWrite(VIBRATION_PIN, 0);
+    debugMessage(String("Vibration motor off"));
   }
 }
 
 void playAudio(int track, int folder) { //Play audio from the Audio Module
   audioModule.playTrackInFolder(track, folder);
-  debugMessage(String("MP3 Playing: Track ") + Track + String(" within folder ") + Folder);
+  debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
 void spinWhells(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
@@ -174,7 +181,7 @@ void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places opt
 }
 
 //***************************GAME***************************
-class gameOption {
+/*class gameOption {
   private:
   public:
     bool isInitialised = false;
@@ -190,9 +197,9 @@ class gameOption {
       
 
     gameOption(String setupString) {
-      if (setupString.length() != 
-      setupStringCharArray[10] = {NULL};
-      setupString.toCharArray()
+      //if (setupString.length() != 
+      //setupStringCharArray[10] = {NULL};
+      //setupString.toCharArray();
       int colourVariant = -1;
       int shapeVariant = -1;
       int sizeVariant = -1;
@@ -211,7 +218,7 @@ class gameOption {
 
 
 
-}
+};*/
 
 class gameRound { //Stores one round (ie one choice)
   private:
@@ -302,6 +309,7 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
   for (int i = 0; i < length; i++) {
     messageTemp[i] = (char)message[i];
   }
+  String messageString = String(messageTemp);
   //Print to serial
   Serial.print("Topic: ");
   Serial.println(topic);
@@ -310,7 +318,25 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
 
   //Handle them
   if(String(topic) == espCommands_topic) {
-    
+    if(messageString.substring(0, 3) == "LED") { //The starting index is inclusive (the corresponding character is included in the substring), but the optional ending index is exclusive (the corresponding character is not included in the substring)
+      if(messageString.substring(4, 5) == "1") {
+        ledStrip(1);
+      }
+      else if(messageString.substring(4, 5) == "0") {
+        ledStrip(0);
+      }
+    }
+  }
+
+  if(String(topic) == espCommands_topic) {
+    if(messageString.substring(0, 3) == "MTR") { //The starting index is inclusive (the corresponding character is included in the substring), but the optional ending index is exclusive (the corresponding character is not included in the substring)
+      if(messageString.substring(4, 5) == "1") {
+        vibrationMotor(1);
+      }
+      else if(messageString.substring(4, 5) == "0") {
+        vibrationMotor(0);
+      }
+    }
   }
 }
 
@@ -335,6 +361,36 @@ void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly
   }
 }
 
+//***************************interrupts --> callbacks for buttons***************************
+//UNRELIABLE. Possibly because the buttons not debounced or callbacks change the values faster than the loop() function can
+//0 : MQTT_CONNECTED - the client is connected
+//MQTTclient.state()
+
+void switchCallbacks(int switchNum, bool endDigitalRead) { //called when digital input goes from high to low or vice versa, switchNum is 1 indexed
+  if (endDigitalRead) { //if current state high, means pin went from low to high, means went from depressed to released
+    buttonFlags[switchNum-1] = -1; //-1 indicates that it got "unpressed"
+  }
+  else { //went from high to low means from released to depressed
+    buttonFlags[switchNum-1] = 1;
+  }
+}
+
+void ARDUINO_ISR_ATTR SW1_callback() { //Called when the button goes from pressed to unpressed or vice versa
+  switchCallbacks(1, digitalRead(SW1_PIN));
+
+}
+
+void ARDUINO_ISR_ATTR SW2_callback() { //Called when the button goes from pressed to unpressed or vice versa
+  switchCallbacks(2, digitalRead(SW2_PIN));
+}
+
+void ARDUINO_ISR_ATTR SW3_callback() { //Called when the button goes from pressed to unpressed or vice versa
+  switchCallbacks(3, digitalRead(SW3_PIN));
+}
+
+void ARDUINO_ISR_ATTR SW4_callback() { //Called when the button goes from pressed to unpressed or vice versa
+  switchCallbacks(4, digitalRead(SW4_PIN));
+}
 
 //***************************SETUP & LOOP***************************
 void setup() {
@@ -350,6 +406,9 @@ void setup() {
   pinMode(VIBRATION_PIN, OUTPUT);
   //Switch
   pinMode(SW1_PIN, INPUT_PULLUP);
+  pinMode(SW2_PIN, INPUT_PULLUP);
+  pinMode(SW3_PIN, INPUT_PULLUP);
+  pinMode(SW4_PIN, INPUT_PULLUP);
 
   //***************************INITIALISATION***************************
   audioModule.setVolume(30);
@@ -357,6 +416,13 @@ void setup() {
 
   setupWIFI();
   setupMQTT();
+
+  //***************************ATTACH INTERRUPTS***************************
+  attachInterrupt(SW1_PIN, SW1_callback, CHANGE);
+  attachInterrupt(SW2_PIN, SW2_callback, CHANGE);
+  attachInterrupt(SW3_PIN, SW3_callback, CHANGE);
+  attachInterrupt(SW4_PIN, SW4_callback, CHANGE);
+  debugMessage("Interrupts attached");
 
   //OptionsGenerator(String("0110111110"));
   /*gameRound firstGame = gameRound(String("0110111110"));
@@ -372,6 +438,20 @@ void setup() {
 }
 
 void loop() {
+  delay(1000);
+  for (int i = 0; i<4; i++) {
+    if(buttonFlags[i] != 0) { //there is a button pressed or released
+      if(buttonFlags[i] == 1) {
+        debugMessage(String("Switch ") + int(i+1) + String(" pressed"));
+        buttonFlags[i] = 0;
+      }
+      
+      else { //button pressed
+        debugMessage(String("Switch ") + int(i+1) + String(" unpressed"));
+        buttonFlags[i] = 0;
+      }
+    }
+  }
   // put your main code here, to run repeatedly:
   /*if (digitalRead(SW1_PIN) == 1) {
     audioModule.playTrackInFolder(1, 1);
@@ -395,3 +475,4 @@ void loop() {
     }
   }*/
 }
+

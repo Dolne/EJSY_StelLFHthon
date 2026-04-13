@@ -34,6 +34,6 @@ MQTT:
 - espCommands: messages to the esp controlling its hardware
 
 espCommands:
-- "MTR ON" / "MTR OFF": vibration motor
-- "LED ON" / "LED OFF": LED Strip
+- "MTR 1" / "MTR 0": vibration motor
+- "LED 1" / "LED 0": LED Strip
 - "MP3 15 2": play track 15 (ie .mp3 file whose name is prefixed w "015") which is within folder "02"
