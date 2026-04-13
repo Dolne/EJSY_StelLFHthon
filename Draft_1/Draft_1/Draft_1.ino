@@ -17,6 +17,9 @@
 
 //Switches
 #define SW1_PIN 22 //pull-up, connect other end of switch to ground
+#define SW2_PIN 22 //pull-up, connect other end of switch to ground
+#define SW3_PIN 22 //pull-up, connect other end of switch to ground
+#define SW4_PIN 22 //pull-up, connect other end of switch to ground
 
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
@@ -26,18 +29,21 @@
 //WiFI settings
 const char *hostname = "hthon_ESP";
 const char *ssid = "TP-Link_8E20"; //WiFi SSID
-const char *password = "P@ssw0rd123"; //WiFi password
+const char *password = "P@ssw0rd123"; //WiFi password //Admin panel pw P@sw0rd123
 
 //MQTT settings
 const char *clientID = "hthon_ESP";
 const char *mqttServerIP = "192.168.1.101"; //MQTT server IP address e.g. 192.168.18.3
 
-//MQTT TOPIC NAMES 
+//MQTT TOPIC NAMES
+//Send
 const char* debug_topic = "debugMessage";
 const char* error_topic = "errorMessage";
 const char* display_topic = "display";
+//Receive (Subscribe)
 const char* settings_topic = "settings";
-
+const char* espCommands_topic = "espCommands";
+//TOADD: Could change the above to an array of subcriptions
 
 //***************************DECLARATIONS***************************
 //Audio Module
@@ -54,30 +60,59 @@ TaskHandle_t mainTask = NULL;
 //******************************************************CODE******************************************************
 
 //***************************DEBUG & ERROR***************************
-void debugMessage(char* message) { //Send a debugging message out, for now via USB Serial only
+void debugMessage(char* message) { //Send a debugging message out via MQTT & USB Serial
   Serial.println(message);
   MQTTpublishWithSerial(debug_topic, message);
 }
 
-void debugMessage(const char* message) { //Send a debugging message out, for now via USB Serial only
+void debugMessage(const char* message) { //Send a debugging message out via MQTT & USB Serial
   Serial.println(message);
   MQTTpublishWithSerial(debug_topic, message);
 }
 
-void debugMessage(String message) { //Send a debugging message out, for now via USB Serial only
+void debugMessage(String message) { //Send a debugging message out via MQTT & USB Serial
   Serial.println(message.c_str());
   MQTTpublishWithSerial(debug_topic, message.c_str());
 }
 
-void errorMessage(char* message) { //Send an error message out, for now via USB Serial only
+void errorMessage(char* message) { //Send an error message out via MQTT & USB Serial
   Serial.println(message);
   MQTTpublishWithSerial(error_topic, message);
 }
 
-void errorMessage(const char* message) { //Send an error message out, for now via USB Serial only
+void errorMessage(const char* message) { //Send an error message out via MQTT & USB Serial
   Serial.println(message);
   MQTTpublishWithSerial(error_topic, message);
 }
+
+//***************************HARDWARE FUNCTIONS***************************
+//These exist in place of directly calling the relevant functions to enable debugging & error messages
+void ledStrip(bool onOff) { //Turn the LED Strip on or off
+  digitalWrite(LED_PIN, onOff);
+    if (onOff) {
+      debugMessage(String("LED Strip on"))
+    }
+    if (onOff == false) {
+      debugMessage(String("LED Strip off"))
+    }
+}
+
+void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=on
+  digitalWrite(VIBRATION_PIN, onOff);
+  if (onOff) {
+    debugMessage(String("Vibration motor on"))
+  }
+  if (onOff == false) {
+    debugMessage(String("Vibration motor off"))
+  }
+}
+
+void playAudio(int track, int folder) { //Play audio from the Audio Module
+  audioModule.playTrackInFolder(track, folder);
+  debugMessage(String("MP3 Playing: Track ") + Track + String(" within folder ") + Folder);
+}
+
+void spinWhells(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
 
 //***************************OPTIONS & DIFFICULTY***************************
 //Option Generator
@@ -139,6 +174,45 @@ void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places opt
 }
 
 //***************************GAME***************************
+class gameOption {
+  private:
+  public:
+    bool isInitialised = false;
+    int colourVariant = -1;
+    int shapeVariant = -1;
+    int sizeVariant = -1;
+    int pitchVariant = -1;
+    int loudnessVariant = -1;
+    int timbreVariant = -1;
+    int leftRightVariant = -1; //0 is left, 9 is right
+    int textureVariant = -1;
+    int tempvariant = -1;
+      
+
+    gameOption(String setupString) {
+      if (setupString.length() != 
+      setupStringCharArray[10] = {NULL};
+      setupString.toCharArray()
+      int colourVariant = -1;
+      int shapeVariant = -1;
+      int sizeVariant = -1;
+      int pitchVariant = -1;
+      int loudnessVariant = -1;
+      int timbreVariant = -1;
+      int leftRightVariant = -1; //0 is left, 9 is right
+      int textureVariant = -1;
+      int tempvariant = -1;
+      
+    }
+
+    gameOption(char *setupString) {
+
+    }
+
+
+
+}
+
 class gameRound { //Stores one round (ie one choice)
   private:
   public:
@@ -218,7 +292,7 @@ void setupMQTT() { //Also subscribes to the appropriate MQTT topics for fleet or
   
   //Subscriptions
   MQTTclient.subscribe(settings_topic);
-  //MQTTclient.loop();
+  MQTTclient.subscribe(espCommands_topic);
 }
 
 void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do the messages receive end in null?
@@ -233,6 +307,11 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
   Serial.println(topic);
   Serial.print("Message: ");
   Serial.println(messageTemp);
+
+  //Handle them
+  if(String(topic) == espCommands_topic) {
+    
+  }
 }
 
 void MQTTpublishWithSerial(const char* topic, const char* payload) {
@@ -256,6 +335,8 @@ void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly
   }
 }
 
+
+//***************************SETUP & LOOP***************************
 void setup() {
   //***************************CONSTRUCTORS***************************
   //Audio Module
@@ -287,7 +368,6 @@ void setup() {
   }*/
 
   gameOverall game = gameOverall("0110111110");
-
   xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
 }
 

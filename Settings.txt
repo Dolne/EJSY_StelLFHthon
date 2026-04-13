@@ -1,19 +1,39 @@
+RASPI:
 device name: lf-hthon
 username: lf
 password: singtel
-
-WiFi: Deco Ong
-Password: KCJ-Ong/57!
-
 keyring password: hackthon
+Raspi IP = MQTT server IP:
 
 raspi set up w
-1. mosquito mqtt broker (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
-
+-  mosquito mqtt broker (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
+- python libraries installed in development environment: paho-mqtt, matplotlib
 raspi ip address: 192.168.1.101
 
-Code must be uploaded using the "ESP32 Dev Module" board, not anything else (e.g. "ESP32-WROOM-DA Module")
+WIFI:
+WiFi SSID: TP-Link_8E20
+Password: P@ssw0rd123
+Admin panel password: P@sw0rd123
 
-python libraries required on raspi
-- paho-mqtt
-- matplotlib
+ESP32:
+- Code must be uploaded using the "ESP32 Dev Module" board, not anything else (e.g. "ESP32-WROOM-DA Module")
+- python libraries required on raspi
+- WiFi hostname = MQTT client ID = "hthon_ESP"
+
+microsd card containing the audio
+- https://github.com/bluejunimo/YX5300_ESP32
+1. First, format your microSD card as FAT16 or FAT32.
+2. Then, create however many folders you want starting with the label "01" and incrementing with each new folder. Think of folders as different playlists.
+3. Your tracks need to have a 3-digit prefix at the start. They each must be unique (not just within, but between folders too), but naming them sequentially is the easiest way. Anything after the prefix is ignored by the module.
+
+MQTT:
+- debugMessage: debug messages from esp (like SerialPrintln)
+- errorMessage: non-fatal error messages from esp
+- display: messages from esp to raspi telling it what to display
+- settings: messages to the esp telling it what settings to change
+- espCommands: messages to the esp controlling its hardware
+
+espCommands:
+- "MTR ON" / "MTR OFF": vibration motor
+- "LED ON" / "LED OFF": LED Strip
+- "MP3 15 2": play track 15 (ie .mp3 file whose name is prefixed w "015") which is within folder "02"
