@@ -8,6 +8,7 @@ Raspi IP = MQTT server IP:
 raspi set up w
 -  mosquito mqtt broker (https://randomnerdtutorials.com/how-to-install-mosquitto-broker-on-raspberry-pi/)
 - python libraries installed in development environment: paho-mqtt, matplotlib
+the raspi sometimes refuses to cooperate/connects to the 5G network
 raspi ip address: 192.168.1.101
 
 WIFI:
