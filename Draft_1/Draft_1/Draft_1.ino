@@ -363,6 +363,7 @@ void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly
 
 //***************************interrupts --> callbacks for buttons***************************
 //UNRELIABLE. Possibly because the buttons not debounced or callbacks change the values faster than the loop() function can
+//Maybe have some thing that logs the history
 //0 : MQTT_CONNECTED - the client is connected
 //MQTTclient.state()
 
@@ -411,7 +412,7 @@ void setup() {
   pinMode(SW4_PIN, INPUT_PULLUP);
 
   //***************************INITIALISATION***************************
-  audioModule.setVolume(30);
+  audioModule.setVolume(10);
   Serial.begin(115200);
 
   setupWIFI();
@@ -435,6 +436,9 @@ void setup() {
 
   gameOverall game = gameOverall("0110111110");
   xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
+
+  //Play music (for debug test)
+  audioModule.playTrackInFolder(1, 1);
 }
 
 void loop() {
