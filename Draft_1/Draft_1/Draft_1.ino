@@ -370,6 +370,9 @@ void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly
 
     //Run the loop to ensure messages are received
     MQTTclient.loop();
+
+    vTaskDelay(pdMS_TO_TICKS(10));
+    //yield for 10 ms
     //delay(100);
   }
 }
