@@ -96,7 +96,7 @@ void ledStrip(bool onOff) { //Turn the LED Strip on or off
       digitalWrite(LED_PIN, 1);
       debugMessage(String("LED Strip on"));
     }
-    if (onOff == false) {
+    else {
       digitalWrite(LED_PIN, 0);
       debugMessage(String("LED Strip off"));
     }
@@ -108,7 +108,7 @@ void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=o
     digitalWrite(VIBRATION_PIN, 1);
     debugMessage(String("Vibration motor on"));
   }
-  if (onOff == false) {
+  else {
     digitalWrite(VIBRATION_PIN, 0);
     debugMessage(String("Vibration motor off"));
   }
@@ -119,7 +119,7 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
-void spinWhells(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
+void spinWheels(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
 
 //***************************OPTIONS & DIFFICULTY***************************
 //Option Generator
@@ -281,7 +281,7 @@ void setupWIFI() {
   Serial.println(WiFi.localIP());
 }
 
-void setupMQTT() { //Also subscribes to the appropriate MQTT topics for fleet or lift adapters
+void setupMQTT() { //Also subscribes to the appropriate MQTT topics
   //Config MQTT
   MQTTclient.setServer(mqttServerIP, 1883); //mqtt_server IP address
   MQTTclient.setCallback(receiveMQTTCallback);
@@ -317,7 +317,9 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
   Serial.println(messageTemp);
 
   //Handle them
-  if(String(topic) == espCommands_topic) {
+  if(String(topic) == espCommands_topic) { //Handle commands to do hardware things
+
+    //LED Strip
     if(messageString.substring(0, 3) == "LED") { //The starting index is inclusive (the corresponding character is included in the substring), but the optional ending index is exclusive (the corresponding character is not included in the substring)
       if(messageString.substring(4, 5) == "1") {
         ledStrip(1);
@@ -326,9 +328,8 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
         ledStrip(0);
       }
     }
-  }
 
-  if(String(topic) == espCommands_topic) {
+    //Vibration Motor
     if(messageString.substring(0, 3) == "MTR") { //The starting index is inclusive (the corresponding character is included in the substring), but the optional ending index is exclusive (the corresponding character is not included in the substring)
       if(messageString.substring(4, 5) == "1") {
         vibrationMotor(1);
@@ -337,6 +338,18 @@ void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do
         vibrationMotor(0);
       }
     }
+
+    //MP3 Audio Player
+    //FOR SIM: String messageString = String("MP3 1 2");
+    if(messageString.substring(0, 3) == "MP3") { //The starting index is inclusive (the corresponding character is included in the substring), but the optional ending index is exclusive (the corresponding character is not included in the substring)
+      int charDividing = messageString.indexOf(" ", 4); //The index of th character dividing the track number and folder number
+      int trackNum = messageString.substring(4, charDividing).toInt();
+      int folderNum = messageString.substring(charDividing).toInt();
+      playAudio(trackNum, folderNum);
+      /*FOR SIM: Serial.println(folderNum);
+      Serial.println(trackNum);*/
+    }
+
   }
 }
 
@@ -357,12 +370,12 @@ void MQTTloop(void* pvParameters) { //Core for 2nd core (core 1) that constantly
 
     //Run the loop to ensure messages are received
     MQTTclient.loop();
-    delay(100); //Delay is needed else this task interferes with IR transmitting
+    //delay(100);
   }
 }
 
 //***************************interrupts --> callbacks for buttons***************************
-//UNRELIABLE. Possibly because the buttons not debounced or callbacks change the values faster than the loop() function can
+//UNRELIABLE. Possibly because the buttons not debounced or callbacks change the values faster than the loop() function can or the 100ms sleep in the mqtt loop was slowing it down
 //Maybe have some thing that logs the history
 //0 : MQTT_CONNECTED - the client is connected
 //MQTTclient.state()
@@ -378,7 +391,6 @@ void switchCallbacks(int switchNum, bool endDigitalRead) { //called when digital
 
 void ARDUINO_ISR_ATTR SW1_callback() { //Called when the button goes from pressed to unpressed or vice versa
   switchCallbacks(1, digitalRead(SW1_PIN));
-
 }
 
 void ARDUINO_ISR_ATTR SW2_callback() { //Called when the button goes from pressed to unpressed or vice versa
@@ -414,7 +426,6 @@ void setup() {
   //***************************INITIALISATION***************************
   audioModule.setVolume(10);
   Serial.begin(115200);
-
   setupWIFI();
   setupMQTT();
 
