@@ -56,7 +56,9 @@ class Wheel:
         
         # go directly to the blank
         if i == 0:
-            self.active_animation = Animation(self.t, self.t(), self.pos_distance(int(self.pos), to_pos) * 200 + 1, self.pos, to_pos)
+            dist = self.pos_distance(int(self.pos), to_pos)
+            # animate to self.pos + dist instead of to_pos to ensure wheel always spins the same way
+            self.active_animation = Animation(self.t, self.t(), dist * 200 + 1, self.pos, self.pos + dist)
         
         # spin to shape
         elif i < len(self.shapes):
