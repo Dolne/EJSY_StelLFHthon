@@ -29,6 +29,8 @@ def launch():
         start_time = int(datetime.now().timestamp() * 1000)
         time_elapsed = lambda: int(datetime.now().timestamp() * 1000) - start_time
         
+        selected_changed = True
+        
         def on_connect(client: mqtt.Client, userdata: Any, flags: mqtt.ConnectFlags, reason_code: mqtt.ReasonCode, props: Union[mqtt.Properties, None]): # pyright: ignore[reportPrivateImportUsage]
             print(f"connected with result code {reason_code}")
             client.subscribe('display/slots/+')
@@ -40,6 +42,8 @@ def launch():
                 return
             print(message.topic, int(message.payload))
             if message.topic == 'display/selected':
+                nonlocal selected_changed
+                selected_changed = True
                 for s in slots:
                     # 0 means no slot selected
                     # 1-4 means the respective slot is selected
@@ -58,6 +62,8 @@ def launch():
         mqttc.connect_async(MQTT_HOST, 1883, 60)
         mqttc.loop_start()
         
+        connected = mqttc.is_connected()
+        
         w = surface.get_width()
         
         manager = StatusManager(SLOT_COUNT, mqttc)
@@ -68,14 +74,35 @@ def launch():
                 if event.type == pygame.QUIT:
                     running = False
                     
-            surface.fill((244, 244, 244))
+            # only re render if there are changes:
+            has_changes = False
+            
+            # 1. connection status changed
+            #    update status indicator
+            if mqttc.is_connected() != connected:
+                connected = mqttc.is_connected()
+                has_changes = True
+            
+            # 2. wheel(s) are active
+            #    render the wheels spinning
+            has_changes = has_changes or manager.status()
+            
+            # 3. selection changed
+            #    update the selection arrow
+            has_changes = has_changes or selected_changed
+                
+            if has_changes:
                     
-            for slot in slots:
-                slot.render()
-            
-            pygame.draw.circle(surface, (0,240,0) if mqttc.is_connected() else (100,0,0), (20,20), 10)
-            
-            pygame.display.update()
+                surface.fill((244, 244, 244))
+                        
+                for slot in slots:
+                    slot.render()
+                selected_changed = False
+                
+                # connection indicator
+                pygame.draw.circle(surface, (0,240,0) if connected else (100,0,0), (20,20), 10)
+                
+                pygame.display.update()
             
             clock.tick(FPS_LIMIT)
         

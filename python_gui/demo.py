@@ -26,7 +26,8 @@ def set_selected(slot):
     publish.single('display/selected', slot)
     
 print('running demo...')
-    
+
+set_selected(0)
 set_slots([1,1,7,1])
 
 set_selected(1)

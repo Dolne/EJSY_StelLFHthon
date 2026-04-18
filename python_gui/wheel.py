@@ -11,13 +11,16 @@ class StatusManager:
     def __init__(self, count: int, client: Client):
         self.slot_status = [False for _ in range(count)]
         self.client = client
+        
+    def status(self):
+        return any(self.slot_status)
     
     def update_status(self, index: int, status: bool):
-        prev = any(self.slot_status)
+        prev = self.status()
         if index > 0 and index <= len(self.slot_status):
             # index starts from 1 so we -1 to make it 0-indexed
             self.slot_status[index-1] = status
-        curr = any(self.slot_status)
+        curr = self.status()
         if curr != prev:
             self.client.publish('display/status', int(curr))
 
@@ -96,7 +99,8 @@ class Wheel:
         bottom = math.floor(self.pos)
         top = (bottom+1) % len(self.shapes)
         offset = (self.pos - bottom) * height
-        self.surface.blit(self.shapes[top], (0,0), (0, height - offset, width, height))
+        if offset > 0:
+            self.surface.blit(self.shapes[top], (0,0), (0, height - offset, width, height))
         self.surface.blit(self.shapes[bottom], (0, offset), (0, 0, width, height - offset))
         
         self.surface.blit(self.border, (0,0))
