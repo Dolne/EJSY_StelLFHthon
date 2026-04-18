@@ -37,22 +37,33 @@ def render_shape(shape: int, colour: int, size: int, width: int, i: int) -> pyga
     surface.set_colorkey((0,0,0))
     surface.fill((0,0,0))
     
-    col = 'blue' if colour == 0 else 'orange'
+    fill = (0, 85, 255) if colour == 0 else (255, 128, 54)
+    border = (0, 66, 198) if colour == 0 else (237, 96, 15)
     scale = 1 if size == 1 else SMALL_SCALE
     
     pts: list[tuple[int,int]] = []
     if shape == SQUARE:
         pts = square_pts(width, 0.7 * scale)
     elif shape == DIAMOND:
-        pts = diamond_pts(width, 0.9 * scale)
+        pts = diamond_pts(width, 0.8 * scale)
     elif shape == TRIANGLE:
         pts = triangle_pts(width, 0.8 * scale)
     
-    pygame.draw.polygon(surface, col, pts)
+    pygame.draw.polygon(surface, fill, pts)
+    pygame.draw.polygon(surface, border, pts, width=int(width * 0.1))
+    
+    # the border is drawn centered, but we only want to inner border
+    # as the border does not join outer corners
+    # so we mask out anything outside the shape
+    mask = pygame.Surface((width, width))
+    mask.set_colorkey((255, 255, 255))
+    mask.fill((0,0,0))
+    pygame.draw.polygon(mask, (255, 255, 255), pts)
+    surface.blit(mask, (0,0))
     
     # temporary display shape index for debugging/testing
-    text = pygame.font.SysFont('Arial', 32).render(str(i), False, 'red')
-    surface.blit(text, (0,0))
+    text = pygame.font.SysFont('Arial', 32).render(str(i), False, (200, 200, 200))
+    surface.blit(text, (width // 10, width // 10))
     
     return surface
         

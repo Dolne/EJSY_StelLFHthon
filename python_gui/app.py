@@ -68,7 +68,7 @@ def launch():
                 if event.type == pygame.QUIT:
                     running = False
                     
-            surface.fill((32,32,32))
+            surface.fill((244, 244, 244))
                     
             for slot in slots:
                 slot.render()

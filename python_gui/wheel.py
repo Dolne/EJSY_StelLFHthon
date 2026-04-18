@@ -28,6 +28,11 @@ class Wheel:
         self.t = t
         self.dest = dest
         self.surface = pygame.Surface((size, size))
+        self.surface.set_colorkey((0,0,0))
+        self.surface.fill((0,0,0))
+        
+        self.border = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.rect(self.border, (0, 0, 0, 12), (0, 0, size, size), size // 25, size // 10)
         
         shapes = [shape.render_shape(s, i//2, (i+1)%2, size, i*3 + s + 1) for i in range(3) for s in range(3)]
         blank = pygame.Surface((size, size))
@@ -83,13 +88,17 @@ class Wheel:
                 self.active_animation = None
                 if self.manager != None:
                     self.manager.update_status(self.index, False)
+                    
+        width = self.surface.get_width()
+        height = self.surface.get_height()
+        pygame.draw.rect(self.surface, (234, 234, 234), (0, 0, width, height), 0, width // 10)
 
         bottom = math.floor(self.pos)
         top = (bottom+1) % len(self.shapes)
-        height = self.surface.get_height()
         offset = (self.pos - bottom) * height
-        width = self.surface.get_width()
-        self.surface.fill((255,255,255))
         self.surface.blit(self.shapes[top], (0,0), (0, height - offset, width, height))
         self.surface.blit(self.shapes[bottom], (0, offset), (0, 0, width, height - offset))
+        
+        self.surface.blit(self.border, (0,0))
+        
         self.dest.blit(self.surface, self.coords)
