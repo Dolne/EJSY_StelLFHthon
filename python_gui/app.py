@@ -23,7 +23,7 @@ def launch():
     try:
         pygame.init()
         pygame.font.init()
-        surface = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN | pygame.SCALED) # pygame.FULLSCREEN | pygame.SCALED
+        surface = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN | pygame.SCALED)
         clock = pygame.time.Clock()
         running = True
         start_time = int(datetime.now().timestamp() * 1000)

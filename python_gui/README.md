@@ -57,22 +57,21 @@ Each topic corresponds to one slot, using the same index 1-4 as `display/selecte
 
 Value `0` means a blank, and is used to "disable" the slot.
 
-Values `1-9` refer to the shapes to display.
+Values `1-8` refer to the shapes to display.
 
 > [!NOTE]
 > THe number of shapes and what each of the shapes are is still subject to change.
 
-Currently, the 9 shapes are:
+Currently, the 8 shapes are:
 
-1. large blue square
-2. large blue diamond
-3. large blue triangle
-4. small blue square
-5. small blue diamond
-6. small blue triangle
-7. large orange square
-8. large orange diamond
-9. large orange triangle
+1. small blue triangle
+2. large blue triangle
+3. small orange triangle
+4. large orange triangle
+5. small blue square
+6. large blue square
+7. small orange square
+8. large orange square
 
 ### `display/status`
 

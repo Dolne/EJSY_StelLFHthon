@@ -2,9 +2,8 @@ import math
 from typing import Union
 import pygame
 
-SQUARE = 0
-DIAMOND = 1
-TRIANGLE = 2
+TRIANGLE = 0
+SQUARE = 1
 
 CONTENT_SCALE = 0.8
 SMALL_SCALE = 0.6
@@ -12,12 +11,6 @@ SMALL_SCALE = 0.6
 def square_pts(width: int, scale: float):
     w = int(width * scale)
     pts = [(0, 0), (0, w), (w, w), (w, 0)]
-    offset = (width - w) // 2
-    return offset_pts(pts, offset, offset)
-
-def diamond_pts(width: int, scale: float):
-    w = int(width * scale)
-    pts = [(w//2, 0), (w, w//2), (w//2, w), (0, w//2)]
     offset = (width - w) // 2
     return offset_pts(pts, offset, offset)
 
@@ -42,12 +35,10 @@ def render_shape(shape: int, colour: int, size: int, width: int, i: int) -> pyga
     scale = 1 if size == 1 else SMALL_SCALE
     
     pts: list[tuple[int,int]] = []
-    if shape == SQUARE:
-        pts = square_pts(width, 0.7 * scale)
-    elif shape == DIAMOND:
-        pts = diamond_pts(width, 0.8 * scale)
-    elif shape == TRIANGLE:
+    if shape == TRIANGLE:
         pts = triangle_pts(width, 0.8 * scale)
+    elif shape == SQUARE:
+        pts = square_pts(width, 0.7 * scale)
     
     pygame.draw.polygon(surface, fill, pts)
     pygame.draw.polygon(surface, border, pts, width=int(width * 0.1))

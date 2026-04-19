@@ -37,7 +37,7 @@ class Wheel:
         self.border = pygame.Surface((size, size), pygame.SRCALPHA)
         pygame.draw.rect(self.border, (0, 0, 0, 12), (0, 0, size, size), size // 25, size // 10)
         
-        shapes = [shape.render_shape(s, i//2, (i+1)%2, size, i*3 + s + 1) for i in range(3) for s in range(3)]
+        shapes = [shape.render_shape(a, b, c, size, a * 4 + b * 2 + c + 1) for a in range(2) for b in range(2) for c in range(2)]
         blank = pygame.Surface((size, size))
         blank.set_colorkey((0,0,0))
         blank.fill((0,0,0))
