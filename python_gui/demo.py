@@ -40,7 +40,7 @@ set_selected(4)
 time.sleep(1)
 set_selected(0)
 
-set_slots([2,2,5,0])
+set_slots([2,2,6,0])
 
 set_selected(1)
 time.sleep(1)

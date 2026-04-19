@@ -59,6 +59,8 @@ Value `0` means a blank, and is used to "disable" the slot.
 
 Values `1-8` refer to the shapes to display.
 
+Value `9` will display the slot number (1-4).
+
 > [!NOTE]
 > THe number of shapes and what each of the shapes are is still subject to change.
 

@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 import random
 from typing import Callable, Union
 
@@ -37,11 +38,16 @@ class Wheel:
         self.border = pygame.Surface((size, size), pygame.SRCALPHA)
         pygame.draw.rect(self.border, (0, 0, 0, 12), (0, 0, size, size), size // 25, size // 10)
         
-        shapes = [shape.render_shape(a, b, c, size, a * 4 + b * 2 + c + 1) for a in range(2) for b in range(2) for c in range(2)]
         blank = pygame.Surface((size, size))
         blank.set_colorkey((0,0,0))
         blank.fill((0,0,0))
-        shapes.insert(0, blank)
+        
+        image = pygame.image.load(Path(__file__).parent / 'img' / f'{index}.png').convert()
+        num = pygame.transform.scale(image, (size, size))
+        num.set_colorkey((0,0,0))
+        
+        shapes = [blank] + [shape.render_shape(a, b, c, size, a * 4 + b * 2 + c + 1) for a in range(2) for b in range(2) for c in range(2)] + [num]
+        
         self.shuffle_map = [i for i in range(len(shapes))]
         if shuffle == False:
             pass
@@ -62,14 +68,14 @@ class Wheel:
         i = i % len(self.shapes)
         to_pos = self.map_pos(i)
         
-        # go directly to the blank
-        if i == 0:
+        # go directly to the blank or number
+        if i == 0 or i == len(self.shapes) - 1:
             dist = self.pos_distance(int(self.pos), to_pos)
             # animate to self.pos + dist instead of to_pos to ensure wheel always spins the same way
             self.active_animation = Animation(self.t, self.t(), dist * 200 + 1, self.pos, self.pos + dist)
         
         # spin to shape
-        elif i < len(self.shapes):
+        elif i < len(self.shapes) - 1:
             self.active_animation = Animation(self.t, self.t(), 6000 + self.index * 250, self.pos, to_pos + len(self.shapes) * 4)
 
         else:
