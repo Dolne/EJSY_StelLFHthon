@@ -57,4 +57,3 @@ def render_shape(shape: int, colour: int, size: int, width: int, i: int) -> pyga
     surface.blit(text, (width // 10, width // 10))
     
     return surface
-        
