@@ -34,6 +34,8 @@ const int TEXTURE_INDEX = 8; //1: Rough, 9: Smooth
 const int TEMPERATURE_INDEX = 9; //1: Low, 9: High
 const int TOTAL_INDEXES = 10;
 
+const int MAX_OPTIONS = 4;
+
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
 #define AUDIO_UART_RX 16 //Orange jumper
@@ -107,105 +109,121 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
 }
 
 //***************************GAME***************************
-//Game option - String object
+//Game option = a String object
 //Index 0: If option is initialised
-//each remaining index: 0=not showing a variant (e.g. no sound, no visual), 1-9 corresponds to a variant, with 1 and 9 being the most different. Check the const ints at the top for details. For prototype: Only 1 & 9.
+/*each remaining index's value:
+  - 0=not showing a variant (e.g. no sound, no visual)
+  - 1-9 corresponds to a variant
+    - 1 and 9 being the most different
+    - Check the const ints at the top for details
+    - For prototype: Only 1 & 9.*/
 
-void OptionsGenerator(String difficulty[4], String resultOptions[4]) { //Places options in resultOptions
+//Difficulty = a String object
+//Index 0: Always 0, not relevant
+/*each remaining index's value:
+  - 0 = not showing a variant (e.g. no sound, no visual)
+  - 1-8 = degree of variance
+    - 8 being greatest difference
+    - Check the const ints at the top for details
+    - For prototype: Only 0 or 8.
+    */
+
+
+/*Places options in resultOptions, a String array of length MAX_OPTIONS
+Returns the index of the odd option*/
+int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX_OPTIONS]) { 
   //* is the pointer to where the data is actually located
-  
-  if (difficulty.length() != 10) { //difficulty String must be 10 char
-    errorMessage(String(String("OptionsGenerator input not 10 char: ") + difficulty).c_str());
+
+  //Create blank template for options
+  char blankOption[TOTAL_INDEXES] = {NULL};
+  for (int i = 0; i < TOTAL_INDEXES; i++) {
+    blankOption[i] = '0';
   }
 
-  //String resultOptions[3];
-  int differentOptionIndex = random(0, 3); //Random int from 0 to 2 (function returns 0<=x<3)
-  debugMessage(String(String("different option (0-2): ") + differentOptionIndex).c_str());
+  //Validate inputs
+  if (difficulty.length() != TOTAL_INDEXES) { //difficulty String must be 10 char
+    errorMessage(String("Length of OptionsGenerator input isn't TOTAL_INDEXES, it's ") + difficulty);
+  }
 
-  //deep copy the difficulty into all 3 options
-  for (int i = 0; i <= 2; i++) {
-    resultOptions[i] = String(difficulty);
+  if ((numOptions == 3) || (numOptions == 4) ) { //Right now only set up for 3 or 4 options
+    errorMessage(String("Number of options requested isn't 3 or 4, it's ") + numOptions);
   }
-  
-  //modify the first character of each sub-array to fit that of the option format (only difference between option and difficulty format is the first character: difficulty vs variant)
-  for (int i = 0; i <= 2; i++) {
-    if (i == differentOptionIndex) {
-      resultOptions[differentOptionIndex].setCharAt(0, '9'); //Change the different option's variant
+
+  //Choose which option is different
+  int differentOptionIndex = random(0, numOptions+1); //Random int from 0 to numOptions-1 (function returns 0<=x<numOptions-1)
+  debugMessage(String("Different option index within resultOptions is ") + differentOptionIndex);
+
+  //Initialise options
+  for (int currentOption = 0; currentOption < MAX_OPTIONS; currentOption++) {
+    //Set to "000..."
+    resultOptions[currentOption] = String(blankOption);
+
+    //If actual option
+    if (i < numOptions) {
+      //change 0th index to 1
+      resultOptions[currentOption].setCharAt(INIT_INDEX, '1');
+      //Other indexes (1-9)
+      for (int indexWithinOption = 1; indexWithinOption < TOTAL_INDEXES, indexWithinOption++) {
+        if (difficulty.charAt(indexWithinOption) != 0) {//means this difference is activated
+          if (currentOption == differentOptionIndex) { //If odd 1 out, set 9
+            resultOptions[currentOption].setCharAt(indexWithinOption, '9');
+          }
+          else { //If others (not the odd 1 out), set 1
+            resultOptions[currentOption].setCharAt(indexWithinOption, '1');
+          }
+        }
+      }
     }
-    else { //The "normal" options
-      resultOptions[i].setCharAt(0, '0'); //TOADD: For now will always be 0, in future should depend on difficulty
-    }
-    debugMessage(String(String("Option ") + i + String("=") + resultOptions[i]).c_str()); //Cannot "+"" char[] and numbers
   }
-  
-  //return resultOptions;
+
+  //Print out all options
+  for (int i = 0; i < numOptions; i++) {
+      debugMessage("Option " + String(i) + ": " + resultOptions[i])
+  }
+
+  return differentOptionIndex;
 }
 
 class gameRound { //Stores one round (ie one choice)
   private:
   public:
     bool isInitialised = false;
-    String difficulty = String();
-    String options[3] = {String(), String(), String()}; //3 element array of the options in the relevant format
+    int numberOptions = NULL;
     int optionChosen = NULL;
+    int correctOption = NULL;
+    String difficulty = String();
+    String options[4] = {String(), String(), String(), String()}; //should be string array of length MAX_OPTIONS to pass into OptionsGenerator
+    
 
-    gameRound(String passedInDifficulty) {
+    gameRound(String passedInDifficulty, int numOptionsInput) {
+      numberOptions = numOptionsInput;
       difficulty = String(passedInDifficulty); //Deep copy because OptionsGenerator (next line) will modify the String object to "return" the output
-      OptionsGenerator(difficulty, options);
+      correctOption = OptionsGenerator(difficulty, numOptionsInput, options);
       isInitialised = true;
 
       /*debugMessage(options[0].c_str());
       debugMessage(options[1].c_str());
       debugMessage(options[2].c_str());*/
     }
-    gameRound() {}
 };
 
 class gameOverall { //Stores multiple game rounds
   //TOADD: More than 4 game rouns
   private:
   public:
-    String arrayOfDifficulties[4];
-    gameRound arrayOfRounds[4];
+    String arrayOfDifficulties[4]; //one per round
+    gameRound arrayOfRounds[4]; //one per round
 
-    gameOverall(String initialDifficulty) {
+    gameOverall(String initialDifficulty) { //initialDifficulty will be used for all rounds
       for (int i = 0; i<4; i++) {
         arrayOfDifficulties[i] = String(initialDifficulty); //Go back and check if rly need this deep copy
         debugMessage(String("Round" + String(i) + "difficulty: " + arrayOfDifficulties[i]));
-        arrayOfRounds[i] = gameRound();
+        arrayOfRounds[i] = gameRound(initialDifficulty, 4);
       }
     }
 
     //TOADD: Keeping score
 };
-
-//***************************OPTIONS & DIFFICULTY***************************
-//Option Generator
-/*Option format:
-  [Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
-  1 <colour diff>
-  2 <shape diff>
-  3 <size diff>
-  4 <pitch diff>
-  5 <loudness diff>
-  6 <timbre diff>
-  7 <left vs right diff (0 is left, 9 is right)>
-  8 <texture diff>
-  9 <temp diff>]
-*/
-
-/*Difficulty format: [
-  Index 0 <number from 0 to 2, with 0 being the easiest and 2 the hardest>
-  1 <colour diff>
-  2 <shape diff>
-  3 <size diff>
-  4 <pitch diff>
-  5 <loudness diff>
-  6 <timbre diff>
-  7 <left vs right diff (0 is left, 9 is right)>
-  8 <texture diff>
-  9 <temp diff>]
-*/
 
 //***************************HARDWARE FUNCTIONS***************************
 //These exist in place of directly calling the relevant functions to enable debugging & error messages
