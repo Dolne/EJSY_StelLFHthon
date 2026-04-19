@@ -131,7 +131,7 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
 
 /*Places options in resultOptions, a String array of length MAX_OPTIONS
 Returns the index of the odd option*/
-int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX_OPTIONS]) { 
+int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX_OPTIONS]) { //TOADD: Missing handler for e.g. shape diff but colour not diff
   //* is the pointer to where the data is actually located
 
   //Create blank template for options
@@ -225,6 +225,43 @@ class gameOverall { //Stores multiple game rounds
     //TOADD: Keeping score
 };
 
+int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only scanning
+  //Display visuals (if any)
+  //Generate the shape IDs
+  /*1. small blue triangle
+    2. large blue triangle
+    3. small orange triangle
+    4. large orange triangle
+    5. small blue square
+    6. large blue square
+    7. small orange square
+    8. large orange square*/
+  //Thus, 4*shape + 2*colour + size
+
+  int shapeIDs [4] = [1, 1, 1, 1]; //Hardcoded 4 wheels oops //TOADD
+  //TOADD: Missing handler for e.g. shape diff but colour not diff
+  for (int i = 0; i < round.numberOptions; i++) {
+    if(round.options.charAt(SIZE_INDEX) == 9) {
+      shapeIDs[i] += 1;
+    }
+    if(round.options.charAt(COLOUR_INDEX) == 9) {
+      shapeIDs[i] += 2;
+    }
+    if(round.options.charAt(SHAPE_INDEX) == 9) {
+      shapeIDs[i] += 4;
+    }
+  }
+  spinWheels(shapeIDs)
+
+  for (int j = 0; j < round.numberOptions; J++) {
+    //highlight option()
+    //read out 1-4
+    //play 1-4
+    //recognise when button pressed
+    //modify round object with option selected
+  }
+}
+
 //***************************HARDWARE FUNCTIONS***************************
 //These exist in place of directly calling the relevant functions to enable debugging & error messages
 void ledStrip(bool onOff) { //Turn the LED Strip on or off
@@ -256,7 +293,7 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
-void spinWheels(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
+void spinWheels(shapeIDs [4]) {} //TOADD: Implement this
 
 //***************************WiFi & MQTT***************************
 
