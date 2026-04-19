@@ -21,6 +21,19 @@
 #define SW3_PIN 12 //pull-up, connect other end of switch to ground
 #define SW4_PIN 13 //pull-up, connect other end of switch to ground //This is slower for some reason
 
+//Option & difficulty variant indexes
+const int INIT_INDEX = 0; //Initialised to 0 if n.a. or not initialised
+const int COLOUR_INDEX = 1; //1: Blue, 9: Orange
+const int SHAPE_INDEX = 2; //1: Triangle, 9: Square
+const int SIZE_INDEX = 3; //1: Small, 9: Big
+const int PITCH_INDEX = 4; //1: Low, 9: High
+const int LOUDNESS_INDEX = 5; //1: Low, 9: High
+const int TIMBRE_INDEX = 6; //1: Piano, 9: Flute
+const int LR_INDEX = 7; //1: Left only, 9: Right only
+const int TEXTURE_INDEX = 8; //1: Rough, 9: Smooth
+const int TEMPERATURE_INDEX = 9; //1: Low, 9: High
+const int TOTAL_INDEXES = 10;
+
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
 #define AUDIO_UART_RX 16 //Orange jumper
@@ -92,67 +105,32 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
   Serial.println(message.c_str());
   MQTTpublishWithSerial(error_topic, message.c_str());
 }
-//***************************HARDWARE FUNCTIONS***************************
-//These exist in place of directly calling the relevant functions to enable debugging & error messages
-void ledStrip(bool onOff) { //Turn the LED Strip on or off
-  digitalWrite(LED_PIN, onOff);
-    if (onOff) {
-      digitalWrite(LED_PIN, 1);
-      debugMessage(String("LED Strip on"));
+
+//***************************GAME***************************
+//Game option
+//Index 0: If option is initialised
+//each remaining index: 0=not showing a variant (e.g. no sound, no visual), 1-9 corresponds to a variant, with 1 and 9 being the most different. For prototype: Only 1 & 9.
+class gameOption {
+  private:
+  public:
+    //Initialise all to 0
+    int variantArray[TOTAL_INDEXES] = {NULL};
+    for (int i = 0; i < TOTAL_INDEXES; i++) {
+      variantArray[i] = 0;
     }
-    else {
-      digitalWrite(LED_PIN, 0);
-      debugMessage(String("LED Strip off"));
+
+    gameOption(int *setupArray) {
+      int arrayLength = sizeof(setupArray) / sizeof(setupArray[0]);
+      if (arrayLength == TOTAL_INDEXES) {
+        for (int i = 0; i < TOTAL_INDEXES; i++) {
+          variantArray[i] = setupArray[i];
+        }
+      }
+      else {
+        errorMessage("game option setup array len is " + String(arrayLength) + "instead of TOTAL_INDEXES = " + String(TOTAL_INDEXES));
+      }
     }
-}
-
-void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=on
-  digitalWrite(VIBRATION_PIN, onOff);
-  if (onOff) {
-    digitalWrite(VIBRATION_PIN, 1);
-    debugMessage(String("Vibration motor on"));
-  }
-  else {
-    digitalWrite(VIBRATION_PIN, 0);
-    debugMessage(String("Vibration motor off"));
-  }
-}
-
-void playAudio(int track, int folder) { //Play audio from the Audio Module
-  audioModule.playTrackInFolder(track, folder);
-  debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
-}
-
-void spinWheels(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
-
-//***************************OPTIONS & DIFFICULTY***************************
-//Option Generator
-/*Option format:
-  [Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
-  1 <colour diff>
-  2 <shape diff>
-  3 <size diff>
-  4 <pitch diff>
-  5 <loudness diff>
-  6 <timbre diff>
-  7 <left vs right diff (0 is left, 9 is right)>
-  8 <texture diff>
-  9 <temp diff>]
-*/
-
-/*Difficulty format: [
-  Index 0 <number from 0 to 2, with 0 being the easiest and 2 the hardest>
-  1 <colour diff>
-  2 <shape diff>
-  3 <size diff>
-  4 <pitch diff>
-  5 <loudness diff>
-  6 <timbre diff>
-  7 <left vs right diff (0 is left, 9 is right)>
-  8 <texture diff>
-  9 <temp diff>]
-*/
-
+};
 void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places options in resultOptions, a 3 element array with first dimension being the options, and second dimension being the details defining each option  
   //* is the pointer to where the data is actually located
   //TOADD: >3 options
@@ -183,46 +161,6 @@ void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places opt
   
   //return resultOptions;
 }
-
-//***************************GAME***************************
-/*class gameOption {
-  private:
-  public:
-    bool isInitialised = false;
-    int colourVariant = -1;
-    int shapeVariant = -1;
-    int sizeVariant = -1;
-    int pitchVariant = -1;
-    int loudnessVariant = -1;
-    int timbreVariant = -1;
-    int leftRightVariant = -1; //0 is left, 9 is right
-    int textureVariant = -1;
-    int tempvariant = -1;
-      
-
-    gameOption(String setupString) {
-      //if (setupString.length() != 
-      //setupStringCharArray[10] = {NULL};
-      //setupString.toCharArray();
-      int colourVariant = -1;
-      int shapeVariant = -1;
-      int sizeVariant = -1;
-      int pitchVariant = -1;
-      int loudnessVariant = -1;
-      int timbreVariant = -1;
-      int leftRightVariant = -1; //0 is left, 9 is right
-      int textureVariant = -1;
-      int tempvariant = -1;
-      
-    }
-
-    gameOption(char *setupString) {
-
-    }
-
-
-
-};*/
 
 class gameRound { //Stores one round (ie one choice)
   private:
@@ -261,6 +199,67 @@ class gameOverall { //Stores multiple game rounds
 
     //TOADD: Keeping score
 };
+
+//***************************OPTIONS & DIFFICULTY***************************
+//Option Generator
+/*Option format:
+  [Index 0 <variant from 0 to 9, with 0 vs 9 being the biggest diff>
+  1 <colour diff>
+  2 <shape diff>
+  3 <size diff>
+  4 <pitch diff>
+  5 <loudness diff>
+  6 <timbre diff>
+  7 <left vs right diff (0 is left, 9 is right)>
+  8 <texture diff>
+  9 <temp diff>]
+*/
+
+/*Difficulty format: [
+  Index 0 <number from 0 to 2, with 0 being the easiest and 2 the hardest>
+  1 <colour diff>
+  2 <shape diff>
+  3 <size diff>
+  4 <pitch diff>
+  5 <loudness diff>
+  6 <timbre diff>
+  7 <left vs right diff (0 is left, 9 is right)>
+  8 <texture diff>
+  9 <temp diff>]
+*/
+
+//***************************HARDWARE FUNCTIONS***************************
+//These exist in place of directly calling the relevant functions to enable debugging & error messages
+void ledStrip(bool onOff) { //Turn the LED Strip on or off
+  digitalWrite(LED_PIN, onOff);
+    if (onOff) {
+      digitalWrite(LED_PIN, 1);
+      debugMessage(String("LED Strip on"));
+    }
+    else {
+      digitalWrite(LED_PIN, 0);
+      debugMessage(String("LED Strip off"));
+    }
+}
+
+void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=on
+  digitalWrite(VIBRATION_PIN, onOff);
+  if (onOff) {
+    digitalWrite(VIBRATION_PIN, 1);
+    debugMessage(String("Vibration motor on"));
+  }
+  else {
+    digitalWrite(VIBRATION_PIN, 0);
+    debugMessage(String("Vibration motor off"));
+  }
+}
+
+void playAudio(int track, int folder) { //Play audio from the Audio Module
+  audioModule.playTrackInFolder(track, folder);
+  debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
+}
+
+void spinWheels(int wheelOne, int wheelTwo, int wheelThree, int wheelFour) {} //TOADD: Implement this
 
 //***************************WiFi & MQTT***************************
 
