@@ -107,34 +107,13 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
 }
 
 //***************************GAME***************************
-//Game option
+//Game option - String object
 //Index 0: If option is initialised
-//each remaining index: 0=not showing a variant (e.g. no sound, no visual), 1-9 corresponds to a variant, with 1 and 9 being the most different. For prototype: Only 1 & 9.
-class gameOption {
-  private:
-  public:
-    //Initialise all to 0
-    int variantArray[TOTAL_INDEXES] = {NULL};
-    for (int i = 0; i < TOTAL_INDEXES; i++) {
-      variantArray[i] = 0;
-    }
+//each remaining index: 0=not showing a variant (e.g. no sound, no visual), 1-9 corresponds to a variant, with 1 and 9 being the most different. Check the const ints at the top for details. For prototype: Only 1 & 9.
 
-    gameOption(int *setupArray) {
-      int arrayLength = sizeof(setupArray) / sizeof(setupArray[0]);
-      if (arrayLength == TOTAL_INDEXES) {
-        for (int i = 0; i < TOTAL_INDEXES; i++) {
-          variantArray[i] = setupArray[i];
-        }
-      }
-      else {
-        errorMessage("game option setup array len is " + String(arrayLength) + "instead of TOTAL_INDEXES = " + String(TOTAL_INDEXES));
-      }
-    }
-};
-void OptionsGenerator(String difficulty, String resultOptions[3]) { //Places options in resultOptions, a 3 element array with first dimension being the options, and second dimension being the details defining each option  
+void OptionsGenerator(String difficulty[4], String resultOptions[4]) { //Places options in resultOptions
   //* is the pointer to where the data is actually located
-  //TOADD: >3 options
-  //TOADD: difficulty >0
+  
   if (difficulty.length() != 10) { //difficulty String must be 10 char
     errorMessage(String(String("OptionsGenerator input not 10 char: ") + difficulty).c_str());
   }
