@@ -36,6 +36,10 @@ const int TOTAL_INDEXES = 10;
 
 const int MAX_OPTIONS = 4;
 
+//Audio files
+const int AUDIO_SCAN_OFFSET = 0; //TOADD AUDIO FILES
+const int AUDIO_OPTIONS_OFFSET = 0; //TOADD AUDIO FILES
+
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
 #define AUDIO_UART_RX 16 //Orange jumper
@@ -55,6 +59,7 @@ const char *mqttServerIP = "192.168.1.101"; //MQTT server IP address e.g. 192.16
 const char* debug_topic = "debugMessage";
 const char* error_topic = "errorMessage";
 const char* display_topic = "display";
+const char* visualScan_topic = "display/selected";
 //Receive (Subscribe)
 const char* settings_topic = "settings";
 const char* espCommands_topic = "espCommands";
@@ -184,7 +189,7 @@ int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX
   return differentOptionIndex;
 }
 
-class gameRound { //Stores one round (ie one choice)
+class gameRound { //Stores one round
   private:
   public:
     bool isInitialised = false;
@@ -215,6 +220,7 @@ class gameOverall { //Stores multiple game rounds
     gameRound arrayOfRounds[4]; //one per round
 
     gameOverall(String initialDifficulty) { //initialDifficulty will be used for all rounds
+      //TOADD: Not 4 rounds
       for (int i = 0; i<4; i++) {
         arrayOfDifficulties[i] = String(initialDifficulty); //Go back and check if rly need this deep copy
         debugMessage(String("Round" + String(i) + "difficulty: " + arrayOfDifficulties[i]));
@@ -222,9 +228,20 @@ class gameOverall { //Stores multiple game rounds
       }
     }
 
+
     //TOADD: Keeping score
 };
 
+int scanOption(int option, bool visual, bool audio) { //Option 1 = 0
+  if (visual) {
+    MQTTpublishWithSerial(visualScan_topic, String(option).c_str());
+  }
+
+  if (audio) {
+    playAudio(AUDIO_SCAN_OFFSET+option, 1);
+  }
+}
+  
 int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only scanning
   //Display visuals (if any)
   //Generate the shape IDs
@@ -253,9 +270,9 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
   }
   spinWheels(shapeIDs)
 
-  for (int j = 0; j < round.numberOptions; J++) {
-    //highlight option()
-    //read out 1-4
+  for (int currentOption = 0; currentOption < round.numberOptions; currentOption++) {
+    scanOption(currentOption, 1, 1); //TOADD: Scanning with only visual or audio
+
     //play 1-4
     //recognise when button pressed
     //modify round object with option selected
