@@ -21,7 +21,7 @@
 #define SW3_PIN 12 //pull-up, connect other end of switch to ground
 #define SW4_PIN 13 //pull-up, connect other end of switch to ground //This is slower for some reason
 
-//Option & difficulty variant indexes
+//Option & difficulty variant indexes (dimensions)
 const int INIT_INDEX = 0; //Initialised to 0 if n.a. or not initialised
 const int COLOUR_INDEX = 1; //1: Blue, 9: Orange
 const int SHAPE_INDEX = 2; //1: Triangle, 9: Square
@@ -116,7 +116,7 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
 
 //***************************GAME***************************
 //Game option = a String object
-//Index 0: If option is initialised
+//Index 0: If option is initialised (0 or 1)
 /*each remaining index's value:
   - 0=not showing a variant (e.g. no sound, no visual)
   - 1-9 corresponds to a variant
@@ -125,9 +125,9 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
     - For prototype: Only 1 & 9.*/
 
 //Difficulty = a String object
-//Index 0: Always 0, not relevant
+//Index 0: Always 0, not relevant //TOADD: CAN REVISIT
 /*each remaining index's value:
-  - 0 = not showing a variant (e.g. no sound, no visual)
+  - 0 = not showing a variant (e.g. no sound, no visual) OR NO DIFFERENCE
   - 1-8 = degree of variance
     - 8 being greatest difference
     - Check the const ints at the top for details
@@ -151,12 +151,12 @@ int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX
     errorMessage(String("Length of OptionsGenerator input isn't TOTAL_INDEXES, it's ") + difficulty);
   }
 
-  if ((numOptions == 3) || (numOptions == 4) ) { //Right now only set up for 3 or 4 options
+  if (!((numOptions == 3) || (numOptions == 4))) { //Right now only set up for 3 or 4 options
     errorMessage(String("Number of options requested isn't 3 or 4, it's ") + numOptions);
   }
 
   //Choose which option is different
-  int differentOptionIndex = random(0, numOptions+1); //Random int from 0 to numOptions-1 (function returns 0<=x<numOptions-1)
+  int differentOptionIndex = random(0, numOptions); //Random int from 0 to numOptions-1 (function returns 0<=x<numOptions-1)
   debugMessage(String("Different option index within resultOptions is ") + differentOptionIndex);
 
   //Initialise options
@@ -165,13 +165,13 @@ int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX
     resultOptions[currentOption] = String(blankOption);
 
     //If actual option
-    if (i < numOptions) {
-      //change 0th index to 1
+    if (currentOption < numOptions) {
+      //change 0th index to 1 to initialise
       resultOptions[currentOption].setCharAt(INIT_INDEX, '1');
       //Other indexes (1-9)
-      for (int indexWithinOption = 1; indexWithinOption < TOTAL_INDEXES, indexWithinOption++) {
+      for (int indexWithinOption = 1; indexWithinOption < TOTAL_INDEXES, indexWithinOption++) { //Start from char @ index 1 cuz index 0 alrdy set to 1 to init
         if (difficulty.charAt(indexWithinOption) != 0) {//means this difference is activated
-          if (currentOption == differentOptionIndex) { //If odd 1 out, set 9
+          if (currentOption == differentOptionIndex) { //If odd one out, set 9
             resultOptions[currentOption].setCharAt(indexWithinOption, '9');
           }
           else { //If others (not the odd 1 out), set 1
@@ -214,7 +214,7 @@ class gameRound { //Stores one round
 };
 
 class gameOverall { //Stores multiple game rounds
-  //TOADD: More than 4 game rouns
+  //TOADD: More or less than 4 game rouns
   private:
   public:
     String arrayOfDifficulties[4]; //one per round
@@ -222,7 +222,7 @@ class gameOverall { //Stores multiple game rounds
 
     gameOverall(String initialDifficulty) { //initialDifficulty will be used for all rounds
       //TOADD: Not 4 rounds
-      for (int i = 0; i<4; i++) {
+      for (int i = 0; i<4; i++) { //set up each round
         arrayOfDifficulties[i] = String(initialDifficulty); //Go back and check if rly need this deep copy
         debugMessage(String("Round" + String(i) + "difficulty: " + arrayOfDifficulties[i]));
         arrayOfRounds[i] = gameRound(initialDifficulty, 4);
@@ -233,13 +233,13 @@ class gameOverall { //Stores multiple game rounds
     //TOADD: Keeping score
 };
 
-int scanOption(int option, bool visual, bool audio) { //Option 1 = 0
+int scanOption(int optionIndex, bool visual, bool audio) { //To highlight / say the option we are currently scanning (ie u will select if u press the button), optionIndex is 0 indexed
   if (visual) {
-    MQTTpublishWithSerial(visualScan_topic, String(option).c_str());
+    MQTTpublishWithSerial(visualScan_topic, String(optionIndex+1).c_str());
   }
 
   if (audio) {
-    playAudio(AUDIO_SCAN_OFFSET+option, 1);
+    playAudio(AUDIO_SCAN_OFFSET+optionIndex, 1);
   }
 }
   
@@ -256,8 +256,8 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
     8. large orange square*/
   //Thus, 4*shape + 2*colour + size
 
-  //Check if any visual at all by seeing if option 1 all visuals is 0
-  bool hasVisual = (round.options[1].charAt(SIZE_INDEX)=='9') || (round.options[1].charAt(COLOUR_INDEX)=='9') || (round.options[1].charAt(SHAPE_INDEX)=='9');
+  //Check if any visual at all by seeing if option 1 all visual indexes is '0'
+  bool hasVisual = !((round.options[1].charAt(SIZE_INDEX)=='0') && (round.options[1].charAt(COLOUR_INDEX)=='0') && (round.options[1].charAt(SHAPE_INDEX)=='0'));
   int shapeIDs [4] = [1, 1, 1, 1]; //Hardcoded 4 wheels oops //TOADD
   if (hasVisual) {
     //Generate the shape IDs to send to raspi via MQTT
@@ -276,28 +276,37 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
   }
   else {
     shapeIDs [4] = [9, 9, 9, 9]; //This will make each wheel display its slot number (e.g. "1")
+    //CAN MAKE IT 0 IF WANT PARITY WTH AUDIO
   }
   
   //Display the visuals
   spinWheels(shapeIDs)
 
-  //Check if any visual at all by seeing if option 1 all visuals is 0
-  bool hasAudio = (round.options[1].charAt(PITCH_INDEX)=='9') || (round.options[1].charAt(LOUDNESS_INDEX)=='9') || (round.options[1].charAt(TIMBRE_INDEX)=='9');
+  //Check if any audio at all by seeing if option 1 all audio indexes is '0'
+  bool hasAudio = !((round.options[1].charAt(PITCH_INDEX)=='0') && (round.options[1].charAt(LOUDNESS_INDEX)=='0') && (round.options[1].charAt(TIMBRE_INDEX)=='0'));
   //Generate the audio file IDs to send to MP3 module
   int audioIDs [4] = [1, 1, 1, 1]; //Hardcoded 4 wheels oops //TOADD
-  //TOADD: Missing handler for e.g. shape diff but colour not diff
-  for (int i = 0; i < round.numberOptions; i++) {
-    if(round.options.charAt(PITCH_INDEX) == '9') {
-      shapeIDs[i] += 1;
-    }
-    if(round.options.charAt(LOUDNESS_INDEX) == '9') {
-      shapeIDs[i] += 2;
-    }
-    if(round.options.charAt(TIMBRE_INDEX) == '9') {
-      shapeIDs[i] += 4;
+  //TOADD: Missing handler for e.g. tone diff but timbre not diff
+  //TOADD: Left and right channel diff
+  if (hasAudio) {
+    for (int i = 0; i < round.numberOptions; i++) { //i is the current option
+      if(round.options[i].charAt(PITCH_INDEX) == '9') {
+        shapeIDs[i] += 1;
+      }
+      if(round.options[i].charAt(LOUDNESS_INDEX) == '9') {
+        shapeIDs[i] += 2;
+      }
+      if(round.options[i].charAt(TIMBRE_INDEX) == '9') {
+        shapeIDs[i] += 4;
     }
   }
+  }
+  else {
+    audioIDs [4] = [0, 0, 0, 0];
+  }
 
+
+  //Actual scanning loop
   for (int currentOption = 0; currentOption < round.numberOptions; currentOption++) {
     //Do the scanning for this option
     scanOption(currentOption, 1, hasAudio); //TOADD: Scanning with only visual or audio
@@ -305,6 +314,7 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
     if (hasAudio) {
       playAudio(AUDIO_OPTION_OFFSET+audioIDs[currentOption], 1);
     }
+
     //recognise when button pressed
     //modify round object with option selected
   }
@@ -341,7 +351,9 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
-void spinWheels(shapeIDs [4]) {} //TOADD: Implement this
+void spinWheels(shapeIDs [4]) {
+  
+} //TOADD: Implement this
 
 //***************************WiFi & MQTT***************************
 
