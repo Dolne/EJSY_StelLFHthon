@@ -156,6 +156,17 @@ void errorMessage(String message) { //Send a debugging message out via MQTT & US
 
 
 
+void errorMessage(String message) { //Send a debugging message out via MQTT & USB Serial
+  Serial.println(message.c_str());
+  MQTTpublishWithSerial(error_topic, message.c_str());
+}
+
+
+
+void errorMessage(String message) { //Send a debugging message out via MQTT & USB Serial
+  Serial.println(message.c_str());
+  MQTTpublishWithSerial(error_topic, message.c_str());
+}
 //***************************HARDWARE FUNCTIONS***************************
 //These exist in place of directly calling the relevant functions to enable debugging & error messages
 void ledStrip(bool onOff) { //Turn the LED Strip on or off
