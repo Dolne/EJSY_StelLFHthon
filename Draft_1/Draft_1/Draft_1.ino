@@ -61,6 +61,7 @@ const char* debug_topic = "debugMessage";
 const char* error_topic = "errorMessage";
 const char* display_topic = "display";
 const char* visualScan_topic = "display/selected";
+const char* setVisualOption_rootTopic = "display/slots/"; //Set option 1 = "display/slots/1"
 //Receive (Subscribe)
 const char* settings_topic = "settings";
 const char* espCommands_topic = "espCommands";
@@ -372,9 +373,11 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
-void spinWheels(shapeIDs [4]) {
-
-} //TOADD: Implement this
+void spinWheels(int numOptions, shapeIDs[4]) {
+  for (int currentOption = 0; currentOption < numOptions; currentOption++) { //Set every wheel
+    MQTTpublishWithSerial((String(setVisualOption_rootTopic) + String(currentOption+1)).c_str(), shapedIDs[currentOption]); //Note that wheel setting topics are 1-indexed, not 0-index (e.g. option 1 is "display/slots/1", not "display/slots/0")
+  }
+}
 
 //***************************WiFi & MQTT***************************
 
