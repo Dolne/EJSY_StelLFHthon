@@ -387,6 +387,8 @@ class gameRound { //Stores one round
       debugMessage(options[2].c_str());*/
     }
 };
+//Chatgpt said this would fix it
+int OptionSelector(gameRound round, int typeOfSelecting);
 
 class gameOverall { //Stores multiple game rounds
   //TOADD: More or less than 4 game rouns
@@ -600,7 +602,8 @@ void setup() {
   xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
 
   //Play music (for debug test)
-  audioModule.playTrackInFolder(1, 1);
+  //audioModule.playTrackInFolder(1, 1);
+  gameOverall(String initialDifficulty);
 }
 
 void loop() {
