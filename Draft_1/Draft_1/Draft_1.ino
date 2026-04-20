@@ -81,6 +81,8 @@ TaskHandle_t mainTask = NULL;
 //***************************GLOBAL VAIRABLES***************************
 int buttonFlags[4] = {0, 0, 0, 0}; //1 indicates button got pressed, -1 indicates released
 
+int wasPressed[4] = {0, 0, 0, 0}; //is reset to 0 before i start waiting for a button press, respective index is changed to 1 when button is pressed, isnt reset to 0 till next time waiting for buttonpress
+
 //******************************************************CODE******************************************************
 
 //***************************DEBUG & ERROR***************************
@@ -244,6 +246,8 @@ int scanOption(int optionIndex, bool visual, bool audio) { //To highlight / say 
 }
   
 int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only scanning
+
+  int optionSelected = -1; //option 1 is optionSelected = 0
   //Display visuals (if any)
   //Generate the shape IDs
   /*1. small blue triangle
@@ -298,8 +302,8 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
       }
       if(round.options[i].charAt(TIMBRE_INDEX) == '9') {
         shapeIDs[i] += 4;
+      }
     }
-  }
   }
   else {
     audioIDs [4] = [0, 0, 0, 0];
@@ -315,9 +319,26 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
       playAudio(AUDIO_OPTION_OFFSET+audioIDs[currentOption], 1);
     }
 
-    //recognise when button pressed
-    //modify round object with option selected
+    //Reset waspressed
+    wasPressed[4] = {0, 0, 0, 0};
+
+    //Wait for someone to press
+    long startTime = millis();
+    long waitTime = 5000;
+
+    while ((millis() - startTime) < waitTime) {
+      delay(10); //TODO: See if need this
+    }
+
+    if(wasPressed[0] == 1) {
+      optionSelected = currentOption;
+    }
   }
+
+  //modify round object with option selected
+  round.optionChosen = optionSelected;
+  //Return optionSelected
+  return optionSelected
 }
 
 //***************************HARDWARE FUNCTIONS***************************
@@ -352,7 +373,7 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
 }
 
 void spinWheels(shapeIDs [4]) {
-  
+
 } //TOADD: Implement this
 
 //***************************WiFi & MQTT***************************
@@ -486,6 +507,7 @@ void switchCallbacks(int switchNum, bool endDigitalRead) { //called when digital
   }
   else { //went from high to low means from released to depressed
     buttonFlags[switchNum-1] = 1;
+    wasPressed[switchNum-1] = 1;
   }
 }
 
