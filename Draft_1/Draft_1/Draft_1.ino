@@ -38,7 +38,8 @@ const int MAX_OPTIONS = 4;
 
 //Audio files
 const int AUDIO_SCAN_OFFSET = 0; //TOADD AUDIO FILES
-const int AUDIO_OPTIONS_OFFSET = 0; //TOADD AUDIO FILES
+const int AUDIO_OPTIONS_OFFSET = 10; //TOADD AUDIO FILES
+//Audio file index = 1+(Pitch==9)+2*(loudness==9)+4*(timbre)
 
 //Audio Module
 //*make sure the RX on the YX5300 goes to the TX on the ESP32, and vice-versa
@@ -255,25 +256,55 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
     8. large orange square*/
   //Thus, 4*shape + 2*colour + size
 
+  //Check if any visual at all by seeing if option 1 all visuals is 0
+  bool hasVisual = (round.options[1].charAt(SIZE_INDEX)=='9') || (round.options[1].charAt(COLOUR_INDEX)=='9') || (round.options[1].charAt(SHAPE_INDEX)=='9');
   int shapeIDs [4] = [1, 1, 1, 1]; //Hardcoded 4 wheels oops //TOADD
+  if (hasVisual) {
+    //Generate the shape IDs to send to raspi via MQTT
+    //TOADD: Missing handler for e.g. shape diff but colour not diff
+    for (int i = 0; i < round.numberOptions; i++) {
+      if(round.options[i].charAt(SIZE_INDEX) == '9') {
+        shapeIDs[i] += 1;
+      }
+      if(round.options[i].charAt(COLOUR_INDEX) == '9') {
+        shapeIDs[i] += 2;
+      }
+      if(round.options[i].charAt(SHAPE_INDEX) == '9') {
+        shapeIDs[i] += 4;
+      }
+    }
+  }
+  else {
+    shapeIDs [4] = [9, 9, 9, 9]; //This will make each wheel display its slot number (e.g. "1")
+  }
+  
+  //Display the visuals
+  spinWheels(shapeIDs)
+
+  //Check if any visual at all by seeing if option 1 all visuals is 0
+  bool hasAudio = (round.options[1].charAt(PITCH_INDEX)=='9') || (round.options[1].charAt(LOUDNESS_INDEX)=='9') || (round.options[1].charAt(TIMBRE_INDEX)=='9');
+  //Generate the audio file IDs to send to MP3 module
+  int audioIDs [4] = [1, 1, 1, 1]; //Hardcoded 4 wheels oops //TOADD
   //TOADD: Missing handler for e.g. shape diff but colour not diff
   for (int i = 0; i < round.numberOptions; i++) {
-    if(round.options.charAt(SIZE_INDEX) == 9) {
+    if(round.options.charAt(PITCH_INDEX) == '9') {
       shapeIDs[i] += 1;
     }
-    if(round.options.charAt(COLOUR_INDEX) == 9) {
+    if(round.options.charAt(LOUDNESS_INDEX) == '9') {
       shapeIDs[i] += 2;
     }
-    if(round.options.charAt(SHAPE_INDEX) == 9) {
+    if(round.options.charAt(TIMBRE_INDEX) == '9') {
       shapeIDs[i] += 4;
     }
   }
-  spinWheels(shapeIDs)
 
   for (int currentOption = 0; currentOption < round.numberOptions; currentOption++) {
-    scanOption(currentOption, 1, 1); //TOADD: Scanning with only visual or audio
-
-    //play 1-4
+    //Do the scanning for this option
+    scanOption(currentOption, 1, hasAudio); //TOADD: Scanning with only visual or audio
+    //play option 1-4 audio
+    if (hasAudio) {
+      playAudio(AUDIO_OPTION_OFFSET+audioIDs[currentOption], 1);
+    }
     //recognise when button pressed
     //modify round object with option selected
   }
