@@ -186,9 +186,9 @@ void playAudio(int track, int folder) { //Play audio from the Audio Module
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
 
-void spinWheels(int numOptions, shapeIDs[4]) {
+void spinWheels(int numOptions, int shapeIDs[4]) {
   for (int currentOption = 0; currentOption < numOptions; currentOption++) { //Set every wheel
-    MQTTpublishWithSerial((String(setVisualOption_rootTopic) + String(currentOption+1)).c_str(), shapedIDs[currentOption]); //Note that wheel setting topics are 1-indexed, not 0-index (e.g. option 1 is "display/slots/1", not "display/slots/0")
+    MQTTpublishWithSerial((String(setVisualOption_rootTopic) + String(currentOption+1)).c_str(), String(shapeIDs[currentOption]).c_str()); //Note that wheel setting topics are 1-indexed, not 0-index (e.g. option 1 is "display/slots/1", not "display/slots/0")
   }
 }
 
@@ -338,7 +338,7 @@ int OptionsGenerator(String difficulty, int numOptions, String resultOptions[MAX
       resultOptions[currentOption].setCharAt(INIT_INDEX, '1');
       //Other indexes (1-9)
       for (int indexWithinOption = 1; indexWithinOption < TOTAL_INDEXES; indexWithinOption++) { //Start from char @ index 1 cuz index 0 alrdy set to 1 to init
-        if (difficulty.charAt(indexWithinOption) != 0) {//means this difference is activated
+        if (difficulty.charAt(indexWithinOption) != '0') {//means this difference is activated
           if (currentOption == differentOptionIndex) { //If odd one out, set 9
             resultOptions[currentOption].setCharAt(indexWithinOption, '9');
           }
@@ -362,12 +362,19 @@ class gameRound { //Stores one round
   private:
   public:
     bool isInitialised = false;
-    int numberOptions = NULL;
-    int optionChosen = NULL;
-    int correctOption = NULL;
+    int numberOptions = -1; //-1 means not init
+    int optionChosen = -1; //-1 means not init
+    int correctOption = -1; //-1 means not init
     String difficulty = String();
     String options[4] = {String(), String(), String(), String()}; //should be string array of length MAX_OPTIONS to pass into OptionsGenerator
-    
+
+    gameRound() {
+      /*isInitialsed = false;
+      numberOptions = 0;
+      optionChosen = -1;
+      difficulty = String();
+      for (int i = 0; i < 4; i++) options[i] String();*/
+    } //Empty constructor to prevent the used before declaration error
 
     gameRound(String passedInDifficulty, int numOptionsInput) {
       numberOptions = numOptionsInput;
@@ -401,7 +408,7 @@ class gameOverall { //Stores multiple game rounds
     //TOADD: Keeping score
 };
 
-int scanOption(int optionIndex, bool visual, bool audio) { //To highlight / say the option we are currently scanning (ie u will select if u press the button), optionIndex is 0 indexed
+void scanOption(int optionIndex, bool visual, bool audio) { //To highlight / say the option we are currently scanning (ie u will select if u press the button), optionIndex is 0 indexed
   if (visual) {
     MQTTpublishWithSerial(visualScan_topic, String(optionIndex+1).c_str());
   }
@@ -445,12 +452,15 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
     }
   }
   else {
-    shapeIDs[] = {9, 9, 9, 9}; //This will make each wheel display its slot number (e.g. "1")
+    //shapeIDs[] = {9, 9, 9, 9}; //This will make each wheel display its slot number (e.g. "1")
+    for (int i = 0; i < 4; i++) {
+      shapeIDs[i] = 9;
+    }
     //CAN MAKE IT 0 IF WANT PARITY WTH AUDIO
   }
   
   //Display the visuals
-  spinWheels(shapeIDs);
+  spinWheels(4, shapeIDs);
 
   //Check if any audio at all by seeing if option 1 all audio indexes is '0'
   bool hasAudio = !((round.options[1].charAt(PITCH_INDEX)=='0') && (round.options[1].charAt(LOUDNESS_INDEX)=='0') && (round.options[1].charAt(TIMBRE_INDEX)=='0'));
@@ -461,18 +471,21 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
   if (hasAudio) {
     for (int i = 0; i < round.numberOptions; i++) { //i is the current option
       if(round.options[i].charAt(PITCH_INDEX) == '9') {
-        shapeIDs[i] += 1;
+        audioIDs[i] += 1;
       }
       if(round.options[i].charAt(LOUDNESS_INDEX) == '9') {
-        shapeIDs[i] += 2;
+        audioIDs[i] += 2;
       }
       if(round.options[i].charAt(TIMBRE_INDEX) == '9') {
-        shapeIDs[i] += 4;
+        audioIDs[i] += 4;
       }
     }
   }
   else {
-    audioIDs[] = {0, 0, 0, 0};
+    //audioIDs[] = {0, 0, 0, 0};
+    for (int i = 0; i < 4; i++) {
+      audioIDs[i] = 0;
+    }
   }
 
 
@@ -486,7 +499,10 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
     }
 
     //Reset waspressed
-    wasPressed[] = {0, 0, 0, 0};
+    //wasPressed[] = {0, 0, 0, 0};
+    for (int i=0; i < 4; i++) {
+      wasPressed[i] = 0;
+    }
 
     //Wait for someone to press
     long startTime = millis();
@@ -625,3 +641,4 @@ void loop() {
     }
   }*/
 }
+ 
