@@ -598,12 +598,14 @@ void setup() {
     debugMessage("No option chosen yet");
   }*/
 
-  gameOverall game = gameOverall("0110111110");
+  
   xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
+  gameOverall testGame = gameOverall("1888888888");
+  OptionSelector(testGame.arrayOfRounds[1], 1);
 
   //Play music (for debug test)
   //audioModule.playTrackInFolder(1, 1);
-  gameOverall(String initialDifficulty);
+  
 }
 
 void loop() {
