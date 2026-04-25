@@ -75,6 +75,53 @@ Currently, the 8 shapes are:
 7. small orange square
 8. large orange square
 
+### `display/lights`
+
+This topic is used to show or hide the RGB light strip.
+
+Value `1` will show the lights while value `0` will hide the lights.
+
+The following subtopics allow more control over how the lights look:
+
+**`display/lights/colours`**
+
+This sets the colours to animate between.
+
+The colours are defined in HSL format. H is from 0–360, while the S and L are from 0–100 inclusive.
+If the values are outside the range, it will be rolled over/under for H and clamped for the other values.
+This can be useful for controlling the direction of animation of H, as for example, H going from 300 to 60 will be different from -60 to 60 (even though the start and end colours are the same).
+
+H must be set, while S defaults to 100, and L defaults to 50.
+
+The format of the value is progress-colour pairs separated by commas,
+with the progress being from `0%` to `100%` and the colour in HSL format represented by 1 to 3 integers separated by a space.
+
+The default value is `0% 0, 100% 360` which will cycle through all the colours at full saturation.
+
+Examples:
+- `0% 0, 50% 0, 50% 240, 100% 240` will switch distinctly between red and blue
+- `0% 0 100 100, 50% 0, 100% 0 100 100` will animate from white to red to white
+
+If there is no value for 0%, the colour at 0% will be the same as the colour at the smallest progress given. Similarly for 100% except that it will take the colour at the largest progress given. There must be a minimum of 1 progress/colour given.
+
+**`display/lights/travel`**
+
+This controls the left-right movement of the colours.
+
+It is a float value which specifies the difference in animation progress between the first and last segment of the lights.
+
+A positive value will cause movement to the right.
+
+The default value is `0.5`
+
+**`display/lights/period`** - the period of the animation in milliseconds (default `1200`)
+
+**`display/lights/segments`** - the number of segments that the light is split into (default `16`)
+
+Setting `travel` to `0` or `segments` to `1` can be used to show a solid colour.
+
+Refer to [lights_demo.py](./lights_demo.py) for some examples.
+
 ### `display/status`
 
 This topic is set by the GUI to indicate if the wheels are spinning.

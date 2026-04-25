@@ -25,6 +25,9 @@ def set_slots(slots):
 def set_selected(slot):
     publish.single('display/selected', slot)
     
+def set_lights(active):
+    publish.single('display/lights', int(active))
+    
 print('running demo...')
 
 set_selected(0)
@@ -39,6 +42,9 @@ time.sleep(1)
 set_selected(4)
 time.sleep(1)
 set_selected(0)
+set_lights(1)
+time.sleep(2)
+set_lights(0)
 
 set_slots([2,2,6,0])
 
@@ -49,6 +55,9 @@ time.sleep(1)
 set_selected(3)
 time.sleep(1)
 set_selected(0)
+set_lights(1)
+time.sleep(2)
+set_lights(0)
 
 while True:
     print('enter slot values (eg 2 2 8 or 3 4 3 3) or "exit"')
@@ -72,7 +81,8 @@ while True:
 
     for i in range(4 - len(slots)):
         slots.append(0)
-        
+    
+    set_lights(0)
     set_slots(slots)
     for i in range(len(slots)):
         if slots[i] != 0:
@@ -80,3 +90,4 @@ while True:
             time.sleep(1)
             
     set_selected(0)
+    set_lights(1)
