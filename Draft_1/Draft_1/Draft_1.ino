@@ -192,6 +192,20 @@ void spinWheels(int numOptions, int shapeIDs[4]) {
   }
 }
 
+
+void win(){
+  debugMessage("Correct option selected");
+  playAudio(6, 2);
+  for (int i = 0; i < 5; i++){
+    ledStrip(1);
+    vibrationMotor(1);
+    delay(200);
+    ledStrip(0);
+    vibrationMotor(0);
+    delay(200);
+  }
+}
+
 void receiveMQTTCallback(char* topic, byte* message, unsigned int length) { //Do the messages receive end in null?
   Serial.println("****received MQTT transmission****");
   //Copy in the MQTT message
@@ -492,37 +506,37 @@ int OptionSelector(gameRound round, int typeOfSelecting) { //For prototype: only
 
 
   //Actual scanning loop
-  for (int currentOption = 0; currentOption < round.numberOptions; currentOption++) {
-    //Do the scanning for this option
-    scanOption(currentOption, 1, hasAudio); //TOADD: Scanning with only visual or audio
-    //play option 1-4 audio
-    if (hasAudio) {
-      playAudio(AUDIO_OPTIONS_OFFSET+audioIDs[currentOption], 1);
-    }
+  while (optionSelected == -1){
+    for (int currentOption = 0; currentOption < round.numberOptions; currentOption++) {
+      //Do the scanning for this option
+      scanOption(currentOption, hasVisual, hasAudio); //TOADD: Scanning with only visual or audio
+      //play option 1-4 audio
+      if (hasAudio) {
+        playAudio(AUDIO_OPTIONS_OFFSET+audioIDs[currentOption], 1);
+      }
 
-    //Reset waspressed
-    //wasPressed[] = {0, 0, 0, 0};
-    for (int i=0; i < 4; i++) {
-      wasPressed[i] = 0;
-    }
+      //Reset waspressed
+      //wasPressed[] = {0, 0, 0, 0};
+      for (int i=0; i < 4; i++) {
+        wasPressed[i] = 0;
+      }
 
-    //Wait for someone to press
-    long startTime = millis();
-    long waitTime = 5000;
+      //Wait for someone to press
+      long startTime = millis();
+      long waitTime = 5000;
 
-    while ((millis() - startTime) < waitTime) {
-      delay(10); //TODO: See if need this
-    }
+      while ((millis() - startTime) < waitTime) {
+        delay(10); //TODO: See if need this
+      }
 
-    if(wasPressed[0] == 1) {
-      optionSelected = currentOption;
+      if(wasPressed[0] == 1) {
+        optionSelected = currentOption;
+        round.optionChosen = optionSelected;
+        return optionSelected;
+      }
     }
   }
-
-  //modify round object with option selected
-  round.optionChosen = optionSelected;
-  //Return optionSelected
-  return optionSelected;
+  return -1;
 }
 
 
@@ -600,9 +614,9 @@ void setup() {
 
   
   xTaskCreate(MQTTloop, "MQTTlooping", 10000, NULL, 4, &MQTTloopTask);
-  gameOverall testGame = gameOverall("1888888888");
-  OptionSelector(testGame.arrayOfRounds[1], 1);
-
+  gameOverall testGame = gameOverall("1000888888");
+  int response = OptionSelector(testGame.arrayOfRounds[1], 1);
+  if (response == testGame.arrayOfRounds[1].correctOption) {win();}
   //Play music (for debug test)
   //audioModule.playTrackInFolder(1, 1);
   
