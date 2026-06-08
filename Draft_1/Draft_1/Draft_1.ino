@@ -181,7 +181,7 @@ void vibrationMotor(bool onOff) { //Turn the vibration motor on or off, true/1=o
   }
 }
 
-void playAudio(int track, int folder) { //Play audio from the Audio Module
+void playAudio(int track, int folder) { //Play audio from the Audio Module, DONT LOOP THIS, MODULE WILL JUST CONTINUALLY "START" PLAYING
   audioModule.playTrackInFolder(track, folder);
   debugMessage(String("MP3 Playing: Track ") + track + String(" within folder ") + folder);
 }
