@@ -1,5 +1,5 @@
 #ifndef game_h
-#define game_h
+#define game_h //Prevents double definition
 
 #include <Arduino.h>
 

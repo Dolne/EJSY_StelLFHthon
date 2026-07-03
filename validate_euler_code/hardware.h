@@ -1,5 +1,5 @@
 #ifndef hardware_h
-#define hardware_h
+#define hardware_h //Prevents double definition
 
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>

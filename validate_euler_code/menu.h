@@ -1,15 +1,15 @@
 #ifndef menu_h
-#define menu_h
+#define menu_h //Prevents double definition
 
 #include <Arduino.h>
 #include "hardware.h"
 
 const uint8_t ROW_NONE = 0xff;
 
-class MenuHardware
+class MenuHardware //Gamemaster controls
 {
 public:
-    MenuHardware(const LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton);
+    MenuHardware(const LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton); //LCD & 3 buttons
     const LCD& getLCD() const;
     const Button& getUpButton() const;
     const Button& getToggleButton() const;
