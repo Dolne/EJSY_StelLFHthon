@@ -6,10 +6,11 @@
 #include "menu.h"
 #include "game.h"
 
-const int lcdAddr = 0x27;
-const int buttonUpPin = 18;
-const int buttonSelectPin = 17;
-const int buttonDownPin = 16;
+const int lcdAddr = 0x27; //The PCF8574 John bought from Sim Lim has default address 0x27 (TI compatible chip)
+const int buttonUpPin = 19;
+const int buttonSelectPin = 18;
+const int buttonDownPin = 17; //Starts at 17 because pin 16 is connected to the ESP's onboard neopixel
+//Default for ESP32 I2C bus is SDA to Pin 21 and SCL to Pin 22 
 
 const int TICKRATE = 100;
 

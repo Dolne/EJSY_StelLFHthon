@@ -6,7 +6,7 @@ Button::Button(uint8_t pin, uint8_t mode)
     currState_ = false;
     pin_ = pin;
     mode_ = mode;
-    activeValue_ = (mode == INPUT_PULLUP) ? LOW : HIGH;
+    activeValue_ = (mode == INPUT_PULLUP) ? HIGH : LOW; //Inverted because the switches are normally closed and will be connected to ground
 }
 Button::Button(uint8_t pin): Button(pin, INPUT_PULLUP)
 {
