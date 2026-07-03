@@ -8,10 +8,10 @@
 #endif*/
 
 // Which pin on the Arduino is connected to the NeoPixels?
-#define PIN 6 // On Trinket or Gemma, suggest changing this to 1
+#define PIN 27 // On Trinket or Gemma, suggest changing this to 1
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 30 // The number of pixels in the strip keewee gave us
+#define NUMPIXELS 30 // The number of pixels in the strip keewe gave us
 
 // When setting up the NeoPixel library, we tell it how many pixels,
 // and which pin to use to send signals. Note that for older NeoPixel
