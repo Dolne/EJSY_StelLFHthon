@@ -1,25 +1,23 @@
-/*A task is something that runs every loop*/
-
 #ifndef task_h
-#define task_h //Prevents double definition
+#define task_h
 
-class Task //Create abstract base class, must be derived from, Task cannot be created directly
+class Task
 {
 public:
     virtual ~Task() {}
-    virtual void begin() = 0;  //Anything that inherits from Task must implement begin() and update()
+    virtual void begin() = 0;
     virtual void update() = 0;
 };
 
-class TaskGroup: public Task //Composite Design Pattern: a TaskGroup is itself a Task, while also containing many other Tasks. That lets you treat a whole group exactly like a single task.
+class TaskGroup: public Task
 {
 public:
-    TaskGroup(Task* tasks[], int n); //Array of pointers to Task objects and length of array
+    TaskGroup(Task* tasks[], int n);
     void begin();
     void update();
 
 private:
-    Task** tasks_; //Adress of first element of array of Task objects
+    Task** tasks_;
     int n_;
 };
 

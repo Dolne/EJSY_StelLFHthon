@@ -1,24 +1,19 @@
 #ifndef menu_h
-#define menu_h //Prevents double definition
+#define menu_h
 
 #include <Arduino.h>
 #include "hardware.h"
 
 const uint8_t ROW_NONE = 0xff;
 
-class MenuHardware //Gamemaster controls
+class MenuHardware
 {
 public:
-    MenuHardware(const LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton); //LCD & 3 buttons
-    const LCD& getLCD() const;
-    const Button& getUpButton() const;
-    const Button& getToggleButton() const;
-    const Button& getDownButton() const;
-private:
-    const LCD& lcd_;
-    const Button& upButton_;
-    const Button& toggleButton_;
-    const Button& downButton_;
+    MenuHardware(LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton);
+    LCD& lcd;
+    const Button& upButton;
+    const Button& toggleButton;
+    const Button& downButton;
 };
 
 class MenuRow
@@ -55,6 +50,11 @@ public:
     Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount);
     const MenuHardware& getHardware() const;
     void update();
+    /**
+     * Called when menu stops being displayed.
+     * This ensures that all the states are correct when the menu is displayed again.
+     */
+    void disable();
 private:
     const MenuHardware& hardware_;
 
@@ -65,6 +65,17 @@ private:
      */
     uint8_t selected_ = 0;
     uint8_t scroll_ = 0;
+};
+
+// TODO can this be done without using Menu* (rather using Menu&)
+class MenuController
+{
+public:
+    MenuController(LCD& lcd);
+    void use(Menu* menu);
+private:
+    Menu* prevMenu_ = NULL;
+    LCD& lcd_;
 };
 
 class MenuOptionRow: public MenuRow
@@ -91,14 +102,14 @@ private:
     void printOption_();
 };
 
-// TODO actually add an action or smth
 class MenuActionRow: public MenuRow
 {
 public:
-    MenuActionRow(const MenuHardware& hardware, char* label);
-    MenuActionRow(const MenuHardware& hardware, char* label, bool (*isHidden)());
+    MenuActionRow(const MenuHardware& hardware, char* label, void (*action)());
+    MenuActionRow(const MenuHardware& hardware, char* label, void (*action)(), bool (*isHidden)());
     void updateInternal();
 private:
+    void (*action_)();
     char* label_;
     long nextBlinkTime_ = 2147483647L;
     bool blinkHide_ = false;

@@ -2,34 +2,17 @@
 /** 
  * the number of rows from the edge that the selected row can be before scrolling will happen
  */
-const uint8_t SCROLL_THRESHOLD = 1;
+const uint8_t SCROLL_THRESHOLD = 0;
 
 const uint8_t LABEL_WIDTH = 12;
 const int BLINK_INTERVAL = 500;
 
-MenuHardware::MenuHardware(const LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton): 
-    lcd_(lcd),
-    upButton_(upButton),
-    toggleButton_(toggleButton),
-    downButton_(downButton)
-{
-}
-const LCD& MenuHardware::getLCD() const
-{
-    return lcd_;
-}
-const Button& MenuHardware::getUpButton() const
-{
-    return upButton_;
-}
-const Button& MenuHardware::getToggleButton() const
-{
-    return toggleButton_;
-}
-const Button& MenuHardware::getDownButton() const
-{
-    return downButton_;
-}
+MenuHardware::MenuHardware(LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton): 
+    lcd(lcd),
+    upButton(upButton),
+    toggleButton(toggleButton),
+    downButton(downButton)
+{}
 
 MenuRow::MenuRow(const MenuHardware& hardware, bool (*isHidden)()): hardware_(hardware), isHidden_(isHidden)
 {
@@ -96,7 +79,7 @@ void Menu::update()
     // if selOk is not set to true it means there are no selectable (ie visible) rows
 
     // handle button clicks to update selected row and scroll
-    if (selOk && selected_ > 0 && getHardware().getUpButton().toggled(true)) {
+    if (selOk && selected_ > 0 && getHardware().upButton.toggled(true)) {
         // select the visible row above
         for (uint8_t sel = selected_ - 1; sel >= 0; sel--) {
             if (visibleRowIndex[sel] != ROW_NONE) {
@@ -105,7 +88,7 @@ void Menu::update()
             }
         }
     }
-    if (selOk && selected_ < rowCount_ - 1 && getHardware().getDownButton().toggled(true)) {
+    if (selOk && selected_ < rowCount_ - 1 && getHardware().downButton.toggled(true)) {
         // select the visible row below
         for (uint8_t sel = selected_ + 1; sel < rowCount_; sel++) {
             if (visibleRowIndex[sel] != ROW_NONE) {
@@ -150,6 +133,13 @@ void Menu::update()
     }
 }
 
+void Menu::disable()
+{
+    for (int i = 0; i < rowCount_; i++) {
+        rows_[i]->update(ROW_NONE, false);
+    }
+}
+
 MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, char *label, const char *options[], uint8_t optionsLen):
     MenuOptionRow(hardware, value, label, options, optionsLen, NULL)
 {
@@ -172,7 +162,7 @@ void MenuOptionRow::updateInternal()
         return;
     }
 
-    if (isSelected() && hardware_.getToggleButton().toggled(true)) {
+    if (isSelected() && hardware_.toggleButton.toggled(true)) {
         *value_ = (*value_ + 1) % optionsLen_;
     }
     
@@ -210,7 +200,7 @@ void MenuOptionRow::updateInternal()
 }
 
 void MenuOptionRow::printLabel_() {
-    LCD lcd = hardware_.getLCD();
+    LCD& lcd = hardware_.lcd;
     if (isSelected()) {
         lcd.print(getRow(), 0, ' ');
         lcd.print(getRow(), 1, LABEL_WIDTH - 1);
@@ -222,14 +212,16 @@ void MenuOptionRow::printLabel_() {
 
 void MenuOptionRow::printOption_()
 {
-    LCD lcd = hardware_.getLCD();
+    LCD& lcd = hardware_.lcd;
+    uint8_t row = getRow();
 
     // draw the arrow if selected (only redraw when just selected or row changed)
     if (selectedChanged() || rowChanged()) {
         if (isSelected()) {
-            lcd.print(getRow(), LABEL_WIDTH, 2, "\u0010 ");
+            lcd.write(row, LABEL_WIDTH, LCD_CHAR_ARROW);
+            lcd.print(row, LABEL_WIDTH + 1, ' ');
         } else {
-            lcd.print(getRow(), LABEL_WIDTH, ' ');
+            lcd.print(row, LABEL_WIDTH, ' ');
         }
     }
 
@@ -242,12 +234,15 @@ void MenuOptionRow::printOption_()
     if (!blinkHide_) {
         opt = options_[*value_];
     }
-    lcd.print(getRow(), col, 20 - col, opt);
+    lcd.print(row, col, 20 - col, opt);
 }
 
-MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label): MenuActionRow(hardware, label, NULL)
+MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)()): MenuActionRow(hardware, label, action, NULL)
 {}
-MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, bool (*isHidden)()): MenuRow(hardware, isHidden), label_(label)
+MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)(), bool (*isHidden)()):
+    MenuRow(hardware, isHidden),
+    label_(label),
+    action_(action)
 {}
 void MenuActionRow::updateInternal()
 {
@@ -255,8 +250,10 @@ void MenuActionRow::updateInternal()
         return;
     }
 
-    if (isSelected() && hardware_.getToggleButton().toggled(true)) {
-        // TODO
+    if (isSelected() && hardware_.toggleButton.toggled(true)) {
+        if (action_ != NULL) {
+            action_();
+        }
     }
 
     if (isSelected()) {
@@ -287,10 +284,12 @@ void MenuActionRow::updateInternal()
 }
 void MenuActionRow::print_()
 {
-    LCD lcd = hardware_.getLCD();
+    LCD& lcd = hardware_.lcd;
+    uint8_t row = getRow();
     if (selectedChanged() || rowChanged()) {
         if (isSelected()) {
-            lcd.print(getRow(), 0, 2, "\u0010 ");
+            lcd.write(row, 0, LCD_CHAR_ARROW);
+            lcd.print(row, 1, ' ');
         } else {
             lcd.print(getRow(), 0, ' ');
         }
@@ -304,4 +303,22 @@ void MenuActionRow::print_()
         label = label_;
     }
     lcd.print(getRow(), col, 20 - col, label);
+}
+
+MenuController::MenuController(LCD& lcd):
+    lcd_(lcd)
+{}
+
+void MenuController::use(Menu *menu)
+{
+    if (prevMenu_ != menu) {
+        if (prevMenu_ != NULL) {
+            prevMenu_->disable();
+        }
+        prevMenu_ = menu;
+        lcd_.clear();
+    }
+    if (menu != NULL) {
+        menu->update();
+    }
 }
