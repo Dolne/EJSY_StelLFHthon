@@ -20,8 +20,8 @@ The function runSpeed() determines when a step is to be taken. runSpeed() subtra
 // $Id: Random.pde,v 1.1 2011/01/05 01:51:01 mikem Exp mikem $
 
 // defines pins
-#define STEP_PIN 2
-#define DIR_PIN 5 
+#define STEP_PIN 26
+#define DIR_PIN 15 //Validated Can use pin 12, 14, 15
 //Leave the enable pin unconnected / grounded. If you connect it to 3V3, it will stop working
 //The stepper we use is 1.8deg per step but the driver does 8 microsteps per step
 //1.8 degrees per step & 8 microsteps per step means 1600 ((360/1.8)*8=1600) steps to turn 360 degrees
