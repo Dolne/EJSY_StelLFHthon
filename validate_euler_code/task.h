@@ -1,3 +1,5 @@
+/*A task is something that runs every loop*/
+
 #ifndef task_h
 #define task_h //Prevents double definition
 

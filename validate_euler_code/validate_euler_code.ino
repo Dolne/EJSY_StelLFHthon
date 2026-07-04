@@ -7,9 +7,9 @@
 #include "game.h"
 
 const int lcdAddr = 0x27; //The PCF8574 John bought from Sim Lim has default address 0x27 (TI compatible chip)
-const int buttonUpPin = 19;
-const int buttonSelectPin = 18;
-const int buttonDownPin = 17; //Starts at 17 because pin 16 is connected to the ESP's onboard neopixel
+const int buttonUpPin = 23; //Pin 21 & 22 already used for I2C
+const int buttonSelectPin = 19;
+const int buttonDownPin = 18; //Starts at 17 because pin 16 is connected to the ESP's onboard neopixel
 //Default for ESP32 I2C bus is SDA to Pin 21 and SCL to Pin 22 
 
 const int TICKRATE = 100;
@@ -37,11 +37,11 @@ bool tactileSubMenuHidden() {
 }
 
 MenuRow* rows[] = {
-    new MenuOptionRow(hardware, &options.rounds, "rounds", OPTS_ROUNDS, 4),
+    new MenuOptionRow(hardware /*hw wrapper*/, &options.rounds /*integer "value" of the menu, 0 indexed*/, "rounds" /*row name on the lcd*/, OPTS_ROUNDS /*actual text that each menu "value" is displayed on the LCD as*/, 4 /*Maximum value of the menu's "value" -1*/),
     new MenuOptionRow(hardware, &options.slotsCount, "slots", OPTS_SLOTS, 2),
 
-    new MenuOptionRow(hardware, &options.visual, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
-    new MenuOptionRow(hardware, &options.visualOptions[0], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(hardware, &options.visual /*if the value of this is 1, visualSubMenuHidden will change the following rows to shown*/, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
+    new MenuOptionRow(hardware, &options.visualOptions[0], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden /*function written above that returns optional bool for if its hidden*/),
     new MenuOptionRow(hardware, &options.visualOptions[1], "  colour", OPTS_ON_OFF, 2, visualSubMenuHidden),
     new MenuOptionRow(hardware, &options.visualOptions[2], "  size", OPTS_ON_OFF, 2, visualSubMenuHidden),
 
@@ -59,7 +59,7 @@ MenuRow* rows[] = {
 };
 Menu menu(hardware, rows, 15);
 
-bool timeForNextUpdate() {
+bool timeForNextUpdate() { /*to make it non blocking*/
     static long nextTime = millis();
     long time = millis();
     if (time >= nextTime) {
