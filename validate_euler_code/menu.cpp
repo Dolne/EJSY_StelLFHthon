@@ -2,7 +2,7 @@
 /** 
  * the number of rows from the edge that the selected row can be before scrolling will happen
  */
-const uint8_t SCROLL_THRESHOLD = 0;
+const uint8_t SCROLL_THRESHOLD = 1;
 
 const uint8_t LABEL_WIDTH = 12;
 const int BLINK_INTERVAL = 500;
