@@ -39,10 +39,10 @@ Total 25 pins
 
     * Stepper (Step, Dir, Homing LightGate)
 
-      * Stepper 1: **26, 12, 34**
-      * Stepper 2: **27, (13), 35**
-      * Stepper 3: **32, 14, 36** (pin 34 is input only)
-      * Stepper 4: **33, 15, 39** (pin 35 is input only)
+      * Stepper A: **26, 12, 34**
+      * Stepper B: **27, 13, 35**
+      * Stepper C: **32, 14, 36** (pin 34 is input only)
+      * Stepper D: **33, 15, 39** (pin 35 is input only)
   * MP3 Module (UART)
 
     * ESP TX --> Module RX: **17**
@@ -50,7 +50,10 @@ Total 25 pins
   * Vibration Motor Relay: **4**
   * RGB Lightstrip: **25**
 
-
+For testing, gamemaster controls is
+- Down: 4
+- Select: 17
+- Up: 25
 
 All pins
 
@@ -81,3 +84,6 @@ All pins
 
 * The ESP32 lowk don't work, can connect but can't seem to upload code
 
+###Settings for the steppers so they dont draw too much current and cause the wires to melt
+- setMaxSpeed(3000); 
+- setAcceleration(200);
