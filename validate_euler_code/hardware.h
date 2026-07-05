@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include <AccelStepper.h>
 
 #include "task.h"
 
@@ -57,6 +58,39 @@ public:
     void clear();
 private:
     LiquidCrystal_I2C lcd_;
+};
+
+class Stepper: public Task
+{
+public:
+    Stepper(uint8_t stepPin, uint8_t dirPin, int stepsPerRotation, float maxSpeed, float maxAcceleration);
+    void begin();
+    void update();
+    void directTo(float rotation);
+    void spinTo(float rotation, int extraRounds);
+    void stop();
+    bool running();
+private:
+    long currentPosition();
+    int currentRotation();
+    AccelStepper stepper_;
+    int stepsPerRotation_;
+    float maxSpeed_;
+    float acceleration_;
+};
+
+class StepperGroup: public Task
+{
+public:
+    StepperGroup(Stepper* steppers[], int n);
+    void begin();
+    void update();
+    void stopAll();
+    bool anyRunning() const;
+    Stepper* get(int i) const;
+private:
+    Stepper** steppers_;
+    int n_;
 };
 
 #endif

@@ -42,21 +42,19 @@ void GameRunner::spinSteppers()
 {
     if (round_ != 0) {
         for (int i = 0; i < MAX_SLOTS; i++) {
-            uint8_t val = round_->visual[i];
-            int position = val * STEPPER_STEPS / VISUAL_TOTAL_VALUES;
+            float val = round_->visual[i];
+            float rot = val / VISUAL_TOTAL_VALUES;
             Serial.print("stepper");
             Serial.print(i+1);
             Serial.print(": ");
-            Serial.println(position);
-            AccelStepper& stepper = hardware_.steppers[i];
-            int current = stepper.currentPosition() % STEPPER_STEPS;
+            Serial.println(rot);
+            Stepper* stepper = hardware_.steppers.get(i);
             if (val < VISUAL_VALUE_OFFSET) {
                 // go direct
-                stepper.move(position - current);
-                // stepper.move((position - current + STEPPER_STEPS) % STEPPER_STEPS);
+                stepper->directTo(rot);
             } else {
                 // spinny spin based on i
-                stepper.move(STEPPER_STEPS * (4 + i) + position - current);
+                stepper->spinTo(rot, 5 + i);
             }
         }
     }
@@ -79,19 +77,10 @@ void GameRunner::update()
         if (gameStage_.changed()) {
             delete round_;
             round_ = 0;
-            for (int i = 0; i < MAX_SLOTS; i++) {
-                hardware_.steppers[i].stop();
-            }
+            hardware_.steppers.stopAll();
         } else {
-            // if all hardware (output) stopped, gameStage_.set(GameStage::STOPPED)
-            bool anyRunning = false;
-            for (int i = 0; i < MAX_SLOTS; i++) {
-                if (hardware_.steppers[i].isRunning()) {
-                    anyRunning = true;
-                    break;
-                }
-            }
-            if (!anyRunning) {
+            // also wait for audio to stop
+            if (!hardware_.steppers.anyRunning()) {
                 gameStage_.set(GameStage::STOPPED);
             }
         }
@@ -123,14 +112,7 @@ void GameRunner::update()
             Serial.println("Spinning steppers...");
             spinSteppers();
         } else { // else if steppers stopped
-            bool anyRunning = false;
-            for (int i = 0; i < MAX_SLOTS; i++) {
-                if (hardware_.steppers[i].isRunning()) {
-                    anyRunning = true;
-                    break;
-                }
-            }
-            if (!anyRunning) {
+            if (!hardware_.steppers.anyRunning()) {
                 gameStage_.set(GameStage::SELECTION);
             }
         }

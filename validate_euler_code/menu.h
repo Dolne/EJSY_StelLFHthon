@@ -74,7 +74,7 @@ public:
     MenuController(LCD& lcd);
     void use(Menu* menu);
 private:
-    Menu* prevMenu_ = NULL;
+    Menu* prevMenu_ = nullptr;
     LCD& lcd_;
 };
 

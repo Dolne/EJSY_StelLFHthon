@@ -27,7 +27,7 @@ void MenuRow::update(uint8_t row, bool selected)
 }
 bool MenuRow::isHidden() 
 {
-    return isHidden_ != NULL && isHidden_();
+    return isHidden_ != nullptr && isHidden_();
 }
 bool MenuRow::isSelected()
 {
@@ -141,7 +141,7 @@ void Menu::disable()
 }
 
 MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, char *label, const char *options[], uint8_t optionsLen):
-    MenuOptionRow(hardware, value, label, options, optionsLen, NULL)
+    MenuOptionRow(hardware, value, label, options, optionsLen, nullptr)
 {
 }
 MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, char *label, const char *options[], uint8_t optionsLen, bool (*isHidden)()):
@@ -237,7 +237,7 @@ void MenuOptionRow::printOption_()
     lcd.print(row, col, 20 - col, opt);
 }
 
-MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)()): MenuActionRow(hardware, label, action, NULL)
+MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)()): MenuActionRow(hardware, label, action, nullptr)
 {}
 MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)(), bool (*isHidden)()):
     MenuRow(hardware, isHidden),
@@ -251,7 +251,7 @@ void MenuActionRow::updateInternal()
     }
 
     if (isSelected() && hardware_.toggleButton.toggled(true)) {
-        if (action_ != NULL) {
+        if (action_ != nullptr) {
             action_();
         }
     }
@@ -312,13 +312,13 @@ MenuController::MenuController(LCD& lcd):
 void MenuController::use(Menu *menu)
 {
     if (prevMenu_ != menu) {
-        if (prevMenu_ != NULL) {
+        if (prevMenu_ != nullptr) {
             prevMenu_->disable();
         }
         prevMenu_ = menu;
         lcd_.clear();
     }
-    if (menu != NULL) {
+    if (menu != nullptr) {
         menu->update();
     }
 }

@@ -9,19 +9,23 @@
 #include "game.h"
 #include "runner.h"
 
-// GPIO 16 (RX2) and 17 (RX2) used for audio
+// GPIO 16 (RX2) and 17 (TX2) used for audio
 
 // GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
 const int LCD_ADDR = 0x27;
 
 const uint8_t BUTTON_UP_PIN = 25;
 const uint8_t BUTTON_SELECT_PIN = 17;
-const uint8_t BUTTON_DOWN_PIN = 16;
+const uint8_t BUTTON_DOWN_PIN = 4;
 
 const uint8_t BUTTON_1_PIN = 5;
 const uint8_t BUTTON_2_PIN = 18;
 const uint8_t BUTTON_3_PIN = 19;
 const uint8_t BUTTON_4_PIN = 23;
+
+const int STEPS_PER_ROTATION = 1600;
+const int STEPPER_MAX_SPEED = 3000;
+const int STEPPER_ACCELERATION = 800;
 
 const uint8_t STEPPER_1_STEP = 26;
 const uint8_t STEPPER_1_DIR = 12;
@@ -47,28 +51,13 @@ Button button4(BUTTON_4_PIN);
 Button* inputButtonList[] = { &button1, &button2, &button3, &button4 };
 ButtonGroup inputButtons(inputButtonList, MAX_SLOTS);
 
-Task* taskList[] = { &configButtons, &inputButtons };
-TaskGroup tasks(taskList, 2);
+Stepper stepper1(STEPPER_1_STEP, STEPPER_1_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+Stepper stepper2(STEPPER_2_STEP, STEPPER_2_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+Stepper stepper3(STEPPER_3_STEP, STEPPER_3_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+Stepper stepper4(STEPPER_4_STEP, STEPPER_4_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+Stepper* stepperList[MAX_SLOTS] = { &stepper1, &stepper2, &stepper3, &stepper4 };
 
-// TODO can probably also wrap steppers into a Task class
-AccelStepper steppers[MAX_SLOTS] = {
-    AccelStepper(AccelStepper::DRIVER, STEPPER_1_STEP, STEPPER_1_DIR),
-    AccelStepper(AccelStepper::DRIVER, STEPPER_2_STEP, STEPPER_2_DIR),
-    AccelStepper(AccelStepper::DRIVER, STEPPER_3_STEP, STEPPER_3_DIR),
-    AccelStepper(AccelStepper::DRIVER, STEPPER_4_STEP, STEPPER_4_DIR)
-};
-
-void setupSteppers() {
-    for (int i = 0; i < MAX_SLOTS; i++) {
-        steppers[i].setMaxSpeed(3000);
-        steppers[i].setAcceleration(200);
-    }
-}
-void runSteppers() {
-    for (int i = 0; i < MAX_SLOTS; i++) {
-        steppers[i].run();
-    }
-}
+StepperGroup steppers(stepperList, MAX_SLOTS);
 
 LCD lcd = LCD(LCD_ADDR);
 
@@ -77,6 +66,9 @@ GameOptions options{};
 GameHardware gameHardware(lcd, inputButtons, configButtons, steppers);
 
 GameRunner runner(gameHardware);
+
+Task* taskList[] = { &configButtons, &inputButtons, &runner };
+TaskGroup tasks(taskList, 3);
 
 MenuHardware menuHardware(lcd, buttonUp, buttonSelect, buttonDown);
 
@@ -156,9 +148,7 @@ void setup() {
     Serial.begin(9600);
 
     tasks.begin();
-    setupSteppers();
-
-    runner.begin();
+    steppers.begin();
 
     lcd.begin();
 }
@@ -169,8 +159,7 @@ void loop() {
     static uint8_t prev2 = 0;
     if (timeForNextUpdate()) {
         tasks.update();
-        // actl are most buttons triggered on up (after down) rather then on down
-        runner.update();
+
         if (runner.stage().is(GameStage::CONFIG)) {
             menus.use(&configMenu);
         } else if (runner.stage().is(GameStage::FEEDBACK)) {
@@ -184,8 +173,8 @@ void loop() {
                 menus.use(&endMenu);
             }
         } else {
-            menus.use(NULL);
+            menus.use(nullptr);
         }
     }
-    runSteppers();
+    steppers.update();
 }

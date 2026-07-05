@@ -110,7 +110,7 @@ void printGameRound(GameRound* gameRound)
     printSlots(gameRound->tactile, TACTILE_FEATS_COUNT);
 }
 
-GameHardware::GameHardware(LCD &lcd, const ButtonGroup &inputButtons, const ButtonGroup &configButtons, AccelStepper steppers[MAX_SLOTS]):
+GameHardware::GameHardware(LCD &lcd, const ButtonGroup &inputButtons, const ButtonGroup &configButtons, StepperGroup& steppers):
     lcd(lcd),
     inputButtons(inputButtons),
     configButtons(configButtons),

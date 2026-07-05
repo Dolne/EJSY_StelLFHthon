@@ -133,7 +133,7 @@ Button *ButtonGroup::get(int i) const
     if (i < n_) {
         return buttons_[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -177,4 +177,115 @@ long ButtonGroup::lastToggled() const
         }
     }
     return latest;
+}
+
+int posMod(long num, int by) {
+    int val = num % by;
+    if (val < 0) {
+        return val + by;
+    }
+    return val;
+}
+
+Stepper::Stepper(uint8_t stepPin, uint8_t dirPin, int stepsPerRotation, float maxSpeed, float acceleration):
+    stepper_(AccelStepper::DRIVER, stepPin, dirPin),
+    stepsPerRotation_(stepsPerRotation),
+    maxSpeed_(maxSpeed),
+    acceleration_(acceleration)
+{}
+
+void Stepper::begin()
+{
+    stepper_.setMaxSpeed(maxSpeed_);
+    stepper_.setAcceleration(acceleration_);
+}
+
+void Stepper::update()
+{
+    stepper_.run();
+}
+
+// this may not work very well if stepper is moving
+void Stepper::directTo(float rotation)
+{
+    int current = currentRotation();
+    int diff1 = posMod(long(rotation * stepsPerRotation_), stepsPerRotation_) - current;
+    int diff2 = diff1 < 0 ? diff1 + stepsPerRotation_ : diff1 - stepsPerRotation_;
+
+    // move the shorter distance to the target rotation
+    Serial.print("direct ");
+    if (abs(diff1) <= abs(diff2)) {
+        Serial.println(diff1);
+        stepper_.move(diff1);
+    } else {
+        Serial.println(diff2);
+        stepper_.move(diff2);
+    }
+}
+
+// this may not work very well if stepper is moving
+void Stepper::spinTo(float rotation, int extraRounds)
+{
+    int diff = posMod(long(rotation * stepsPerRotation_) - currentRotation(), stepsPerRotation_);
+    Serial.print("spin ");
+    Serial.print(diff);
+    Serial.print("  ");
+    Serial.println(diff + stepsPerRotation_ * extraRounds);
+    stepper_.move(diff + stepsPerRotation_ * extraRounds);
+}
+
+void Stepper::stop()
+{
+    stepper_.stop();
+}
+
+bool Stepper::running()
+{
+    return stepper_.isRunning();
+}
+
+long Stepper::currentPosition()
+{
+    return stepper_.currentPosition();
+}
+int Stepper::currentRotation()
+{
+    return posMod(currentPosition(), stepsPerRotation_);
+}
+
+StepperGroup::StepperGroup(Stepper *steppers[], int n):
+    steppers_(steppers), n_(n)
+{
+}
+
+void StepperGroup::begin()
+{
+    for (int i = 0; i < n_; i++) {
+        steppers_[i]->begin();
+    }
+}
+void StepperGroup::update()
+{
+    for (int i = 0; i < n_; i++) {
+        steppers_[i]->update();
+    }
+}
+void StepperGroup::stopAll()
+{
+    for (int i = 0; i < n_; i++) {
+        steppers_[i]->stop();
+    }
+}
+bool StepperGroup::anyRunning() const
+{
+    for (int i = 0; i < n_; i++) {
+        if (steppers_[i]->running()) {
+            return true;
+        }
+    }
+    return false;
+}
+Stepper* StepperGroup::get(int i) const
+{
+    return i < n_ ? steppers_[i] : nullptr;
 }
