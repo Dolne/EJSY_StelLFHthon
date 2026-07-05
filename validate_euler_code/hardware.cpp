@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-Button::Button(uint8_t pin, uint8_t mode, uint8_t activeValue):
+Button::Button(Pin pin, uint8_t mode, uint8_t activeValue):
     prevState_(false),
     currState_(false),
     pin_(pin),
@@ -11,13 +11,13 @@ Button::Button(uint8_t pin, uint8_t mode, uint8_t activeValue):
     since_(millis())
 {
 }
-Button::Button(uint8_t pin): Button(pin, INPUT_PULLUP, LOW)
+Button::Button(Pin pin): Button(pin, INPUT_PULLUP, LOW)
 {
 }
 
 void Button::begin()
 {
-    pinMode(pin_, mode_);
+    pin_.pinMode(mode_);
     since_ = millis();
     update();
 }
@@ -25,7 +25,7 @@ void Button::begin()
 void Button::update()
 {
     prevState_ = currState_;
-    currState_ = digitalRead(pin_) == activeValue_;
+    currState_ = pin_.digitalRead() == activeValue_;
     if (toggled()) {
         since_ = millis();
     }
@@ -288,4 +288,40 @@ bool StepperGroup::anyRunning() const
 Stepper* StepperGroup::get(int i) const
 {
     return i < n_ ? steppers_[i] : nullptr;
+}
+
+Pin::Pin(uint8_t pin):
+    pin_(pin)
+{
+}
+
+Pin::Pin(uint8_t pin, Adafruit_MCP23XXX *expander):
+    pin_(pin), expander_(expander)
+{
+}
+
+void Pin::pinMode(uint8_t mode)
+{
+    if (expander_ == nullptr) {
+        ::pinMode(pin_, mode);
+    } else {
+        expander_->pinMode(pin_, mode);
+    }
+}
+
+uint8_t Pin::digitalRead() {
+    if (expander_ == nullptr) {
+        return ::digitalRead(pin_);
+    } else {
+        return expander_->digitalRead(pin_);
+    }
+}
+
+void Pin::digitalWrite(uint8_t val)
+{
+    if (expander_ == nullptr) {
+        ::digitalWrite(pin_, val);
+    } else {
+        expander_->digitalWrite(pin_, val);
+    }
 }

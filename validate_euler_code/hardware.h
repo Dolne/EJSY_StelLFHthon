@@ -4,16 +4,38 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <AccelStepper.h>
+#include <Adafruit_MCP23XXX.h>
 
 #include "task.h"
 
 inline const int STEPPER_STEPS = 1600;
 
+class Pin
+{
+public:
+    /** 
+     * represents a GPIO on the ESP32.
+     * this is a converting constructor.
+     */
+    Pin(uint8_t pin);
+    /**
+     * 
+     */
+    Pin(uint8_t pin, Adafruit_MCP23XXX* expander);
+    void pinMode(uint8_t mode);
+    uint8_t digitalRead();
+    void digitalWrite(uint8_t val);
+
+private:
+    uint8_t pin_;
+    Adafruit_MCP23XXX* expander_ = nullptr;
+};
+
 class Button: public Task
 {
 public:
-    Button(uint8_t pin);
-    Button(uint8_t pin, uint8_t mode, uint8_t activeValue);
+    Button(Pin pin);
+    Button(Pin pin, uint8_t mode, uint8_t activeValue);
     void begin();
     void update();
     bool toggled() const;
@@ -21,7 +43,7 @@ public:
     bool isActive() const;
     long lastToggled() const;
 private:
-    uint8_t pin_;
+    Pin pin_;
     uint8_t mode_;
     bool prevState_;
     bool currState_;
