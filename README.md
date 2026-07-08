@@ -67,8 +67,6 @@ All pins
 
 **34, 35,** **36, 39**
 
-### 
-
 ### The stuff from LF
 
 * The ESP32 lowk don't work, can connect but can't seem to upload code
