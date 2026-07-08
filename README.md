@@ -71,6 +71,22 @@ All pins
 
 * The ESP32 lowk don't work, can connect but can't seem to upload code
 
-###Settings for the steppers so they dont draw too much current and cause the wires to melt
+### Settings for the steppers so they dont draw too much current and cause the wires to melt
 - setMaxSpeed(3000); 
 - setAcceleration(200);
+
+## ToDo
+### Outstanding features software
+- [ ] YX5300
+- [ ] Individually addressable RGB for feedback
+- [ ] Individually addressable RGB for scanning
+- [ ] Vibration Motor
+- [ ] LightGate
+
+### Outstanding features hardware
+- [ ] Power Solution
+- [x] YX5300 & Logic Level Shifter (on breadboard)
+- [x] LightGate ()
+- [ ] Masking tape
+- [ ] MCP 
+- [ ] Individual neopixels / make some
