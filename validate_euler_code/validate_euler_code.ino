@@ -17,9 +17,14 @@ Adafruit_MCP23X17 expander;
 // GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
 const int LCD_ADDR = 0x27;
 
-const uint8_t BUTTON_UP_PIN = 25; // const Pin BUTTON_UP_PIN = Pin(0, &expander);
-const uint8_t BUTTON_SELECT_PIN = 17; // const Pin BUTTON_SELECT_PIN = Pin(1, &expander);
-const uint8_t BUTTON_DOWN_PIN = 4; // const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
+//const uint8_t BUTTON_UP_PIN = 25;
+const Pin BUTTON_UP_PIN = Pin(0, &expander);
+
+//const uint8_t BUTTON_SELECT_PIN = 17;
+const Pin BUTTON_SELECT_PIN = Pin(1, &expander);
+
+//const uint8_t BUTTON_DOWN_PIN = 4;
+const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
 
 const uint8_t BUTTON_1_PIN = 5;
 const uint8_t BUTTON_2_PIN = 18;
