@@ -15,45 +15,34 @@ Unassigned pins as letters
 Total 25 pins
 
 * Gamemaster Controls Subsystem
-
   * I2C (for 20x4 LCD)
-
     * SDA (Serial Data): **21**
     * SCL (Serial Clock): **22**
   * 3 buttons
-
-    * **A**
-    * **B**
-    * **C**
+    * MCP23017
 * User Controls Subsystem
-
   * 4 buttons
-
     * **5**
     * **18**
     * **19**
     * **23**
 * Option Stimuli \& Feedback Subsystem
-
   * Visual Stimuli
-
     * Stepper (Step, Dir, Homing LightGate)
-
       * Stepper A: **26, 12, 34**
       * Stepper B: **27, 13, 35**
       * Stepper C: **32, 14, 36** (pin 34 is input only)
       * Stepper D: **33, 15, 39** (pin 35 is input only)
   * MP3 Module (UART)
-
     * ESP TX --> Module RX: **17**
     * ESP RX <-- Module TX: **16**
   * Vibration Motor Relay: **4**
   * RGB Lightstrip: **25**
 
 For testing, gamemaster controls is
-- Down: 4
-- Select: 17
-- Up: 25
+* Down: 4
+* Select: 17
+* Up: 25
 
 All pins
 
