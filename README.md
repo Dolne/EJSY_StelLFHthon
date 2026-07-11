@@ -77,23 +77,38 @@ All pins
 
 ## ToDo
 ### Outstanding features software
-- [ ] YX5300
-- [ ] Individually addressable RGB for feedback
-- [ ] Individually addressable RGB for scanning
-- [ ] Vibration Motor
+#### Option stimuli
+- [ ] YX5300 (Audio Player)
+- [ ] Show options for tactile on gamemaster screen
 - [ ] LightGate
+
+#### User Controls
+- [ ] Individually addressable RGB for scanning
+
+#### Feedback
+- [ ] Individually addressable RGB for feedback
+- [ ] Vibration Motor
+- [ ] Round / Score messages
 
 ### Outstanding features hardware
-- [x] Power Solution
+#### Option stimuli
+- [x] Individual neopixels / make some
 - [ ] YX5300 & Logic Level Shifter (on breadboard)
 - [ ] LightGate
-- [x] Masking tape
-- [x] MCP23017 
-- [x] Individual neopixels / make some
-- [ ] 5V Power Solution
 - [ ] Overlays
-- [ ] Vibration Motor & Relay
+- [ ] Wheels
+- [ ] Stepper mount
+
+#### User Controls
 - [ ] Scanning RGB Lightstrip
-- [ ] Scanning + Feedback Lightstrip
 
+#### Feedback
+- [ ] Vibration Motor & Relay
+- [ ] Feedback Lightstrip
 
+#### Power
+- [x] Power Solution
+- [ ] 5V Power Solution
+
+#### Others
+- [x] Masking tape
