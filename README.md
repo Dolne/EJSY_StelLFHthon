@@ -78,10 +78,16 @@ All pins
 
 ## ToDo
 ### Outstanding features software
-#### Option stimuli
-- [ ] YX5300 (Audio Player)
+
+#### Software ↔︎ Hardware
+- [x] YX5300 (Audio Player)
+- [ ] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
+- [ ] stepper homing sequence (light gates)
+- [ ] bring steppers to 0 at end of game or before turning off?
+
+#### Gamemaster
 - [ ] Show options for tactile on gamemaster screen
-- [ ] LightGate
+- [ ] Check/validate options (eg no diffs selected)
 
 #### User Controls
 - [ ] Individually addressable RGB for scanning
