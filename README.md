@@ -19,7 +19,7 @@ Total 25 pins
     * SDA (Serial Data): **21**
     * SCL (Serial Clock): **22**
   * 3 buttons
-    * MCP23017 pins **0, 1 and 2**
+    * **MCP23017 pins 0, 1 and 2**
 * User Controls Subsystem
   * 4 buttons
     * **5**
@@ -36,8 +36,9 @@ Total 25 pins
   * MP3 Module (UART)
     * ESP TX --> Module RX: **17**
     * ESP RX <-- Module TX: **16**
-  * Vibration Motor Relay: **4**
-  * RGB Lightstrip: **25**
+  * Vibration Motor Relay: **2**
+  * Feedback RGB Lightstrip: **25**
+  * Scanning RGB Lightstrip: **4**
 
 ~~For testing, gamemaster controls is --> dont need, the MCP23017 expander works liao~~
 * ~~Down: 4~~
@@ -49,7 +50,7 @@ All pins
 0
 ~~1,~~ (Serial Monitor)
 
-2,
+**2,**
 
 ~~3,~~ (Serial Monitor)
 
