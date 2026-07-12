@@ -32,7 +32,7 @@ void GameRunner::reset()
     options_.enabled = false;
     scanningRunner_.stop();
     delete round_;
-    round_ = 0;
+    round_ = nullptr;
     score_ = 0;
     rounds_ = 0;
     gameStage_.set(GameStage::STOPPING);
@@ -148,18 +148,11 @@ void GameRunner::update()
             Serial.println(round_->answer);
             if (round_->answer == round_->odd1OutSlot) {
                 Serial.println("Correct answer!");
+                score_++;
             } else {
                 Serial.println("Wrong answer :(");
             }
         }
-        if (round_->answer == round_->odd1OutSlot) {
-            
-        } else {
-
-        }
-        // show a menu with the score
-        // and action to start new game
-        // call reset() to go back to config
     }
 }
 
@@ -173,12 +166,12 @@ uint8_t GameRunner::currRound()
 }
 uint8_t GameRunner::totalRounds()
 {
-    return options_.enabled ? options_.rounds : 0;
+    return options_.enabled ? options_.rounds + 1 : 0;
 }
 
 bool GameRunner::hasNextRound()
 {
-    return currRound() < totalRounds();
+    return currRound() < totalRounds() - 1;
 }
 
 
