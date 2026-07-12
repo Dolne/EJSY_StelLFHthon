@@ -46,10 +46,15 @@ bool MenuRow::rowChanged()
     return row_ != prevRow_;
 }
 
-Menu::Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount): 
+Menu::Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount):
+    Menu(hardware, rows, rowCount, 0)
+{}
+Menu::Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount, uint8_t initSelected): 
     hardware_(hardware),
     rows_(rows),
-    rowCount_(rowCount)
+    rowCount_(rowCount),
+    initSelected_(initSelected),
+    selected_(initSelected_)
 {
 }
 const MenuHardware& Menu::getHardware() const
@@ -102,8 +107,12 @@ void Menu::update()
     if (scroll_ < 0) {
         scroll_ = 0;
     }
-    if (scroll_ > visibleRowCount - 4) {
-        scroll_ = visibleRowCount - 4;
+    uint8_t maxScroll = visibleRowCount - 4;
+    if (maxScroll < 0) {
+        maxScroll = 0;
+    }
+    if (scroll_ > maxScroll) {
+        scroll_ = maxScroll;
     }
 
     // scroll selected_ into view
@@ -135,16 +144,17 @@ void Menu::update()
 
 void Menu::disable()
 {
+    selected_ = initSelected_;
     for (int i = 0; i < rowCount_; i++) {
         rows_[i]->update(ROW_NONE, false);
     }
 }
 
-MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, char *label, const char *options[], uint8_t optionsLen):
+MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, const char *label, const char *options[], uint8_t optionsLen):
     MenuOptionRow(hardware, value, label, options, optionsLen, nullptr)
 {
 }
-MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, char *label, const char *options[], uint8_t optionsLen, bool (*isHidden)()):
+MenuOptionRow::MenuOptionRow(const MenuHardware& hardware, uint8_t *value, const char *label, const char *options[], uint8_t optionsLen, bool (*isHidden)()):
     MenuRow(hardware, isHidden),
     value_(value),
     prevValue_(*value),
@@ -237,9 +247,9 @@ void MenuOptionRow::printOption_()
     lcd.print(row, col, 20 - col, opt);
 }
 
-MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)()): MenuActionRow(hardware, label, action, nullptr)
+MenuActionRow::MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)()): MenuActionRow(hardware, label, action, nullptr)
 {}
-MenuActionRow::MenuActionRow(const MenuHardware& hardware, char* label, void (*action)(), bool (*isHidden)()):
+MenuActionRow::MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)(), bool (*isHidden)()):
     MenuRow(hardware, isHidden),
     label_(label),
     action_(action)
@@ -290,15 +300,13 @@ void MenuActionRow::print_()
         if (isSelected()) {
             lcd.write(row, 0, LCD_CHAR_ARROW);
             lcd.print(row, 1, ' ');
-        } else {
-            lcd.print(getRow(), 0, ' ');
         }
     }
-    uint8_t col = 1;
+    uint8_t col = 0;
     if (isSelected()) {
-        col += 1;
+        col += 2;
     }
-    char* label = "";
+    const char* label = "";
     if (!blinkHide_) {
         label = label_;
     }
@@ -321,4 +329,35 @@ void MenuController::use(Menu *menu)
     if (menu != nullptr) {
         menu->update();
     }
+}
+
+MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, char *info):
+    MenuInfoRow(hardware, info, nullptr)
+{
+}
+
+MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, char *info, bool (*isHidden)()):
+    MenuRow(hardware, isHidden),
+    info_(info)
+{
+}
+
+void MenuInfoRow::updateInternal()
+{
+    if (getRow() == ROW_NONE) {
+        return;
+    }
+    if (rowChanged() || selectedChanged()) {
+        print_();
+    }
+}
+
+void MenuInfoRow::print_()
+{
+    uint8_t col = 0;
+    if (isSelected()) {
+        col = 1;
+        hardware_.lcd.print(getRow(), 0, ' ');
+    }
+    hardware_.lcd.print(getRow(), col, 20 - col, info_);
 }

@@ -80,12 +80,7 @@ TaskGroup tasks(taskList, 3);
 
 MenuHardware menuHardware(lcd, buttonUp, buttonSelect, buttonDown);
 
-int score = 0;
-int roundsDone = 0;
-
 void startGame() {
-    score = 0;
-    roundsDone = 0;
     runner.startGame(options);
 }
 bool visualSubMenuHidden() {
@@ -122,23 +117,42 @@ MenuRow* configRows[] = {
 };
 Menu configMenu(menuHardware, configRows, sizeof(configRows) / sizeof(configRows[0]));
 
+void resetGame() {
+    runner.reset();
+}
+
+char roundInfo[20] = {};
+
+MenuRow* roundRows[] = {
+    new MenuInfoRow(menuHardware, roundInfo),
+    new MenuActionRow(menuHardware, "Reset/Restart Game", resetGame)
+};
+Menu roundMenu(menuHardware, roundRows, sizeof(roundRows) / sizeof(roundRows[0]));
+
+char scoreInfo[20] = {};
+
 void nextRound() {
     runner.nextRound();
 }
 
 MenuRow* nextRows[] = {
+    new MenuInfoRow(menuHardware, roundInfo),
+    new MenuInfoRow(menuHardware, scoreInfo),
     new MenuActionRow(menuHardware, "Next round", nextRound)
 };
-Menu nextMenu(menuHardware, nextRows, sizeof(nextRows) / sizeof(nextRows[0]));
+Menu nextMenu(menuHardware, nextRows, sizeof(nextRows) / sizeof(nextRows[0]), 2);
+
+char endScoreInfo[20] = {};
 
 void newGame() {
     runner.reset();
 }
 
 MenuRow* endRows[] = {
+    new MenuInfoRow(menuHardware, endScoreInfo),
     new MenuActionRow(menuHardware, "New game", newGame)
 };
-Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]));
+Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]), 1);
 
 MenuController menus(lcd);
 
@@ -171,9 +185,15 @@ void loop() {
 
         if (runner.stage().is(GameStage::CONFIG)) {
             menus.use(&configMenu);
+        } else if (runner.stage().is(GameStage::SPINNING) || runner.stage().is(GameStage::SELECTION)) {
+            if (runner.stage().changed()) {
+                sprintf(roundInfo, "Round %d/%d", runner.currRound() + 1, runner.totalRounds());
+            }
+            menus.use(&roundMenu);
         } else if (runner.stage().is(GameStage::FEEDBACK)) {
             if (runner.stage().changed()) {
-                roundsDone++;
+                sprintf(scoreInfo, "Total score: %d", runner.score());
+                sprintf(endScoreInfo, "Total score: %d/%d", runner.score(), runner.totalRounds());
             }
             
             if (runner.hasNextRound()) {

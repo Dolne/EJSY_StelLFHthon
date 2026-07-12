@@ -89,7 +89,7 @@ All pins
 #### Feedback
 - [ ] Individually addressable RGB for feedback
 - [ ] Vibration Motor
-- [ ] Round / Score messages
+- [x] Round / Score messages
 
 ### Outstanding features hardware
 #### Option stimuli

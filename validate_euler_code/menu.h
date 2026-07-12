@@ -48,6 +48,7 @@ class Menu
 {
 public:
     Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount);
+    Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount, uint8_t initSelected);
     const MenuHardware& getHardware() const;
     void update();
     /**
@@ -60,6 +61,7 @@ private:
 
     MenuRow** rows_;
     uint8_t rowCount_;
+    uint8_t initSelected_ = 0;
     /**
      * the currently selected row. controlled by `upButton_` and `downButton_`.
      */
@@ -81,8 +83,8 @@ private:
 class MenuOptionRow: public MenuRow
 {
 public:
-    MenuOptionRow(const MenuHardware& hardware, uint8_t* value, char* label, const char* options[], uint8_t optionsLen);
-    MenuOptionRow(const MenuHardware& hardware, uint8_t* value, char* label, const char* options[], uint8_t optionsLen, bool (*isHidden)());
+    MenuOptionRow(const MenuHardware& hardware, uint8_t* value, const char* label, const char* options[], uint8_t optionsLen);
+    MenuOptionRow(const MenuHardware& hardware, uint8_t* value, const char* label, const char* options[], uint8_t optionsLen, bool (*isHidden)());
 private:
     void updateInternal();
     /**
@@ -92,7 +94,7 @@ private:
      */
     uint8_t* value_;
     uint8_t prevValue_;
-    char* label_;
+    const char* label_;
     const char** options_;
     uint8_t optionsLen_;
     long nextBlinkTime_ = 2147483647L;
@@ -105,15 +107,26 @@ private:
 class MenuActionRow: public MenuRow
 {
 public:
-    MenuActionRow(const MenuHardware& hardware, char* label, void (*action)());
-    MenuActionRow(const MenuHardware& hardware, char* label, void (*action)(), bool (*isHidden)());
-    void updateInternal();
+    MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)());
+    MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)(), bool (*isHidden)());
 private:
+    void updateInternal();
     void (*action_)();
-    char* label_;
+    const char* label_;
     long nextBlinkTime_ = 2147483647L;
     bool blinkHide_ = false;
 
+    void print_();
+};
+
+class MenuInfoRow: public MenuRow
+{
+public:
+    MenuInfoRow(const MenuHardware& hardware, char* info);
+    MenuInfoRow(const MenuHardware& hardware, char* info, bool (*isHidden)());
+private:
+    void updateInternal();
+    char* info_;
     void print_();
 };
 
