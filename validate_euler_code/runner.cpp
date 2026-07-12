@@ -78,9 +78,11 @@ void GameRunner::update()
             delete round_;
             round_ = 0;
             hardware_.steppers.stopAll();
+            hardware_.audio.stop();
+            // TODO stop led animation
         } else {
             // also wait for audio to stop
-            if (!hardware_.steppers.anyRunning()) {
+            if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing()) {
                 gameStage_.set(GameStage::STOPPED);
             }
         }
@@ -141,18 +143,27 @@ void GameRunner::update()
         }
     } else if (gameStage_.is(GameStage::FEEDBACK)) {
         if (round_->answer >= round_->slotsCount) {
+            // invalid answer; go back to answer selection
             gameStage_.set(GameStage::SELECTION);
         }
         if (gameStage_.changed()) {
             Serial.print("Slot selected: ");
             Serial.println(round_->answer);
+            // update score, play audio
             if (round_->answer == round_->odd1OutSlot) {
                 Serial.println("Correct answer!");
                 score_++;
+                // hardware_.audio.play(1, 5);
+                // TODO start led success animation
             } else {
                 Serial.println("Wrong answer :(");
+                // hard
+                // hardware_.audio.play(1, 6);
+                // TODO start led failure animation
             }
         }
+        // run led animation
+        // should be plenty good enough to run in update here (100 times per second)
     }
 }
 
@@ -205,10 +216,10 @@ void ScanningRunner::update()
     if (scanStage_.is(ScanStage::STOPPED)) {
         if (scanStage_.changed()) {
             slot_ = 0;
-            // TODO tell the audio to stop
+            hardware_.audio.stop();
             // probably doesnt need to wait for it to stop?
             // if need to wait should have a STOPPING state
-            // TODO turn off the light
+            // TODO turn off led
         }
     } else if (scanStage_.is(ScanStage::WAITING)) {
         long diff = millis() - scanStage_.since();
@@ -221,11 +232,12 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::SLOT_START)) {
         Serial.print("Scanning slot ");
         Serial.println(slot_);
-        // turn on the arrow light for the slot
+        // TODO turn on the arrow light for the slot
         scanStage_.set(ScanStage::INITIAL_AUDIO);
     } else if (scanStage_.is(ScanStage::INITIAL_AUDIO)) {
         if (scanStage_.changed()) {
             // if enabled, play audio
+            // hardware_.audio.play(1, slot_ + 1);
         } else if (/* audio done */ true) {
             if (round_->hasAudio) {
                 wait(500, ScanStage::AUDIO);
@@ -236,11 +248,19 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::AUDIO)) {
         if (scanStage_.changed()) {
             // play audio
-        } else if (/* audio done */ true) {
-            wait(2000, ScanStage::SLOT_END);
-            // wait(500, ScanStage::SLOT_END);
+            // if (round->audio[slot_] > 0) {
+            //     hardware_.audio.play(2, round_->audio[slot_]);
+            // }
+        } else if (/* !hardware_.audio.playing() */ true) {
+            long dur = millis() - scanStage_.since();
+            if (dur < 2000) {
+                wait(2500 - dur, ScanStage::SLOT_END);
+            } else {
+                wait(500, ScanStage::SLOT_END);
+            }
         }
     } else if (scanStage_.is(ScanStage::SLOT_END)) {
+        // TODO turn off led
         if (round_->slotsCount <= MAX_SLOTS && slot_ < round_->slotsCount - 1) {
             slot_++;
         } else {

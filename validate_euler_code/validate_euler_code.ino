@@ -13,6 +13,9 @@ const uint8_t MCP_ADDR = 0x20;
 Adafruit_MCP23X17 expander;
 
 // GPIO 16 (RX2) and 17 (TX2) used for audio
+const uint8_t MP3_RX = 16; // ESP RX2 connected to YX5300 TX
+const uint8_t MP3_TX = 17; // ESP TX2 connected to YX5300 RX
+const uint8_t AUDIO_VOLUME = 30;
 
 // GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
 const int LCD_ADDR = 0x27;
@@ -67,11 +70,13 @@ Stepper* stepperList[MAX_SLOTS] = { &stepper1, &stepper2, &stepper3, &stepper4 }
 
 StepperGroup steppers(stepperList, MAX_SLOTS);
 
-LCD lcd = LCD(LCD_ADDR);
+AudioPlayer audio(Serial2, MP3_RX, MP3_TX);
+
+LCD lcd(LCD_ADDR);
 
 GameOptions options{};
 
-GameHardware gameHardware(lcd, inputButtons, configButtons, steppers);
+GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio);
 
 GameRunner runner(gameHardware);
 
@@ -172,6 +177,8 @@ void setup() {
 
     tasks.begin();
     steppers.begin();
+    audio.begin();
+    audio.setVolume(AUDIO_VOLUME);
 
     lcd.begin();
 }
@@ -206,4 +213,5 @@ void loop() {
         }
     }
     steppers.update();
+    audio.update();
 }

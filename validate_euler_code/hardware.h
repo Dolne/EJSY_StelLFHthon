@@ -5,6 +5,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <AccelStepper.h>
 #include <Adafruit_MCP23XXX.h>
+#include <MD_YX5300.h>
 
 #include "task.h"
 
@@ -113,6 +114,28 @@ public:
 private:
     Stepper** steppers_;
     int n_;
+};
+
+class AudioPlayer: public Task
+{
+public:
+    AudioPlayer(HardwareSerial& serial, uint8_t rxPin, uint8_t txPin);
+    void begin();
+    void update();
+    void play(uint8_t track);
+    void play(uint8_t folder, uint8_t track);
+    void stop();
+    void setVolume(uint8_t volume);
+    bool playing();
+
+private:
+    uint8_t rxPin_;
+    uint8_t txPin_;
+    HardwareSerial& serial_;
+    MD_YX5300 mp3_;
+    bool playing_ = false;
+
+    void handleStatus_(const MD_YX5300::cbData *data);
 };
 
 #endif

@@ -325,3 +325,72 @@ void Pin::digitalWrite(uint8_t val)
         expander_->digitalWrite(pin_, val);
     }
 }
+
+AudioPlayer::AudioPlayer(HardwareSerial &serial, uint8_t rxPin, uint8_t txPin):
+    serial_(serial),
+    mp3_(serial_),
+    rxPin_(rxPin),
+    txPin_(txPin)
+{
+}
+
+void AudioPlayer::begin()
+{
+    serial_.begin(MD_YX5300::SERIAL_BPS, SERIAL_8N1, rxPin_, txPin_);
+    mp3_.begin();
+    mp3_.setSynchronous(false);
+}
+
+void AudioPlayer::update()
+{
+    if (mp3_.check()) {
+        handleStatus_(mp3_.getStatus());
+    }
+}
+
+void AudioPlayer::play(uint8_t track)
+{
+    mp3_.playTrack(track);
+    playing_ = true;
+}
+void AudioPlayer::play(uint8_t folder, uint8_t track)
+{
+    mp3_.playSpecific(folder, track);
+    playing_ = true;
+}
+
+void AudioPlayer::stop()
+{
+    mp3_.playStop();
+    playing_ = false;
+}
+
+void AudioPlayer::setVolume(uint8_t volume)
+{
+    mp3_.volume(volume);
+}
+
+bool AudioPlayer::playing()
+{
+    return playing_;
+}
+
+void AudioPlayer::handleStatus_(const MD_YX5300::cbData *data)
+{
+    switch (data->code) {
+        case MD_YX5300::STS_ACK_OK:
+            // last command acknolwedged; do nothing
+            Serial.println("STS_ACK_OK");
+            break;
+        case MD_YX5300::STS_FILE_END:
+            // file being played has ended; update status
+            Serial.println("STS_FILE_END");
+            playing_ = false;
+            break;
+        case MD_YX5300::STS_ERR_FILE:
+            // error playing file; update status
+            Serial.println("STS_ERR_FILE");
+            playing_ = false;
+            break;
+    }
+}
