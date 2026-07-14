@@ -394,3 +394,52 @@ void AudioPlayer::handleStatus_(const MD_YX5300::cbData *data)
             break;
     }
 }
+
+OutputController::OutputController(Pin pin):
+    pin_(pin)
+{}
+void OutputController::begin()
+{
+    pin_.pinMode(OUTPUT);
+    pin_.digitalWrite(LOW);
+}
+void OutputController::update()
+{
+    long time = millis();
+    if (seq_ != nullptr && seqLen_ > 0 && time >= seqStart_) {
+        int t = (time - seqStart_) % seqDuration_;
+        int accum = 0;
+        for (int i = 0; i < seqLen_; i++) {
+            accum += seq_[i];
+            if (t < accum) {
+                // currently this will digital write every update
+                if (i % 2 == 0) {
+                    pin_.digitalWrite(HIGH);
+                } else {
+                    pin_.digitalWrite(LOW);
+                }
+                break;
+            }
+        }
+    }
+}
+void OutputController::enable()
+{
+    pin_.digitalWrite(HIGH);
+}
+void OutputController::disable()
+{
+    seq_ = nullptr;
+    seqLen_ = 0;
+    pin_.digitalWrite(LOW);
+}
+void OutputController::startSequence(const int seq[], int seqLen)
+{
+    seq_ = seq;
+    seqLen_ = seqLen;
+    seqStart_ = millis();
+    seqDuration_ = 0;
+    for (int i = 0; i < seqLen; i++) {
+        seqDuration_ += seq[i];
+    }
+}

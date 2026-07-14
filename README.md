@@ -84,6 +84,7 @@ All pins
 - [ ] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
 - [ ] stepper homing sequence (light gates)
 - [ ] bring steppers to 0 at end of game or before turning off?
+- [ ] periodically refresh entire screen
 
 #### Gamemaster
 - [ ] Show options for tactile on gamemaster screen
@@ -94,7 +95,7 @@ All pins
 
 #### Feedback
 - [ ] Individually addressable RGB for feedback
-- [ ] Vibration Motor
+- [x] Vibration Motor
 - [x] Round / Score messages
 
 ### Outstanding features hardware

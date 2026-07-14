@@ -73,13 +73,16 @@ void GameRunner::update()
 {
     gameStage_.update();
 
+    if (!gameStage_.is(GameStage::FEEDBACK) && gameStage_.changed()) {
+        hardware_.vibration.disable();
+        // TODO stop led animation
+    }
     if (gameStage_.is(GameStage::STOPPING)) {
         if (gameStage_.changed()) {
             delete round_;
             round_ = 0;
             hardware_.steppers.stopAll();
             hardware_.audio.stop();
-            // TODO stop led animation
         } else {
             // also wait for audio to stop
             if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing()) {
@@ -154,11 +157,13 @@ void GameRunner::update()
                 Serial.println("Correct answer!");
                 score_++;
                 // hardware_.audio.play(1, 5);
+                hardware_.vibration.startSequence(hardware_.vibrationSeqSuccess, hardware_.vibrationSeqSuccessLen);
                 // TODO start led success animation
             } else {
                 Serial.println("Wrong answer :(");
                 // hard
                 // hardware_.audio.play(1, 6);
+                hardware_.vibration.startSequence(hardware_.vibrationSeqFail, hardware_.vibrationSeqFailLen);
                 // TODO start led failure animation
             }
         }

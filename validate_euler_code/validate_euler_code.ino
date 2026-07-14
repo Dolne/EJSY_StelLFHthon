@@ -34,6 +34,8 @@ const uint8_t BUTTON_2_PIN = 18;
 const uint8_t BUTTON_3_PIN = 19;
 const uint8_t BUTTON_4_PIN = 23;
 
+const uint8_t VIBRATION_PIN = 2; // can be a Pin with &expander also
+
 const int STEPS_PER_ROTATION = 1600;
 const int STEPPER_MAX_SPEED = 3000;
 const int STEPPER_ACCELERATION = 800;
@@ -62,6 +64,12 @@ Button button4(BUTTON_4_PIN);
 Button* inputButtonList[] = { &button1, &button2, &button3, &button4 };
 ButtonGroup inputButtons(inputButtonList, MAX_SLOTS);
 
+OutputController vibration(VIBRATION_PIN);
+const int VIBRATION_SUCCESS[] = {500, 500, 500, 500, 500, 1500};
+const int VIBRATION_SUCCESS_LEN = 6;
+const int VIBRATION_FAIL[] = {2500, 500};
+const int VIBRATION_FAIL_LEN = 2;
+
 Stepper stepper1(STEPPER_1_STEP, STEPPER_1_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
 Stepper stepper2(STEPPER_2_STEP, STEPPER_2_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
 Stepper stepper3(STEPPER_3_STEP, STEPPER_3_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
@@ -76,12 +84,12 @@ LCD lcd(LCD_ADDR);
 
 GameOptions options{};
 
-GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio);
+GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 
-Task* taskList[] = { &configButtons, &inputButtons, &runner };
-TaskGroup tasks(taskList, 3);
+Task* taskList[] = { &configButtons, &inputButtons, &runner, &vibration };
+TaskGroup tasks(taskList, 4);
 
 MenuHardware menuHardware(lcd, buttonUp, buttonSelect, buttonDown);
 
@@ -162,10 +170,11 @@ Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]), 1);
 MenuController menus(lcd);
 
 bool timeForNextUpdate() {
+    static const int interval = 1000 / TICKRATE;
     static long nextTime = millis();
     long time = millis();
     if (time >= nextTime) {
-        nextTime += 1000 / TICKRATE;
+        nextTime += ((time - nextTime) / interval + 1) * interval;
         return true;
     }
     return false;

@@ -138,4 +138,21 @@ private:
     void handleStatus_(const MD_YX5300::cbData *data);
 };
 
+class OutputController: public Task
+{
+public:
+    OutputController(Pin pin);
+    void begin();
+    void update();
+    void enable();
+    void startSequence(const int seq[], int seqLen);
+    void disable();
+private:
+    Pin pin_;
+    const int *seq_ = nullptr;
+    int seqLen_ = 0;
+    int seqDuration_ = 0;
+    long seqStart_ = 0;
+};
+
 #endif

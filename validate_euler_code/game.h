@@ -32,12 +32,17 @@ inline const int MAX_SLOTS = 4;
 class GameHardware
 {
 public:
-    GameHardware(LCD& lcd, const ButtonGroup& inputButtons, const ButtonGroup& configButtons, StepperGroup& steppers, AudioPlayer& audio);
+    GameHardware(LCD& lcd, const ButtonGroup& inputButtons, const ButtonGroup& configButtons, StepperGroup& steppers, AudioPlayer& audio, OutputController& vibration, const int* v1, int l1, const int* v2, int l2);
     LCD& lcd;
     const ButtonGroup& inputButtons;
     const ButtonGroup& configButtons;
     StepperGroup& steppers;
     AudioPlayer& audio;
+    OutputController& vibration;
+    const int* vibrationSeqSuccess;
+    int vibrationSeqSuccessLen;
+    const int* vibrationSeqFail;
+    int vibrationSeqFailLen;
 };
 
 // for custom game mode create another options class and add a constructor to GameRound
