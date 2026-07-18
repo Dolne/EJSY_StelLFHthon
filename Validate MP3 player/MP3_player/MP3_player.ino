@@ -30,7 +30,7 @@ void setup() {
   // mp3.playTrack(1);
   // mp3.playTrackInLoop(1);
   // mp3.playFolderInLoop(1);
-  audioModule.playTrackInFolder(1, 1);
+  audioModule.playTrackInFolder(3, 24);
 
 }
 

@@ -16,12 +16,13 @@ MD_YX5300 mp3(Serial2);
 
 void setup() {
     Serial2.begin(MD_YX5300::SERIAL_BPS, SERIAL_8N1, 16, 17);
+    Serial.begin(115200);
     mp3.begin();
     mp3.setSynchronous(false);
     Serial.print("Maximum volume: ");
     Serial.println(mp3.volumeMax());
     mp3.volume(30);
-    mp3.playSpecific(1, 1); // folder, file
+    mp3.playSpecific(3, 24); // folder, file
 }
 
 void loop() {
