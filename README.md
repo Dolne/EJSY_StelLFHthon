@@ -83,7 +83,7 @@ All pins
 - [x] YX5300 (Audio Player)
 - [ ] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
 - [ ] stepper homing sequence (light gates)
-- [ ] bring steppers to 0 at end of game or before turning off?
+- [ ] bring steppers to 0 at end of game or before turning off? Yes
 - [ ] periodically refresh entire screen
 
 #### Gamemaster
@@ -94,7 +94,7 @@ All pins
 - [ ] Individually addressable RGB for scanning
 
 #### Feedback
-- [ ] Individually addressable RGB for feedback
+- [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
 
@@ -103,20 +103,20 @@ All pins
 - [x] Individual neopixels / make some
 - [ ] YX5300 & Logic Level Shifter (on breadboard)
 - [ ] LightGate
-- [ ] Overlays
-- [ ] Wheels
-- [ ] Stepper mount
+- [x] Overlays
+- [x] Wheels
+- [x] Stepper mount
 
 #### User Controls
-- [ ] Scanning RGB Lightstrip
+- [ ] Scanning RGB Lightstrip - have the LEDs, havent connected
 
 #### Feedback
 - [ ] Vibration Motor & Relay
-- [ ] Feedback Lightstrip
+- [ ] Feedback Lightstrip - have the LEDs, havent connected
 
 #### Power
 - [x] Power Solution
-- [ ] 5V Power Solution
+- [x] 5V Power Solution
 
 #### Others
-- [x] Masking tape
+- [x] Masking tape labels on the wires
