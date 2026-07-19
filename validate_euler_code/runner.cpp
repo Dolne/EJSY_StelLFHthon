@@ -253,7 +253,7 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::AUDIO)) {
         if (scanStage_.changed()) {
             // play audio
-            if (round->audio[slot_] > 0) {
+            if (round_->audio[slot_] > 0) {
                 Serial.print("Playing audio ");
                 Serial.println(round_->audio[slot_]);
                 hardware_.audio.play(1, round_->audio[slot_]);
