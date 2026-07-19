@@ -243,7 +243,7 @@ void ScanningRunner::update()
         if (scanStage_.changed()) {
             // if enabled, play audio
             // hardware_.audio.play(1, slot_ + 1);
-        } else if (/* audio done */ true) {
+        } else if (/* !hardware_.audio.playing() */ true) {
             if (round_->hasAudio) {
                 wait(500, ScanStage::AUDIO);
             } else {
@@ -253,10 +253,13 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::AUDIO)) {
         if (scanStage_.changed()) {
             // play audio
-            // if (round->audio[slot_] > 0) {
-            //     hardware_.audio.play(2, round_->audio[slot_]);
-            // }
-        } else if (/* !hardware_.audio.playing() */ true) {
+            if (round->audio[slot_] > 0) {
+                Serial.print("Playing audio ");
+                Serial.println(round_->audio[slot_]);
+                hardware_.audio.play(1, round_->audio[slot_]);
+            }
+        } else if (!hardware_.audio.playing()) {
+            Serial.println("audio completed!");
             long dur = millis() - scanStage_.since();
             if (dur < 2000) {
                 wait(2500 - dur, ScanStage::SLOT_END);
