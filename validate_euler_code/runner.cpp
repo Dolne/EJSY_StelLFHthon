@@ -1,5 +1,24 @@
 #include "runner.h"
 
+void successAnimation(long start, Adafruit_NeoPixel& strip)
+{
+    static const int DURATION = 2000;
+    float t = (millis() - start) % DURATION / (float) DURATION;
+    strip.rainbow(0xFFFF * t, 1);
+    strip.show();
+}
+
+void failAnimation(long start, Adafruit_NeoPixel& strip)
+{
+    static const int DURATION = 2000;
+    float t = (millis() - start) % DURATION / (float) DURATION * 2;
+    if (t > 1) {
+        t = 2 - t;
+    }
+    strip.fill(strip.Color(255 * t, 0, 0));
+    strip.show();
+}
+
 GameRunner::GameRunner(const GameHardware &hardware):
     hardware_(hardware),
     scanningRunner_(hardware)
@@ -75,7 +94,13 @@ void GameRunner::update()
 
     if (!gameStage_.is(GameStage::FEEDBACK) && gameStage_.changed()) {
         hardware_.vibration.disable();
-        // TODO stop led animation
+        // hide led animation
+        hardware_.feedbackStrip.clear();
+        hardware_.feedbackStrip.show();
+    }
+    if (!gameStage_.is(GameStage::SELECTION) && gameStage_.changed()) {
+        scanningRunner_.stop();
+        scanningRunner_.update();
     }
     if (gameStage_.is(GameStage::STOPPING)) {
         if (gameStage_.changed()) {
@@ -151,24 +176,27 @@ void GameRunner::update()
         }
         if (gameStage_.changed()) {
             Serial.print("Slot selected: ");
-            Serial.println(round_->answer);
+            Serial.print(round_->answer);
+            Serial.print(", Answer: ");
+            Serial.println(round_->odd1OutSlot);
             // update score, play audio
             if (round_->answer == round_->odd1OutSlot) {
                 Serial.println("Correct answer!");
                 score_++;
-                // hardware_.audio.play(1, 5);
+                // hardware_.audio.play(25);
                 hardware_.vibration.startSequence(hardware_.vibrationSeqSuccess, hardware_.vibrationSeqSuccessLen);
-                // TODO start led success animation
             } else {
                 Serial.println("Wrong answer :(");
-                // hard
-                // hardware_.audio.play(1, 6);
+                // hardware_.audio.play(26);
                 hardware_.vibration.startSequence(hardware_.vibrationSeqFail, hardware_.vibrationSeqFailLen);
-                // TODO start led failure animation
             }
         }
         // run led animation
-        // should be plenty good enough to run in update here (100 times per second)
+        if (round_->answer == round_->odd1OutSlot) {
+            successAnimation(gameStage_.since(), hardware_.feedbackStrip);
+        } else {
+            failAnimation(gameStage_.since(), hardware_.feedbackStrip);
+        }
     }
 }
 
@@ -189,7 +217,6 @@ bool GameRunner::hasNextRound()
 {
     return currRound() < totalRounds() - 1;
 }
-
 
 ScanningRunner::ScanningRunner(const GameHardware &hardware):
     hardware_(hardware),
@@ -222,9 +249,8 @@ void ScanningRunner::update()
         if (scanStage_.changed()) {
             slot_ = 0;
             hardware_.audio.stop();
-            // probably doesnt need to wait for it to stop?
-            // if need to wait should have a STOPPING state
-            // TODO turn off led
+            hardware_.scanningStrip.clear();
+            hardware_.scanningStrip.show();
         }
     } else if (scanStage_.is(ScanStage::WAITING)) {
         long diff = millis() - scanStage_.since();
@@ -237,13 +263,15 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::SLOT_START)) {
         Serial.print("Scanning slot ");
         Serial.println(slot_);
-        // TODO turn on the arrow light for the slot
+        // turn on the arrow light for the slot
+        hardware_.scanningStrip.setPixelColor(slot_, 255, 255, 0); // some colour idk
+        hardware_.scanningStrip.show();
         scanStage_.set(ScanStage::INITIAL_AUDIO);
     } else if (scanStage_.is(ScanStage::INITIAL_AUDIO)) {
         if (scanStage_.changed()) {
             // if enabled, play audio
             // hardware_.audio.play(1, slot_ + 1);
-        } else if (/* !hardware_.audio.playing() */ true) {
+        } else if (!hardware_.audio.playing()) {
             if (round_->hasAudio) {
                 wait(500, ScanStage::AUDIO);
             } else {
@@ -253,7 +281,7 @@ void ScanningRunner::update()
     } else if (scanStage_.is(ScanStage::AUDIO)) {
         if (scanStage_.changed()) {
             // play audio
-            if (round_->audio[slot_] > 0) {
+            if (!SIMULATION && round_->audio[slot_] > 0) {
                 Serial.print("Playing audio ");
                 Serial.println(round_->audio[slot_]);
                 hardware_.audio.play(1, round_->audio[slot_]);
@@ -261,14 +289,16 @@ void ScanningRunner::update()
         } else if (!hardware_.audio.playing()) {
             Serial.println("audio completed!");
             long dur = millis() - scanStage_.since();
-            if (dur < 2000) {
-                wait(2500 - dur, ScanStage::SLOT_END);
+            if (dur < 1500) {
+                wait(2000 - dur, ScanStage::SLOT_END);
             } else {
                 wait(500, ScanStage::SLOT_END);
             }
         }
     } else if (scanStage_.is(ScanStage::SLOT_END)) {
-        // TODO turn off led
+        // turn off led
+        hardware_.scanningStrip.clear();
+        hardware_.scanningStrip.show();
         if (round_->slotsCount <= MAX_SLOTS && slot_ < round_->slotsCount - 1) {
             slot_++;
         } else {

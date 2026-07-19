@@ -2,6 +2,11 @@
 #include <Wire.h>
 
 #include <Adafruit_MCP23X17.h>
+#include <Adafruit_NeoPixel.h>
+
+#ifndef SIMULATION // SIMULATION is defined as 1 in the simulation compiler config 
+#define SIMULATION 0
+#endif
 
 #include "hardware.h"
 #include "task.h"
@@ -20,14 +25,15 @@ const uint8_t AUDIO_VOLUME = 15;
 // GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
 const int LCD_ADDR = 0x27;
 
-//const uint8_t BUTTON_UP_PIN = 25;
-const Pin BUTTON_UP_PIN = Pin(0, &expander);
-
-//const uint8_t BUTTON_SELECT_PIN = 17;
-const Pin BUTTON_SELECT_PIN = Pin(1, &expander);
-
-//const uint8_t BUTTON_DOWN_PIN = 4;
-const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
+#if SIMULATION
+    const uint8_t BUTTON_UP_PIN = 0;
+    const uint8_t BUTTON_SELECT_PIN = 35;
+    const uint8_t BUTTON_DOWN_PIN = 34;
+#else
+    const Pin BUTTON_UP_PIN = Pin(0, &expander);
+    const Pin BUTTON_SELECT_PIN = Pin(1, &expander);
+    const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
+#endif
 
 const uint8_t BUTTON_1_PIN = 5;
 const uint8_t BUTTON_2_PIN = 18;
@@ -35,6 +41,14 @@ const uint8_t BUTTON_3_PIN = 19;
 const uint8_t BUTTON_4_PIN = 23;
 
 const uint8_t VIBRATION_PIN = 2; // can be a Pin with &expander also
+const int VIBRATION_SUCCESS[] = {500, 500, 500, 500, 500, 1500};
+const int VIBRATION_SUCCESS_LEN = 6;
+const int VIBRATION_FAIL[] = {2500, 500};
+const int VIBRATION_FAIL_LEN = 2;
+
+const uint8_t SCANNING_LED_PIN = 4;
+const uint8_t FEEDBACK_LED_PIN = 25;
+const uint8_t FEEDBACK_LED_COUNT = 32; // TODO update this for actual
 
 const int STEPS_PER_ROTATION = 1600;
 const int STEPPER_MAX_SPEED = 3000;
@@ -51,9 +65,16 @@ const uint8_t STEPPER_4_DIR = 15;
 
 const int TICKRATE = 100;
 
-Button buttonUp(BUTTON_UP_PIN, INPUT_PULLUP, HIGH);
-Button buttonSelect(BUTTON_SELECT_PIN, INPUT_PULLUP, HIGH);
-Button buttonDown(BUTTON_DOWN_PIN, INPUT_PULLUP, HIGH);
+#if SIMULATION
+    Button buttonUp(BUTTON_UP_PIN);
+    Button buttonSelect(BUTTON_SELECT_PIN);
+    Button buttonDown(BUTTON_DOWN_PIN);
+#else
+    Button buttonUp(BUTTON_UP_PIN, INPUT_PULLUP, HIGH);
+    Button buttonSelect(BUTTON_SELECT_PIN, INPUT_PULLUP, HIGH);
+    Button buttonDown(BUTTON_DOWN_PIN, INPUT_PULLUP, HIGH);
+#endif
+
 Button* configButtonList[] = { &buttonUp, &buttonSelect, &buttonDown };
 ButtonGroup configButtons(configButtonList, 3);
 
@@ -64,11 +85,10 @@ Button button4(BUTTON_4_PIN);
 Button* inputButtonList[] = { &button1, &button2, &button3, &button4 };
 ButtonGroup inputButtons(inputButtonList, MAX_SLOTS);
 
+Adafruit_NeoPixel scanningStrip(MAX_SLOTS, SCANNING_LED_PIN); // TODO led type
+Adafruit_NeoPixel feedbackStrip(FEEDBACK_LED_COUNT, FEEDBACK_LED_PIN); // TODO led type
+
 OutputController vibration(VIBRATION_PIN);
-const int VIBRATION_SUCCESS[] = {500, 500, 500, 500, 500, 1500};
-const int VIBRATION_SUCCESS_LEN = 6;
-const int VIBRATION_FAIL[] = {2500, 500};
-const int VIBRATION_FAIL_LEN = 2;
 
 Stepper stepper1(STEPPER_1_STEP, STEPPER_1_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
 Stepper stepper2(STEPPER_2_STEP, STEPPER_2_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
@@ -84,7 +104,7 @@ LCD lcd(LCD_ADDR);
 
 GameOptions options{};
 
-GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
+GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 

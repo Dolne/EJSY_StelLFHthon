@@ -111,10 +111,10 @@ All pins
 - [ ] Check/validate options (eg no diffs selected)
 
 #### User Controls
-- [ ] Individually addressable RGB for scanning
+- [x] Individually addressable RGB for scanning
 
 #### Feedback
-- [ ] Individually addressable RGB for feedback
+- [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
 

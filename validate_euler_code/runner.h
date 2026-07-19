@@ -1,6 +1,10 @@
 #ifndef runner_h
 #define runner_h
 
+#ifndef SIMULATION
+#define SIMULATION false
+#endif
+
 #include <Arduino.h>
 #include "task.h"
 #include "game.h"
