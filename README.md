@@ -142,3 +142,4 @@ All pins
 - [x] Masking tape labels on the wires
 * The white button might hv some issues, check it
 * Need solder one more F 3.5mm jack
+* Stepper #1 seems to be having some issues 
