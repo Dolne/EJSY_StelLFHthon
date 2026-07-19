@@ -12,6 +12,7 @@ microsd card containing the audio
 1. First, format your microSD card as FAT16 or FAT32.
 2. Then, create however many folders you want starting with the label "01" and incrementing with each new folder. Think of folders as different playlists.
 3. Your tracks need to have a 3-digit prefix at the start. They each must be unique (not just within, but between folders too), but naming them sequentially is the easiest way. Anything after the prefix is ignored by the module.
+* **The MP3 module needs ~2s from the moment it receives power till the moment it's actually ready to send/receive UART data, so your code cannot immediately on setup ask to play a file**
 
 #### Logic level convertrer
 * At least channel 1 works from LV --> HV
@@ -120,7 +121,7 @@ All pins
 ### Outstanding features hardware
 #### Option stimuli
 - [x] Individual neopixels / make some
-- [ ] YX5300 & Logic Level Shifter (on breadboard)
+- [ ] YX5300 ~~& Logic Level Shifter (on breadboard) (don't seem to need the LLC actl, and it seems to make the YX TX --> ESP RX data not work)~~
 - [ ] LightGate
 - [x] Overlays
 - [x] Wheels
