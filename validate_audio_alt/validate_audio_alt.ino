@@ -22,7 +22,8 @@ void setup() {
     Serial.print("Maximum volume: ");
     Serial.println(mp3.volumeMax());
     mp3.volume(30);
-    mp3.playSpecific(3, 24); //folder, file
+    delay(2000);
+    mp3.playSpecific(1, 1); //folder, file
 }
 
 void loop() {
@@ -39,6 +40,10 @@ void loop() {
             case MD_YX5300::STS_ERR_FILE:
                 // error playing file
                 Serial.println("STS_ERR_FILE");
+                break;
+            case MD_YX5300::STS_INIT:
+                // initialisaion complete
+                Serial.println("STS_INIT");
                 break;
         }
     }
