@@ -101,7 +101,7 @@ All pins
 
 #### Software ↔︎ Hardware
 - [x] YX5300 (Audio Player)
-- [ ] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
+- [x] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
 - [ ] stepper homing sequence (light gates)
 - [ ] bring steppers to 0 at end of game or before turning off? Yes
 - [ ] periodically refresh entire screen
@@ -114,15 +114,15 @@ All pins
 - [ ] Individually addressable RGB for scanning
 
 #### Feedback
-- [x] Individually addressable RGB for feedback
+- [ ] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
 
 ### Outstanding features hardware
 #### Option stimuli
 - [x] Individual neopixels / make some
-- [ ] YX5300 ~~& Logic Level Shifter (on breadboard) (don't seem to need the LLC actl, and it seems to make the YX TX --> ESP RX data not work)~~
-- [ ] LightGate
+- [x] YX5300 ~~& Logic Level Shifter (on breadboard) (don't seem to need the LLC actl, and it seems to make the YX TX --> ESP RX data not work)~~
+- [ ] LightGate - might forgo for now since no time
 - [x] Overlays
 - [x] Wheels
 - [x] Stepper mount
