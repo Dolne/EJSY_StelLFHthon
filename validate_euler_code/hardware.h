@@ -39,10 +39,10 @@ public:
     Button(Pin pin, uint8_t mode, uint8_t activeValue);
     void begin();
     void update();
-    bool toggled() const;
-    bool toggled(bool active) const;
-    bool isActive() const;
-    long lastToggled() const;
+    bool toggled() const; //Both if button pressed/released
+    bool toggled(bool active) const; //Only if button is pressed
+    bool isActive() const; //If button is pressed (active state)
+    long lastToggled() const; //Last time button was toggled
 private:
     Pin pin_;
     uint8_t mode_;
@@ -59,8 +59,8 @@ public:
     void begin();
     void update();
     Button* get(int i) const;
-    bool anyToggled(bool active) const;
-    bool anyActive() const;
+    bool anyToggled(bool active) const; //If any buttons were toggled this update (pressed/released)
+    bool anyActive() const; //If any buttons are currently pressed
     bool allActive() const;
     long lastToggled() const;
 private:

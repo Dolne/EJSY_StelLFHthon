@@ -216,15 +216,15 @@ void Stepper::directTo(float rotation)
     Serial.print("direct ");
     if (abs(diff1) <= abs(diff2)) {
         Serial.println(diff1);
-        stepper_.move(diff1);
+        stepper_.move(diff1); //Sets target location (degrees) wrt current location, not an absolute rot value
     } else {
         Serial.println(diff2);
-        stepper_.move(diff2);
+        stepper_.move(diff2); //Sets target location (degrees) wrt current location, not an absolute rot value
     }
 }
 
 // this may not work very well if stepper is moving
-void Stepper::spinTo(float rotation, int extraRounds)
+void Stepper::spinTo(float rotation, int extraRounds) //Spin a few times before going to the desired symbol
 {
     int diff = posMod(long(rotation * stepsPerRotation_) - currentRotation(), stepsPerRotation_);
     Serial.print("spin ");

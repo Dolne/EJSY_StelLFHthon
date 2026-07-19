@@ -1,11 +1,30 @@
 # EJSY\_StelLFHthon Finals Readme
 
+### Terminology
+* Icon = the 10 faces of a wheel
+  * The first of which is blank
+  * The second of which is the corresponding wheel's number
+  * Images = all the faces from the third to the last one
 
+### MP3 Player module
+microsd card containing the audio
+* https://github.com/bluejunimo/YX5300_ESP32
+1. First, format your microSD card as FAT16 or FAT32.
+2. Then, create however many folders you want starting with the label "01" and incrementing with each new folder. Think of folders as different playlists.
+3. Your tracks need to have a 3-digit prefix at the start. They each must be unique (not just within, but between folders too), but naming them sequentially is the easiest way. Anything after the prefix is ignored by the module.
+
+#### Logic level convertrer
+* At least channel 1 works from LV --> HV
+
+#### Masking tape
+* The connectors are usually bunched up with masking tape
+* The pins each wire corresponds to is either written on  the female/male end of the wire, or it matches the order of the connections written on the masking tape (e.g. Gnd, 3.3V, Pin 5 next to Red, Green, Blue colour wire means Red=Gnd, Green=3.3V, Blue=Pin5)
 
 ### Uploading code to the ESP
 
 * Select "ESP32 Dev Module", not something else
 * If you're using the one from Lionsforge (with the expansion board), download the drivers for the CP2102 from e.g. https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads
+* ESP Board library V3.3.5 is compatible, V3.3.10 isnt
 
 ### Connections to the ESP
 

@@ -30,14 +30,17 @@ void setup() {
   // mp3.playTrack(1);
   // mp3.playTrackInLoop(1);
   // mp3.playFolderInLoop(1);
-  audioModule.playTrackInFolder(3, 24);
+  delay(1000);
+  audioModule.playTrackInFolder(24, 3);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  delay(2000);
   Serial.println(audioModule.queryDeviceState());
-  delay(100);
+  delay(2000);
+  audioModule.playTrackInFolder(24, 3); //RMEMBER, TRACK NAME THEN FOLDER NAME
 
 }
 

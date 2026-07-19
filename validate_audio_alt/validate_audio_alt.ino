@@ -22,7 +22,7 @@ void setup() {
     Serial.print("Maximum volume: ");
     Serial.println(mp3.volumeMax());
     mp3.volume(30);
-    mp3.playSpecific(3, 24); // folder, file
+    mp3.playSpecific(3, 24); //folder, file
 }
 
 void loop() {
