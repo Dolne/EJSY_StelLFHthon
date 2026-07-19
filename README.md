@@ -140,5 +140,5 @@ All pins
 
 #### Others
 - [x] Masking tape labels on the wires
-- The white button might hv some issues, check it
-- Need solder one more F 3.5mm jack
+* The white button might hv some issues, check it
+* Need solder one more F 3.5mm jack
