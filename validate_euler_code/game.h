@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <AccelStepper.h>
+#include <Adafruit_NeoPixel.h> //John added this, not sure if it's in the right spot
 #include "hardware.h"
 #include "state.h"
 
