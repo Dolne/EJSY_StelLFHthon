@@ -1,1 +1,1 @@
-/Users/euler/Developer/ejsy/EJSY_StelLFHthon/finals/hardware.h
+../../main/hardware.h

@@ -1,1 +1,1 @@
-/Users/euler/Developer/ejsy/EJSY_StelLFHthon/finals/task.cpp
+../../main/task.cpp
