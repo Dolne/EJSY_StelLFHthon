@@ -20,7 +20,7 @@ Adafruit_MCP23X17 expander;
 // GPIO 16 (RX2) and 17 (TX2) used for audio
 const uint8_t MP3_RX = 16; // ESP RX2 connected to YX5300 TX
 const uint8_t MP3_TX = 17; // ESP TX2 connected to YX5300 RX
-const uint8_t AUDIO_VOLUME = 10; //Max is 30, reduced to 10 for testing at night
+const uint8_t AUDIO_VOLUME = 10; // max is 30, reduced to 10 for testing at night
 
 // GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
 const int LCD_ADDR = 0x27;
@@ -48,7 +48,7 @@ const int VIBRATION_FAIL_LEN = 2;
 
 const uint8_t SCANNING_LED_PIN = 4;
 const uint8_t FEEDBACK_LED_PIN = 25;
-const uint8_t FEEDBACK_LED_COUNT = 30; // TODO update this for actual <-- updated
+const uint8_t FEEDBACK_LED_COUNT = 30;
 
 const int STEPS_PER_ROTATION = 1600;
 const int STEPPER_MAX_SPEED = 3000;

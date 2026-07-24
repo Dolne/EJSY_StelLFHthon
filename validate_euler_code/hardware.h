@@ -6,6 +6,7 @@
 #include <AccelStepper.h>
 #include <Adafruit_MCP23XXX.h>
 #include <MD_YX5300.h>
+#include <Adafruit_NeoPixel.h>
 
 #include "task.h"
 

@@ -1,3 +1,5 @@
+#include <Adafruit_NeoPixel.h>
+
 #include "runner.h"
 
 void successAnimation(long start, Adafruit_NeoPixel& strip)
