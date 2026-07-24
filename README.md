@@ -112,9 +112,11 @@ All pins
 #### Gamemaster
 - [ ] Show options for tactile on gamemaster screen
 - [ ] Check/validate options (eg no diffs selected)
+- [ ] customizable scanning speed
 
 #### User Controls
 - [x] Individually addressable RGB for scanning
+- [ ] small delay between slots when scanning?
 
 #### Feedback
 - [x] Individually addressable RGB for feedback
