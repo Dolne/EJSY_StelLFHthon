@@ -208,23 +208,25 @@ void Stepper::update()
 // this may not work very well if stepper is moving
 void Stepper::directTo(float rotation)
 {
-    int current = currentRotation();
-    int diff1 = posMod(long(rotation * stepsPerRotation_), stepsPerRotation_) - current;
+    stepper_.stop(); // use this to get the minimum distance will stepper must go if it is moving
+    long startAbs = stepper_.targetPosition();
+    int start = posMod(startAbs, stepsPerRotation_);
+    int diff1 = posMod(long(rotation * stepsPerRotation_), stepsPerRotation_) - start;
     int diff2 = diff1 < 0 ? diff1 + stepsPerRotation_ : diff1 - stepsPerRotation_;
 
     // move the shorter distance to the target rotation
-    Serial.print("direct ");
+    Serial.print("direct to ");
     if (abs(diff1) <= abs(diff2)) {
-        Serial.println(diff1);
-        stepper_.move(diff1); //Sets target location (degrees) wrt current location, not an absolute rot value
+        Serial.println(startAbs + diff1);
+        stepper_.moveTo(startAbs + diff1);
     } else {
-        Serial.println(diff2);
-        stepper_.move(diff2); //Sets target location (degrees) wrt current location, not an absolute rot value
+        Serial.println(startAbs + diff2);
+        stepper_.moveTo(startAbs + diff2);
     }
 }
 
 // this may not work very well if stepper is moving
-void Stepper::spinTo(float rotation, int extraRounds) //Spin a few times before going to the desired symbol
+void Stepper::spinTo(float rotation, int extraRounds)
 {
     int diff = posMod(long(rotation * stepsPerRotation_) - currentRotation(), stepsPerRotation_);
     Serial.print("spin ");
@@ -268,6 +270,12 @@ void StepperGroup::update()
 {
     for (int i = 0; i < n_; i++) {
         steppers_[i]->update();
+    }
+}
+void StepperGroup::allDirectTo(float rotation)
+{
+    for (int i = 0; i < n_; i++) {
+        steppers_[i]->directTo(rotation);
     }
 }
 void StepperGroup::stopAll()

@@ -30,12 +30,12 @@ GameRunner::GameRunner(const GameHardware &hardware):
 void GameRunner::startGame(GameOptions opts)
 {
     // if running, stop first
-    reset();
+    reset(); // sets to game stage to STOPPING
 
     // set the game round
     options_ = opts;
     options_.enabled = true;
-    gameStage_.set(GameStage::STARTING);
+    // game stage will be set to STARTING after STOPPED (after STOPPING)
 }
 
 void GameRunner::nextRound()
@@ -108,7 +108,7 @@ void GameRunner::update()
         if (gameStage_.changed()) {
             delete round_;
             round_ = 0;
-            hardware_.steppers.stopAll();
+            hardware_.steppers.allDirectTo(0);
             hardware_.audio.stop();
         } else {
             // also wait for audio to stop

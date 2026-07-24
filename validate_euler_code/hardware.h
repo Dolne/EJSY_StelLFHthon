@@ -110,6 +110,7 @@ public:
     void begin();
     void update();
     void stopAll();
+    void allDirectTo(float rotation);
     bool anyRunning() const;
     Stepper* get(int i) const;
 private:

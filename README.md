@@ -106,7 +106,7 @@ All pins
 - [x] YX5300 (Audio Player)
 - [x] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
 - [ ] stepper homing sequence (light gates)
-- [ ] bring steppers to 0 at end of game or before turning off? Yes
+- [x] bring steppers to 0 at end of game or before turning off
 - [ ] periodically refresh entire screen
 
 #### Gamemaster
