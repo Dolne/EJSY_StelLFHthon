@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "hardware.h"
 
-const uint8_t ROW_NONE = 0xff;
+inline const uint8_t ROW_NONE = 0xff;
 
 class MenuHardware
 {
@@ -25,7 +25,7 @@ public:
     virtual bool isHidden();
 protected:
     const MenuHardware& hardware_;
-    virtual void updateInternal() = 0;
+    virtual void updateInternal(bool refresh) = 0;
     bool isSelected();
     bool selectedChanged();
     uint8_t getRow();
@@ -42,6 +42,8 @@ private:
      */
     bool selected_ = false;
     bool prevSelected_ = false;
+
+    long lastRefresh_ = 0;
 };
 
 class Menu
@@ -86,7 +88,7 @@ public:
     MenuOptionRow(const MenuHardware& hardware, uint8_t* value, const char* label, const char* options[], uint8_t optionsLen);
     MenuOptionRow(const MenuHardware& hardware, uint8_t* value, const char* label, const char* options[], uint8_t optionsLen, bool (*isHidden)());
 private:
-    void updateInternal();
+    void updateInternal(bool refresh);
     /**
      * the value that is being controlled. it is used to index `options_` and must be less than `optionsLen_`.
      * 
@@ -110,7 +112,7 @@ public:
     MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)());
     MenuActionRow(const MenuHardware& hardware, const char* label, void (*action)(), bool (*isHidden)());
 private:
-    void updateInternal();
+    void updateInternal(bool refresh);
     void (*action_)();
     const char* label_;
     long nextBlinkTime_ = 2147483647L;
@@ -125,7 +127,7 @@ public:
     MenuInfoRow(const MenuHardware& hardware, char* info);
     MenuInfoRow(const MenuHardware& hardware, char* info, bool (*isHidden)());
 private:
-    void updateInternal();
+    void updateInternal(bool refresh);
     char* info_;
     void print_();
 };
