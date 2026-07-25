@@ -1,6 +1,4 @@
 #include "game.h"
-#include "hardware.h"
-#include "menu.h"
 
 /**
  * takes a random sample of size `enabled` and sets to 1, while all others set to 0.
@@ -112,7 +110,7 @@ void printGameRound(GameRound* gameRound)
 
 GameHardware::GameHardware(
     LCD &lcd,
-    const ButtonGroup &inputButtons, const ButtonGroup &configButtons,
+    const ButtonGroup &inputButtons, const Button &debugButton,
     StepperGroup& steppers,
     AudioPlayer& audio,
     Adafruit_NeoPixel& scanningStrip, Adafruit_NeoPixel& feedbackStrip,
@@ -120,7 +118,7 @@ GameHardware::GameHardware(
 ):
     lcd(lcd),
     inputButtons(inputButtons),
-    configButtons(configButtons),
+    debugButton(debugButton),
     steppers(steppers),
     audio(audio),
     scanningStrip(scanningStrip),

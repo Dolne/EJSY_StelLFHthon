@@ -38,9 +38,15 @@ public:
         state_ = next_;
         if (changed()) {
             since_ = millis();
+            revertTo_ = previous_;
         }
     }
     
+    void revert()
+    {
+        set(revertTo_);
+    }
+
     long since() const
     {
         return since_;
@@ -49,6 +55,7 @@ public:
 private:
     T state_{};
     T previous_{};
+    T revertTo_{};
     T next_{};
     long since_{};
 };

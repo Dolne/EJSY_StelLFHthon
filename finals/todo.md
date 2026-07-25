@@ -15,23 +15,22 @@ should we use github issues & milestones instead
 - [ ] Show options for tactile on gamemaster screen
 - [ ] Check/validate options (eg no diffs selected)
 - [ ] customizable scanning speed
-- [ ] Null option (no dimension diff selected)
+- [ ] customizable audio volume
+- [ ] show answer slot
 
 ### User Controls
 - [x] Individually addressable RGB for scanning
-- [ ] small delay between slots when scanning?
-- [ ] Customisable scanning speed
-- [ ] Have a gap between each option when sccanning
-- [ ] Let user try again if they get the ans wrong
-- [ ] If doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
-
+- [ ] small delay between slots when scanning
+- [ ] let user try again if they get the ans wrong
+- [ ] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
+- [ ] "null" gameplay if no diffs selected
 
 ### Feedback
 - [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
 - [ ] Win ("Yaay") /lose ("Please try again") audio
-
+- [ ] replace numbers on wheels with "success icon"
 
 ## Hardware
 

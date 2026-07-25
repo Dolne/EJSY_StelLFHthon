@@ -235,7 +235,7 @@ void MenuOptionRow::printOption_()
 
     // draw the arrow if selected
     if (isSelected()) {
-        lcd.write(row, LABEL_WIDTH, LCD_CHAR_ARROW);
+        lcd.print(row, LABEL_WIDTH, LCD_CHAR_ARROW);
         lcd.print(row, LABEL_WIDTH + 1, ' ');
     } else {
         lcd.print(row, LABEL_WIDTH, ' ');
@@ -307,7 +307,7 @@ void MenuActionRow::print_()
     uint8_t row = getRow();
     uint8_t col = 0;
     if (isSelected()) {
-        lcd.write(row, 0, LCD_CHAR_ARROW);
+        lcd.print(row, 0, LCD_CHAR_ARROW);
         lcd.print(row, 1, ' ');
         col += 2;
     }
@@ -318,14 +318,20 @@ void MenuActionRow::print_()
     lcd.print(getRow(), col, 20 - col, label);
 }
 
-MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, char *info):
+MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, const char *info):
     MenuInfoRow(hardware, info, nullptr)
 {
 }
 
-MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, char *info, bool (*isHidden)()):
+MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, const char *info, bool (*infoUpdated)()):
+    MenuInfoRow(hardware, info, infoUpdated, nullptr)
+{
+}
+
+MenuInfoRow::MenuInfoRow(const MenuHardware &hardware, const char *info, bool (*infoUpdated)(), bool (*isHidden)()):
     MenuRow(hardware, isHidden),
-    info_(info)
+    info_(info),
+    infoUpdated_(infoUpdated)
 {
 }
 
@@ -334,7 +340,7 @@ void MenuInfoRow::updateInternal(bool refresh)
     if (getRow() == ROW_NONE) {
         return;
     }
-    if (rowChanged() || selectedChanged() || refresh) {
+    if (rowChanged() || selectedChanged() || refresh || (infoUpdated_ && infoUpdated_())) {
         print_();
     }
 }

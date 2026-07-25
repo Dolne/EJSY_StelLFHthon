@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "hardware.h"
+#include "button.h"
 
 inline const uint8_t ROW_NONE = 0xff;
 
@@ -124,11 +125,13 @@ private:
 class MenuInfoRow: public MenuRow
 {
 public:
-    MenuInfoRow(const MenuHardware& hardware, char* info);
-    MenuInfoRow(const MenuHardware& hardware, char* info, bool (*isHidden)());
+    MenuInfoRow(const MenuHardware& hardware, const char* info);
+    MenuInfoRow(const MenuHardware& hardware, const char* info, bool (*infoUpdated)());
+    MenuInfoRow(const MenuHardware& hardware, const char* info, bool (*infoUpdated)(), bool (*isHidden)());
 private:
     void updateInternal(bool refresh);
-    char* info_;
+    bool (*infoUpdated_)();
+    const char* info_;
     void print_();
 };
 

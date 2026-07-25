@@ -93,7 +93,19 @@ void GameRunner::begin()
 void GameRunner::update()
 {
     gameStage_.update();
-
+    
+    if (gameStage_.is(GameStage::DEBUG_MENU)) {
+        if (hardware_.debugButton.toggled(true)) {
+            gameStage_.revert();
+        }
+        // pause all game logic
+        // debug menu is handled from main.cpp
+        return;
+    } else if (hardware_.debugButton.toggled(true)) {
+        Serial.println("entering debug menu");
+        gameStage_.set(GameStage::DEBUG_MENU);
+        return;
+    }
     if (!gameStage_.is(GameStage::FEEDBACK) && gameStage_.changed()) {
         hardware_.vibration.disable();
         // hide led animation
@@ -218,6 +230,18 @@ uint8_t GameRunner::totalRounds()
 bool GameRunner::hasNextRound()
 {
     return currRound() < totalRounds() - 1;
+}
+
+void GameRunner::enterDebug()
+{
+    gameStage_.set(GameStage::DEBUG_MENU);
+}
+
+void GameRunner::exitDebug()
+{
+    if (gameStage_.is(GameStage::DEBUG_MENU)) {
+        gameStage_.revert();
+    }
 }
 
 ScanningRunner::ScanningRunner(const GameHardware &hardware):

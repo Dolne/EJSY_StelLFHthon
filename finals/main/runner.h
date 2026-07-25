@@ -41,6 +41,7 @@ private:
 
 enum class GameStage {
     CONFIG,
+    DEBUG_MENU,
     STARTING,
     SPINNING,
     SELECTION,
@@ -68,6 +69,8 @@ public:
     uint8_t currRound();
     uint8_t totalRounds();
     bool hasNextRound();
+    void enterDebug();
+    void exitDebug();
 private:
     void spinSteppers();
 

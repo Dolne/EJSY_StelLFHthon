@@ -8,8 +8,9 @@
 #define SIMULATION 0
 #endif
 
-#include "hardware.h"
 #include "task.h"
+#include "hardware.h"
+#include "button.h"
 #include "menu.h"
 #include "game.h"
 #include "runner.h"
@@ -26,12 +27,15 @@ const uint8_t AUDIO_VOLUME = 10; // max is 30, reduced to 10 for testing at nigh
 // LCD HD44780 display over I2C
 const int LCD_ADDR = 0x27;
 
+// ESP32 on board boot, used as a "last resort" for debugging
+const uint8_t BUTTON_BOOT_PIN = 0;
+
 // gamemaster buttons (up, action, down)
 #if SIMULATION
     // connected to esp in simulation
-    const uint8_t BUTTON_UP_PIN = 0;
-    const uint8_t BUTTON_ACTION_PIN = 35;
-    const uint8_t BUTTON_DOWN_PIN = 34;
+    const uint8_t BUTTON_UP_PIN = 35;
+    const uint8_t BUTTON_ACTION_PIN = 34;
+    const uint8_t BUTTON_DOWN_PIN = 39;
 #else
     // connected to MCP23017 for actual
     const Pin BUTTON_UP_PIN = Pin(0, &expander);
@@ -79,20 +83,23 @@ const uint8_t STEPPER_4_DIR = 15;
 // how many times a second to check for updates from inputs to update game stage
 const int TICKRATE = 100;
 
+Button buttonBoot(BUTTON_BOOT_PIN);
+
+// active values of buttons are auto detected on setup by assuming they are not pressed
 #if SIMULATION
-    // simulated gamemaster buttons are normally open
-    Button buttonUp(BUTTON_UP_PIN);
-    Button buttonSelect(BUTTON_ACTION_PIN);
-    Button buttonDown(BUTTON_DOWN_PIN);
+    // simulated gamemaster buttons are normally open and connected with an external pull-down resistor
+    Button buttonUp(BUTTON_UP_PIN, INPUT);
+    Button buttonAction(BUTTON_ACTION_PIN, INPUT);
+    Button buttonDown(BUTTON_DOWN_PIN, INPUT);
 #else
     // actual gamemaster buttons are normally closed
     // so with INPUT_PULLUP they will HIGH when pressed
-    Button buttonUp(BUTTON_UP_PIN, INPUT_PULLUP, HIGH);
-    Button buttonSelect(BUTTON_ACTION_PIN, INPUT_PULLUP, HIGH);
-    Button buttonDown(BUTTON_DOWN_PIN, INPUT_PULLUP, HIGH);
+    Button buttonUp(BUTTON_UP_PIN);
+    Button buttonAction(BUTTON_ACTION_PIN);
+    Button buttonDown(BUTTON_DOWN_PIN);
 #endif
 
-Button* configButtonList[] = { &buttonUp, &buttonSelect, &buttonDown };
+Button* configButtonList[] = { &buttonUp, &buttonAction, &buttonDown };
 ButtonGroup configButtons(configButtonList, 3);
 
 Button button1(BUTTON_1_PIN);
@@ -122,17 +129,17 @@ LCD lcd(LCD_ADDR);
 GameOptions options{};
 
 // wrapper to pass all the hardware to game runner
-GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
+GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 
 // tasks to run at TICKRATE
 // the order of tasks should be inputs -> runner -> outputs
-Task* taskList[] = { &configButtons, &inputButtons, &runner, &vibration };
-TaskGroup tasks(taskList, 4);
+Task* taskList[] = { &configButtons, &inputButtons, &buttonBoot, &runner, &vibration };
+TaskGroup tasks(taskList, 5);
 
 // gamemaster hardware
-MenuHardware menuHardware(lcd, buttonUp, buttonSelect, buttonDown);
+MenuHardware menuHardware(lcd, buttonUp, buttonAction, buttonDown);
 
 void startGame() {
     runner.startGame(options);
@@ -181,7 +188,7 @@ void resetGame() {
     runner.reset();
 }
 
-char roundInfo[20] = {};
+char roundInfo[21] = {};
 
 // menu shown while game is in progress with an option to reset/restart the game
 MenuRow* roundRows[] = {
@@ -190,7 +197,7 @@ MenuRow* roundRows[] = {
 };
 Menu roundMenu(menuHardware, roundRows, sizeof(roundRows) / sizeof(roundRows[0]));
 
-char scoreInfo[20] = {};
+char scoreInfo[21] = {};
 
 void nextRound() {
     runner.nextRound();
@@ -205,7 +212,7 @@ MenuRow* nextRows[] = {
 };
 Menu nextMenu(menuHardware, nextRows, sizeof(nextRows) / sizeof(nextRows[0]), 2);
 
-char endScoreInfo[20] = {};
+char endScoreInfo[21] = {};
 
 void newGame() {
     runner.reset();
@@ -218,6 +225,26 @@ MenuRow* endRows[] = {
     new MenuActionRow(menuHardware, "New game", newGame)
 };
 Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]), 1);
+
+char configButtonsInfo[21] = "";
+char inputButtonsInfo[21] = "";
+
+bool configButtonsUpdated() {
+    return configButtons.anyToggled();
+}
+bool inputButtonsUpdated() {
+    return inputButtons.anyToggled();
+}
+
+MenuRow *debugRows[] = {
+    new MenuActionRow(menuHardware, "Go back", []() { return runner.exitDebug(); }),
+    new MenuInfoRow(menuHardware, "Gamemaster buttons:"),
+    new MenuInfoRow(menuHardware, configButtonsInfo, configButtonsUpdated),
+    new MenuInfoRow(menuHardware, "User buttons:"),
+    new MenuInfoRow(menuHardware, inputButtonsInfo, inputButtonsUpdated),
+    new MenuActionRow(menuHardware, "Reset user buttons", [] () { inputButtons.resetActiveValues(false); }),
+};
+Menu debugMenu(menuHardware, debugRows, sizeof(debugRows) / sizeof(debugRows[0]), 0);
 
 // menu controller to ensure only 1 menu is trying to display itself on the LCD
 MenuController menus(lcd);
@@ -237,6 +264,8 @@ void setup() {
     Serial.begin(9600);
     expander.begin_I2C(MCP_ADDR);
 
+    // the buttons will use the pin value at setup as the inactive value
+    // as such all buttons must not be pressed on setup
     tasks.begin();
     steppers.begin();
     audio.begin();
@@ -244,7 +273,6 @@ void setup() {
 
     lcd.begin();
 }
-
 void loop() {
     static bool selected = false;
     static uint8_t prev = 0;
@@ -254,7 +282,15 @@ void loop() {
         tasks.update();
 
         // set the setting displayed menu using the menu controller based on game stage
-        if (runner.stage().is(GameStage::CONFIG)) {
+        if (runner.stage().is(GameStage::DEBUG_MENU)) {
+            if (configButtonsUpdated() || runner.stage().changed()) {
+                updateButtonGroupInfo(configButtons, configButtonsInfo);
+            }
+            if (inputButtonsUpdated() || runner.stage().changed()) {
+                updateButtonGroupInfo(inputButtons, inputButtonsInfo);
+            }
+            menus.use(&debugMenu);
+        } else if (runner.stage().is(GameStage::CONFIG)) {
             menus.use(&configMenu);
         } else if (runner.stage().is(GameStage::SPINNING) || runner.stage().is(GameStage::SELECTION)) {
             if (runner.stage().changed()) {

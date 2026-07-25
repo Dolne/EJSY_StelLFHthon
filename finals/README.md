@@ -38,6 +38,8 @@ See [simulation/README.md](./simulation/README.md) for more info.
 
 The gamemaster buttons are "normally closed" and connected to the MCP23017 I2C GPIO expander.
 
+On setup, the code assumes that all buttons are not pressed, and will read the value of the pins to use as the inactive value. To reset the active values for the gamemaster buttons, restart/reset the ESP.
+
 | Button | Pin |
 | ------ | --- |
 | Up     | A0  |
@@ -49,6 +51,10 @@ The gamemaster buttons are "normally closed" and connected to the MCP23017 I2C G
 ### User buttons
 
 The user buttons are connected via a 3.5mm mono audio jack, and assumed to be "normally open".
+
+On setup, the code assumes that all buttons are not pressed, and will read the value of the pins to use as the inactive value.
+
+If the a button is changed to one with a different value when active, the debug menu can be used to reset the active value for all the user buttons. Press the BOOT button on the ESP to open the debug menu, and navigate down to the "Reset user buttons" options. Ensure that none of the user buttons are pressed when resetting. The debug menu should then show that all the user buttons are not pressed.
 
 | Button | Pin |
 | ------ | --- |
@@ -135,7 +141,7 @@ Reference https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
 | GPIO             | Connection                |
 | ---------------- | ------------------------- |
-| 0                |                           |
+| 0 (BOOT)         | built-in BOOT button      |
 | 1 (TX0)          |                           |
 | 2                |                           |
 | 3 (RX0)          |                           |

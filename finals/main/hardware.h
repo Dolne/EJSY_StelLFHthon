@@ -33,50 +33,15 @@ private:
     Adafruit_MCP23XXX* expander_ = nullptr;
 };
 
-class Button: public Task
-{
-public:
-    Button(Pin pin);
-    Button(Pin pin, uint8_t mode, uint8_t activeValue);
-    void begin();
-    void update();
-    bool toggled() const; //Both if button pressed/released
-    bool toggled(bool active) const; //Only if button is pressed
-    bool isActive() const; //If button is pressed (active state)
-    long lastToggled() const; //Last time button was toggled
-private:
-    Pin pin_;
-    uint8_t mode_;
-    bool prevState_;
-    bool currState_;
-    int activeValue_;
-    long since_;
-};
-
-class ButtonGroup: public Task
-{
-public:
-    ButtonGroup(Button* buttons[], int n);
-    void begin();
-    void update();
-    Button* get(int i) const;
-    bool anyToggled(bool active) const; //If any buttons were toggled this update (pressed/released)
-    bool anyActive() const; //If any buttons are currently pressed
-    bool allActive() const;
-    long lastToggled() const;
-private:
-    Button** buttons_;
-    int n_;
-};
-
-inline const uint8_t LCD_CHAR_ARROW = 0;
+inline const uint8_t LCD_CHAR_ARROW = 1;
+inline const uint8_t LCD_CHAR_BUTTON_DOWN = 2;
+inline const uint8_t LCD_CHAR_BUTTON_UP = 3;
 
 class LCD
 {
 public:
     LCD(uint8_t addr);
     void begin();
-    void write(uint8_t row, uint8_t col, uint8_t ch);
     void print(uint8_t row, uint8_t col, char ch);
     void print(uint8_t row, uint8_t col, uint8_t width, const char* str);
     void clear();
