@@ -12,8 +12,8 @@ should we use github issues & milestones instead
 - [x] periodically refresh entire screen
 
 ### Gamemaster
-- [ ] Show options for tactile on gamemaster screen
-- [ ] Check/validate options (eg no diffs selected)
+- [ ] ~~Show options for tactile on gamemaster screen~~
+- [ ] ~~Check/validate options (eg no diffs selected)~~
 - [ ] customizable scanning speed
 - [ ] customizable audio volume
 - [ ] show answer slot
@@ -22,7 +22,7 @@ should we use github issues & milestones instead
 - [x] Individually addressable RGB for scanning
 - [ ] small delay between slots when scanning
 - [ ] let user try again if they get the ans wrong
-- [ ] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
+- [x] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
 - [ ] "null" gameplay if no diffs selected
 
 ### Feedback
@@ -30,7 +30,7 @@ should we use github issues & milestones instead
 - [x] Vibration Motor
 - [x] Round / Score messages
 - [ ] Win ("Yaay") /lose ("Please try again") audio
-- [ ] replace numbers on wheels with "success icon"
+- [ ] wheels "success icon"
 
 ## Hardware
 

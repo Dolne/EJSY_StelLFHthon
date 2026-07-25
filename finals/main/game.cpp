@@ -58,10 +58,6 @@ GameRound::GameRound(GameOptions opts):
 {
     if (hasVisual) {
         generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT);
-    } else {
-        for (int i = 0; i < slotsCount; i++) {
-            visual[i] = 1; // display the slot number
-        }
     }
 
     if (hasAudio) {
