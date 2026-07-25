@@ -2,7 +2,7 @@
 
 This folder houses the code for simulating the project using [Wokwi](https://wokwi.com).
 
-The [source files](./src/) are symlinks of the source files in the parent [finals](../) directory. If any new files are created, they must be symlinked into the [src](./src/) folder.
+The [source files](./src/) are symlinks of the source files in the [finals/main](../main/) directory. If any new files are created, they must be symlinked into the [src](./src/) folder.
 
 ## Development
 
@@ -32,7 +32,7 @@ There are some differences between the simulation and the actual hardware. This 
 - Gamemaster buttons are "normally open" in the simulation but "normally closed" in the actual
 - The vibration motor is "simulated" with an LED
 
-Additionally to note that the [finals.ino](../finals.ino) file is symlinked as [main.cpp](./src/main.cpp), and as such it must also be fully valid C++ code.
+Additionally to note that the [main/main.ino](../main/main.ino) file is symlinked as [main.cpp](./src/main.cpp), and as such it must also be fully valid C++ code.
 
 ## Circuit
 
