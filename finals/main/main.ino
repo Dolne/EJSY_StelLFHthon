@@ -14,46 +14,57 @@
 #include "game.h"
 #include "runner.h"
 
+// MCP23017 I2C GPIO expander
 const uint8_t MCP_ADDR = 0x20;
 Adafruit_MCP23X17 expander;
 
-// GPIO 16 (RX2) and 17 (TX2) used for audio
+// YX5300 serial MP3 player on Serial2
 const uint8_t MP3_RX = 16; // ESP RX2 connected to YX5300 TX
 const uint8_t MP3_TX = 17; // ESP TX2 connected to YX5300 RX
 const uint8_t AUDIO_VOLUME = 10; // max is 30, reduced to 10 for testing at night
 
-// GPIO 21 (I2C SDA) and 22 (I2C SCL) used for I2C
+// LCD HD44780 display over I2C
 const int LCD_ADDR = 0x27;
 
+// gamemaster buttons (up, action, down)
 #if SIMULATION
+    // connected to esp in simulation
     const uint8_t BUTTON_UP_PIN = 0;
-    const uint8_t BUTTON_SELECT_PIN = 35;
+    const uint8_t BUTTON_ACTION_PIN = 35;
     const uint8_t BUTTON_DOWN_PIN = 34;
 #else
+    // connected to MCP23017 for actual
     const Pin BUTTON_UP_PIN = Pin(0, &expander);
-    const Pin BUTTON_SELECT_PIN = Pin(1, &expander);
+    const Pin BUTTON_ACTION_PIN = Pin(1, &expander);
     const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
 #endif
 
+// user control buttons/switches (via 3.5mm mono audio jack)
 const uint8_t BUTTON_1_PIN = 5;
 const uint8_t BUTTON_2_PIN = 18;
 const uint8_t BUTTON_3_PIN = 19;
 const uint8_t BUTTON_4_PIN = 23;
 
+// relay for vibration motor
 const uint8_t VIBRATION_PIN = 2; // can be a Pin with &expander also
+// vibration patterns in sequence of on, off, on, off, ...
 const int VIBRATION_SUCCESS[] = {500, 500, 500, 500, 500, 1500};
 const int VIBRATION_SUCCESS_LEN = 6;
 const int VIBRATION_FAIL[] = {2500, 500};
 const int VIBRATION_FAIL_LEN = 2;
 
-const uint8_t SCANNING_LED_PIN = 4;
+// NeoPixel led strips for scanning and feedback
+const uint8_t SCANNING_LED_PIN = 4; // scanning strip length is MAX_SLOTS
 const uint8_t FEEDBACK_LED_PIN = 25;
 const uint8_t FEEDBACK_LED_COUNT = 30;
 
+// 200 steps per rotation x 8 microsteps = 1600
 const int STEPS_PER_ROTATION = 1600;
+// stepper max speed and acceleration to limit current draw
 const int STEPPER_MAX_SPEED = 3000;
 const int STEPPER_ACCELERATION = 800;
 
+// step and dir pins connected to TMC2160-OC stepper driver
 const uint8_t STEPPER_1_STEP = 26;
 const uint8_t STEPPER_1_DIR = 12;
 const uint8_t STEPPER_2_STEP = 27;
@@ -63,15 +74,21 @@ const uint8_t STEPPER_3_DIR = 14;
 const uint8_t STEPPER_4_STEP = 33;
 const uint8_t STEPPER_4_DIR = 15;
 
+// currently enable pin is not used and lightgates for homing not implemented
+
+// how many times a second to check for updates from inputs to update game stage
 const int TICKRATE = 100;
 
 #if SIMULATION
+    // simulated gamemaster buttons are normally open
     Button buttonUp(BUTTON_UP_PIN);
-    Button buttonSelect(BUTTON_SELECT_PIN);
+    Button buttonSelect(BUTTON_ACTION_PIN);
     Button buttonDown(BUTTON_DOWN_PIN);
 #else
+    // actual gamemaster buttons are normally closed
+    // so with INPUT_PULLUP they will HIGH when pressed
     Button buttonUp(BUTTON_UP_PIN, INPUT_PULLUP, HIGH);
-    Button buttonSelect(BUTTON_SELECT_PIN, INPUT_PULLUP, HIGH);
+    Button buttonSelect(BUTTON_ACTION_PIN, INPUT_PULLUP, HIGH);
     Button buttonDown(BUTTON_DOWN_PIN, INPUT_PULLUP, HIGH);
 #endif
 
@@ -104,18 +121,25 @@ LCD lcd(LCD_ADDR);
 
 GameOptions options{};
 
+// wrapper to pass all the hardware to game runner
 GameHardware gameHardware(lcd, inputButtons, configButtons, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 
+// tasks to run at TICKRATE
+// the order of tasks should be inputs -> runner -> outputs
 Task* taskList[] = { &configButtons, &inputButtons, &runner, &vibration };
 TaskGroup tasks(taskList, 4);
 
+// gamemaster hardware
 MenuHardware menuHardware(lcd, buttonUp, buttonSelect, buttonDown);
 
 void startGame() {
     runner.startGame(options);
 }
+
+// callbacks to control whether the submenu for "manual" diffs for each stimuli is shown
+// this returns true when "manual" is selected for each stimuli
 bool visualSubMenuHidden() {
     return options.visual != 1;
 }
@@ -126,6 +150,9 @@ bool tactileSubMenuHidden() {
     return options.tactile != 1;
 }
 
+// menu for changing game options and starting the game
+// the game options does not actually know/care what each option within a stimuli is
+// so that means it is only defined by the order in the submenu
 MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.rounds, "rounds", OPTS_ROUNDS, 4),
     new MenuOptionRow(menuHardware, &options.slotsCount, "slots", OPTS_SLOTS, 2),
@@ -156,6 +183,7 @@ void resetGame() {
 
 char roundInfo[20] = {};
 
+// menu shown while game is in progress with an option to reset/restart the game
 MenuRow* roundRows[] = {
     new MenuInfoRow(menuHardware, roundInfo),
     new MenuActionRow(menuHardware, "Reset/Restart Game", resetGame)
@@ -168,6 +196,8 @@ void nextRound() {
     runner.nextRound();
 }
 
+// menu shown at the end of each round to start the next round
+// shows the current round number and score
 MenuRow* nextRows[] = {
     new MenuInfoRow(menuHardware, roundInfo),
     new MenuInfoRow(menuHardware, scoreInfo),
@@ -181,12 +211,15 @@ void newGame() {
     runner.reset();
 }
 
+// menu shown at the end of the game to go back to options menu
+// shows the total score
 MenuRow* endRows[] = {
     new MenuInfoRow(menuHardware, endScoreInfo),
     new MenuActionRow(menuHardware, "New game", newGame)
 };
 Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]), 1);
 
+// menu controller to ensure only 1 menu is trying to display itself on the LCD
 MenuController menus(lcd);
 
 bool timeForNextUpdate() {
@@ -217,17 +250,21 @@ void loop() {
     static uint8_t prev = 0;
     static uint8_t prev2 = 0;
     if (timeForNextUpdate()) {
+        // run things at TICKRATE
         tasks.update();
 
+        // set the setting displayed menu using the menu controller based on game stage
         if (runner.stage().is(GameStage::CONFIG)) {
             menus.use(&configMenu);
         } else if (runner.stage().is(GameStage::SPINNING) || runner.stage().is(GameStage::SELECTION)) {
             if (runner.stage().changed()) {
+                // update round number string BEFORE menu is shown
                 sprintf(roundInfo, "Round %d/%d", runner.currRound() + 1, runner.totalRounds());
             }
             menus.use(&roundMenu);
         } else if (runner.stage().is(GameStage::FEEDBACK)) {
             if (runner.stage().changed()) {
+                // update score strings BEFORE menu is shown
                 sprintf(scoreInfo, "Total score: %d", runner.score());
                 sprintf(endScoreInfo, "Total score: %d/%d", runner.score(), runner.totalRounds());
             }
@@ -238,9 +275,14 @@ void loop() {
                 menus.use(&endMenu);
             }
         } else {
+            // blank screen
             menus.use(nullptr);
         }
     }
+
+    // steppers must be able to step in every loop
     steppers.update();
+
+    // check for response from mp3 module as frequently as possible
     audio.update();
 }
