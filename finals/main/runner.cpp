@@ -61,7 +61,7 @@ void GameRunner::reset()
 
 void GameRunner::spinSteppers()
 {
-    if (round_ != 0) {
+    if (round_ != nullptr) {
         for (int i = 0; i < MAX_SLOTS; i++) {
             float val = round_->visual[i];
             float rot = val / VISUAL_TOTAL_VALUES;
@@ -119,7 +119,7 @@ void GameRunner::update()
     if (gameStage_.is(GameStage::STOPPING)) {
         if (gameStage_.changed()) {
             delete round_;
-            round_ = 0;
+            round_ = nullptr;
             hardware_.steppers.allDirectTo(0);
             hardware_.audio.stop();
         } else {
@@ -230,6 +230,15 @@ uint8_t GameRunner::totalRounds()
 bool GameRunner::hasNextRound()
 {
     return currRound() < totalRounds() - 1;
+}
+
+uint8_t GameRunner::roundAnswer()
+{
+    if (round_ != nullptr) {
+        return round_->odd1OutSlot;
+    } else {
+        return 0xFF;
+    }
 }
 
 void GameRunner::enterDebug()

@@ -189,10 +189,12 @@ void resetGame() {
 }
 
 char roundInfo[21] = {};
+char answerInfo[21] = {};
 
 // menu shown while game is in progress with an option to reset/restart the game
 MenuRow* roundRows[] = {
     new MenuInfoRow(menuHardware, roundInfo),
+    new MenuInfoRow(menuHardware, answerInfo),
     new MenuActionRow(menuHardware, "Reset/Restart Game", resetGame)
 };
 Menu roundMenu(menuHardware, roundRows, sizeof(roundRows) / sizeof(roundRows[0]));
@@ -294,8 +296,9 @@ void loop() {
             menus.use(&configMenu);
         } else if (runner.stage().is(GameStage::SPINNING) || runner.stage().is(GameStage::SELECTION)) {
             if (runner.stage().changed()) {
-                // update round number string BEFORE menu is shown
+                // update round number and answer strings BEFORE menu is shown
                 sprintf(roundInfo, "Round %d/%d", runner.currRound() + 1, runner.totalRounds());
+                sprintf(answerInfo, "Answer: %d", runner.roundAnswer() + 1);
             }
             menus.use(&roundMenu);
         } else if (runner.stage().is(GameStage::FEEDBACK)) {

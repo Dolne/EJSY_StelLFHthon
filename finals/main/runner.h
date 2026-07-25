@@ -68,6 +68,7 @@ public:
     uint8_t score();
     uint8_t currRound();
     uint8_t totalRounds();
+    uint8_t roundAnswer();
     bool hasNextRound();
     void enterDebug();
     void exitDebug();

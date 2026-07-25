@@ -16,7 +16,7 @@ should we use github issues & milestones instead
 - [ ] ~~Check/validate options (eg no diffs selected)~~
 - [ ] customizable scanning speed
 - [ ] customizable audio volume
-- [ ] show answer slot
+- [x] show answer slot
 - [x] collapse tactile options
 
 ### User Controls

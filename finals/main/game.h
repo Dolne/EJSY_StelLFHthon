@@ -72,7 +72,13 @@ public:
     GameRound(GameOptions opts);
     uint8_t slotsCount; // 3 or 4
     uint8_t inputMode;
+    /**
+     * The actual/correct odd one slot. 0 <= odd1OutSlot < slotsCount.
+     */
     uint8_t odd1OutSlot;
+    /**
+     * The user's answer. 0xFF if no answer given.
+     */
     uint8_t answer = 0xFF;
     bool hasVisual = false;
     uint8_t visual[MAX_SLOTS] = { 0 };
