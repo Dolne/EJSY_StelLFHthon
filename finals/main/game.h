@@ -58,6 +58,7 @@ public:
     uint8_t rounds = 0;
     uint8_t inputMode = 0;
     uint8_t slotsCount = 0;
+    uint8_t retries = 1;
 
     uint8_t visual = 0;
     uint8_t visualOptions[VISUAL_FEATS_COUNT] = { 0 };

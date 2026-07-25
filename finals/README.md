@@ -61,7 +61,7 @@ If the a button is changed to one with a different value when active, the debug 
 | 1      | 5   |
 | 2      | 18  |
 | 3      | 19  |
-| 3      | 23  |
+| 4      | 23  |
 
 ## Stimuli/feedback
 

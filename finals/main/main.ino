@@ -166,6 +166,7 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.rounds, "rounds", OPTS_ROUNDS, 4),
     new MenuOptionRow(menuHardware, &options.slotsCount, "slots", OPTS_SLOTS, 2),
     new MenuOptionRow(menuHardware, &options.inputMode, "input mode", OPTS_INPUT_MODE, 2),
+    new MenuOptionRow(menuHardware, &options.retries, "retries", OPTS_ON_OFF, 2),
 
     new MenuOptionRow(menuHardware, &options.visual, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
     new MenuOptionRow(menuHardware, &options.visualOptions[0], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
@@ -180,13 +181,10 @@ MenuRow* configRows[] = {
 
     new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, tactileHidden),
     
-    new MenuActionRow(menuHardware, "Start game", startGame)
+    new MenuActionRow(menuHardware, "Start game", startGame),
 };
 Menu configMenu(menuHardware, configRows, sizeof(configRows) / sizeof(configRows[0]));
 
-void resetGame() {
-    runner.reset();
-}
 
 char roundInfo[21] = {};
 char answerInfo[21] = {};
@@ -195,38 +193,23 @@ char answerInfo[21] = {};
 MenuRow* roundRows[] = {
     new MenuInfoRow(menuHardware, roundInfo),
     new MenuInfoRow(menuHardware, answerInfo),
-    new MenuActionRow(menuHardware, "Reset/Restart Game", resetGame)
+    new MenuActionRow(menuHardware, "Reset/Restart Game", [] () { runner.reset(); }),
 };
 Menu roundMenu(menuHardware, roundRows, sizeof(roundRows) / sizeof(roundRows[0]));
 
+MenuActionRow retryRow(menuHardware, "Retry round", [] () { runner.retry(); }, [] () { return !runner.canRetry(); });
+
 char scoreInfo[21] = {};
 
-void nextRound() {
-    runner.nextRound();
-}
-
-// menu shown at the end of each round to start the next round
-// shows the current round number and score
-MenuRow* nextRows[] = {
+// menu shown at the end of each round with the current round number and score
+MenuRow* feedbackRows[] = {
     new MenuInfoRow(menuHardware, roundInfo),
     new MenuInfoRow(menuHardware, scoreInfo),
-    new MenuActionRow(menuHardware, "Next round", nextRound)
+    new MenuActionRow(menuHardware, "Next round", [] () { runner.nextRound(); }, [] () { return !runner.hasNextRound(); }),
+    new MenuActionRow(menuHardware, "New game", [] () { runner.reset(); }, [] () { return runner.hasNextRound(); }),
+    new MenuActionRow(menuHardware, "Retry round", [] () { runner.retry(); }, [] () { return !runner.canRetry(); }),
 };
-Menu nextMenu(menuHardware, nextRows, sizeof(nextRows) / sizeof(nextRows[0]), 2);
-
-char endScoreInfo[21] = {};
-
-void newGame() {
-    runner.reset();
-}
-
-// menu shown at the end of the game to go back to options menu
-// shows the total score
-MenuRow* endRows[] = {
-    new MenuInfoRow(menuHardware, endScoreInfo),
-    new MenuActionRow(menuHardware, "New game", newGame)
-};
-Menu endMenu(menuHardware, endRows, sizeof(endRows) / sizeof(endRows[0]), 1);
+Menu feedbackMenu(menuHardware, feedbackRows, sizeof(feedbackRows) / sizeof(feedbackRows[0]), 4);
 
 char configButtonsInfo[21] = "";
 char inputButtonsInfo[21] = "";
@@ -309,14 +292,9 @@ void loop() {
             if (runner.stage().changed()) {
                 // update score strings BEFORE menu is shown
                 sprintf(scoreInfo, "Total score: %d", runner.score());
-                sprintf(endScoreInfo, "Total score: %d/%d", runner.score(), runner.totalRounds());
             }
             
-            if (runner.hasNextRound()) {
-                menus.use(&nextMenu);
-            } else {
-                menus.use(&endMenu);
-            }
+            menus.use(&feedbackMenu);
         } else {
             // blank screen
             menus.use(nullptr);

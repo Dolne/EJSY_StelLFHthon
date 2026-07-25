@@ -70,6 +70,8 @@ public:
     uint8_t totalRounds();
     uint8_t roundAnswer();
     bool hasNextRound();
+    bool canRetry();
+    void retry();
     void enterDebug();
     void exitDebug();
 private:

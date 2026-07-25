@@ -245,6 +245,21 @@ uint8_t GameRunner::roundAnswer()
     }
 }
 
+bool GameRunner::canRetry()
+{
+    // can only retry from FEEDBACK stage and only if retries are on and answer is wrong
+    return gameStage_.is(GameStage::FEEDBACK) && options_.enabled && options_.retries && round_->answer != round_->odd1OutSlot;
+}
+
+void GameRunner::retry()
+{
+    if (canRetry()) {
+        // reset answer and go back to SELECTION stage
+        round_->answer = 0xFF;
+        gameStage_.set(GameStage::SELECTION);
+    }
+}
+
 void GameRunner::enterDebug()
 {
     gameStage_.set(GameStage::DEBUG_MENU);
