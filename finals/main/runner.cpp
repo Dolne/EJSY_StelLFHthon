@@ -171,21 +171,21 @@ void GameRunner::update()
             if (hardware_.inputButtons.anyToggled(true)) {
                 // null gameplay means any button press is the "correct answer"
                 round_->answer = round_->odd1OutSlot;
-                gameStage_.set(GameStage::FEEDBACK);
             }
         } else if (round_->inputMode == INPUT_MODE_SCANNING) {
             if (hardware_.inputButtons.anyToggled(true)) {
                 round_->answer = scanningRunner_.slot();
-                gameStage_.set(GameStage::FEEDBACK);
             }
         } else if (round_->inputMode == INPUT_MODE_SELECT) {
             for (int i = 0; i < round_->slotsCount; i++) {
                 if (hardware_.inputButtons.get(i)->toggled(true)) {
                     round_->answer = i;
-                    gameStage_.set(GameStage::FEEDBACK);
                     break;
                 }
             }
+        }
+        if (round_->answer < round_->slotsCount) {
+            gameStage_.set(GameStage::FEEDBACK);
         }
     } else if (gameStage_.is(GameStage::FEEDBACK)) {
         if (round_->answer >= round_->slotsCount) {
@@ -328,10 +328,10 @@ void ScanningRunner::update()
         } else if (!hardware_.audio.playing()) {
             Serial.println("audio completed!");
             long dur = millis() - scanStage_.since();
-            if (dur < 1500) {
+            if (dur < 2000) {
                 wait(2000 - dur, ScanStage::SLOT_END);
             } else {
-                wait(500, ScanStage::SLOT_END);
+                scanStage_.set(ScanStage::SLOT_END);
             }
         }
     } else if (scanStage_.is(ScanStage::SLOT_END)) {
@@ -343,12 +343,16 @@ void ScanningRunner::update()
         } else {
             slot_ = 0;
         }
-        scanStage_.set(ScanStage::SLOT_START);
+        wait(500, ScanStage::SLOT_START);
     }
 }
 
 uint8_t ScanningRunner::slot()
 {
+    // in between slots
+    if (scanStage_.is(ScanStage::WAITING) && waitNext_ == ScanStage::SLOT_START) {
+        return 0xFF;
+    }
     return slot_;
 }
 
