@@ -17,6 +17,7 @@ should we use github issues & milestones instead
 - [ ] customizable scanning speed
 - [ ] customizable audio volume
 - [ ] show answer slot
+- [x] collapse tactile options
 
 ### User Controls
 - [x] Individually addressable RGB for scanning

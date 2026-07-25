@@ -54,7 +54,7 @@ GameRound::GameRound(GameOptions opts):
     odd1OutSlot(random(slotsCount)),
     hasVisual(opts.visual > 0),
     hasAudio(opts.audio > 0),
-    hasTactile(opts.tactile > 0)
+    hasTactile(opts.tactile > 0 && opts.inputMode == 1) // tactile can only be active if input mode is "select"
 {
     if (hasVisual) {
         generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT);
@@ -62,10 +62,6 @@ GameRound::GameRound(GameOptions opts):
 
     if (hasAudio) {
         generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT);
-    }
-
-    if (hasTactile) {
-        generateSlots(tactile, slotsCount, odd1OutSlot, opts.tactile, opts.tactileOptions, TACTILE_FEATS_COUNT);
     }
 }
 
@@ -100,8 +96,7 @@ void printGameRound(GameRound* gameRound)
     printSlots(gameRound->audio, AUDIO_FEATS_COUNT);
 
     Serial.print("tactile: ");
-    Serial.print(gameRound->hasTactile);
-    printSlots(gameRound->tactile, TACTILE_FEATS_COUNT);
+    Serial.println(gameRound->hasTactile);
 }
 
 GameHardware::GameHardware(

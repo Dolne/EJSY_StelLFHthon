@@ -27,7 +27,6 @@ inline const int VISUAL_FEATS_COUNT = 3;  // shape colour size
 inline const int VISUAL_VALUE_OFFSET = 2;
 inline const int VISUAL_TOTAL_VALUES = (1 << VISUAL_FEATS_COUNT) + VISUAL_VALUE_OFFSET;
 inline const int AUDIO_FEATS_COUNT = 4;   // loudness pitch timbre L/R
-inline const int TACTILE_FEATS_COUNT = 2; // texture temperature
 
 inline const int MAX_SLOTS = 4;
 
@@ -65,7 +64,6 @@ public:
     uint8_t audio = 0;
     uint8_t audioOptions[AUDIO_FEATS_COUNT] = { 0 };
     uint8_t tactile = 0;
-    uint8_t tactileOptions[TACTILE_FEATS_COUNT] = { 0 };
 };
 
 class GameRound
@@ -81,7 +79,6 @@ public:
     bool hasAudio = false;
     uint8_t audio[MAX_SLOTS] = { 0 };
     bool hasTactile = false;
-    uint8_t tactile[MAX_SLOTS] = { 0 };
 };
 
 void printGameRound(GameRound* gameRound);

@@ -153,8 +153,10 @@ bool visualSubMenuHidden() {
 bool audioSubMenuHidden() {
     return options.audio != 1;
 }
-bool tactileSubMenuHidden() {
-    return options.tactile != 1;
+
+// tactile stimuli only works if input mode is "select"
+bool tactileHidden() {
+    return options.inputMode != 1;
 }
 
 // menu for changing game options and starting the game
@@ -176,9 +178,7 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.audioOptions[2], "  timbre", OPTS_ON_OFF, 2, audioSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[3], "  L/R", OPTS_ON_OFF, 2, audioSubMenuHidden), // or "panning"
 
-    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_DIFFS, TACTILE_FEATS_COUNT + 2),
-    new MenuOptionRow(menuHardware, &options.tactileOptions[0], "  texture", OPTS_ON_OFF, 2, tactileSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.tactileOptions[2], "  temperature", OPTS_ON_OFF, 2, tactileSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, tactileHidden),
     
     new MenuActionRow(menuHardware, "Start game", startGame)
 };
