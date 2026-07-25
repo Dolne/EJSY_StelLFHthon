@@ -15,15 +15,25 @@ void enableFeatures(uint8_t* features, uint8_t featuresCount, uint8_t enabled) {
     }
 }
 
-void generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uint8_t enabled, uint8_t* features, uint8_t featuresCount)
+bool hasFeatures(uint8_t* features, uint8_t featuresCount) {
+    for (int i = 0; i < featuresCount; i++) {
+        if (features[i] != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uint8_t enabled, uint8_t* features, uint8_t featuresCount)
 {
     if (enabled == 0) {
         // need to do anything? eg set slots to all NONE
-        return;
+        return false;
     } else if (enabled > 1) {
         enableFeatures(features, featuresCount, enabled - 1);
-    } else {
-        // TODO check that at least 1 feature is enabled for manual
+    }
+    if (!hasFeatures(features, featuresCount)) {
+        return false;
     }
     // generate 2 values: the odd-1-out, and the value for the other slots
     uint8_t odd1Out = random(1 << featuresCount); // 2^n
@@ -46,6 +56,7 @@ void generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uin
             slots[i] = 0;
         }
     }
+    return true;
 }
 
 GameRound::GameRound(GameOptions opts):
@@ -57,12 +68,14 @@ GameRound::GameRound(GameOptions opts):
     hasTactile(opts.tactile > 0 && opts.inputMode == 1) // tactile can only be active if input mode is "select"
 {
     if (hasVisual) {
-        generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT);
+        hasVisual = generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT);
     }
 
     if (hasAudio) {
-        generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT);
+        hasAudio = generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT);
     }
+
+    isNullRound = !hasVisual && !hasAudio && !hasTactile;
 }
 
 
@@ -85,7 +98,11 @@ void printGameRound(GameRound* gameRound)
     Serial.print("slots: ");
     Serial.println(gameRound->slotsCount);
     Serial.print("odd 1 out: ");
-    Serial.println(gameRound->odd1OutSlot);
+    if (gameRound->isNullRound) {
+        Serial.println("NULL");
+    } else {
+        Serial.println(gameRound->odd1OutSlot);
+    }
 
     Serial.print("visual: ");
     Serial.print(gameRound->hasVisual);

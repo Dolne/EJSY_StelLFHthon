@@ -85,6 +85,7 @@ public:
     bool hasAudio = false;
     uint8_t audio[MAX_SLOTS] = { 0 };
     bool hasTactile = false;
+    bool isNullRound = false;
 };
 
 void printGameRound(GameRound* gameRound);

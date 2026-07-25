@@ -162,14 +162,18 @@ void GameRunner::update()
         }
     } else if (gameStage_.is(GameStage::SELECTION)) {
         if (gameStage_.changed()) {
-            if (round_->inputMode == INPUT_MODE_SCANNING || round_->hasAudio) {
+            if (!round_->isNullRound && round_->inputMode == INPUT_MODE_SCANNING || round_->hasAudio) {
                 scanningRunner_.startScanning(round_);
-            } else if (round_->inputMode == INPUT_MODE_SELECT) {
-                // do nothing??
             }
         }
         scanningRunner_.update();
-        if (round_->inputMode == INPUT_MODE_SCANNING) {
+        if (round_->isNullRound) {
+            if (hardware_.inputButtons.anyToggled(true)) {
+                // null gameplay means any button press is the "correct answer"
+                round_->answer = round_->odd1OutSlot;
+                gameStage_.set(GameStage::FEEDBACK);
+            }
+        } else if (round_->inputMode == INPUT_MODE_SCANNING) {
             if (hardware_.inputButtons.anyToggled(true)) {
                 round_->answer = scanningRunner_.slot();
                 gameStage_.set(GameStage::FEEDBACK);
@@ -234,7 +238,7 @@ bool GameRunner::hasNextRound()
 
 uint8_t GameRunner::roundAnswer()
 {
-    if (round_ != nullptr) {
+    if (round_ != nullptr && !round_->isNullRound) {
         return round_->odd1OutSlot;
     } else {
         return 0xFF;

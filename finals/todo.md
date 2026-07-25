@@ -24,7 +24,7 @@ should we use github issues & milestones instead
 - [ ] small delay between slots when scanning
 - [ ] let user try again if they get the ans wrong
 - [x] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
-- [ ] "null" gameplay if no diffs selected
+- [x] "null" gameplay if no diffs selected
 
 ### Feedback
 - [x] Individually addressable RGB for feedback

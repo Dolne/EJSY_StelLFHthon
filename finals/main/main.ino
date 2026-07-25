@@ -298,7 +298,11 @@ void loop() {
             if (runner.stage().changed()) {
                 // update round number and answer strings BEFORE menu is shown
                 sprintf(roundInfo, "Round %d/%d", runner.currRound() + 1, runner.totalRounds());
-                sprintf(answerInfo, "Answer: %d", runner.roundAnswer() + 1);
+                if (runner.roundAnswer() < 0xFF) {
+                    sprintf(answerInfo, "Answer: %d", runner.roundAnswer() + 1);
+                } else {
+                    sprintf(answerInfo, "Answer: NULL");
+                }
             }
             menus.use(&roundMenu);
         } else if (runner.stage().is(GameStage::FEEDBACK)) {
