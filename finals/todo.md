@@ -15,15 +15,23 @@ should we use github issues & milestones instead
 - [ ] Show options for tactile on gamemaster screen
 - [ ] Check/validate options (eg no diffs selected)
 - [ ] customizable scanning speed
+- [ ] Null option (no dimension diff selected)
 
 ### User Controls
 - [x] Individually addressable RGB for scanning
 - [ ] small delay between slots when scanning?
+- [ ] Customisable scanning speed
+- [ ] Have a gap between each option when sccanning
+- [ ] Let user try again if they get the ans wrong
+- [ ] If doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
+
 
 ### Feedback
 - [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
+- [ ] Win ("Yaay") /lose ("Please try again") audio
+
 
 ## Hardware
 
@@ -50,3 +58,16 @@ should we use github issues & milestones instead
 - [x] Masking tape labels on the wires
 - [ ] The white button might hv some issues, check it
 - [ ] solder one more F 3.5mm jack
+- [ ] Cover up the visual icons that aren't being shown
+- [ ] Box for each wheel
+- [ ] Box for electronics
+- [ ] Velcro for icons on the wheel
+- [ ] For audio decide if they change lesson by changing SD Card or by pressing in gamemaster controls
+- [ ] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module)
+- [ ] Give the wheel box and button the same number with the same text colour
+- [ ] Gamemaster guide
+- [ ] Prepare the strip for the wheel
+- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) 
+- [ ] Rigid strip to mount feedback LED strip on
+- [ ] Wiring / electronics box
+- [ ] Add star icon to replace number icon on wheel
