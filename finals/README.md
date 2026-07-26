@@ -25,6 +25,28 @@ See [simulation/README.md](./simulation/README.md) for more info.
 
 ## Gamemaster controls
 
+The gamemaster configures the game options and controls the game using a 20x4 character LCD display with 3 buttons.
+
+The gamemaster can control settings like the number of rounds in the game as well as the [input mode](#user-input), and control whether certain stimuli are active and how the odd one out should differ from the others. The gamemaster controls are also used to go to the next round of the game or start a new game.
+
+The screen displays a menu, which is navigated using the 3 buttons — up, action, and down. The up and down buttons control which row is selected, and will cause the screen to scroll if necessary.
+
+There are 3 different kinds of menu rows:
+
+1.  Info rows which just display some text. 
+
+    Pressing the action button does nothing when these rows are selected.
+
+2.  Action rows which are like a button to do something.
+
+    Pressing the action button will do something as described on the row.
+
+3.  Option rows which have a label and a value.
+
+    Pressing the action button will cycle through the possible values for that option. Each option row is linked to a specific game option.
+
+If there is something interactive, either an action row or value for an option row, it will blink on the screen to indicate that the action button can be pressed to do something. 
+
 ### Gamemaster LCD
 
 20x4 LCD character display over I2C using the [LiquidCrystal_I2C library](https://registry.platformio.org/libraries/marcoschwartz/LiquidCrystal_I2C). The display is driven by a HD44780 controller over I2C on address `0x27`.
@@ -46,7 +68,15 @@ On setup, the code assumes that all buttons are not pressed, and will read the v
 | Action | A1  |
 | Down   | A2  |
 
-## User controls
+## User input
+
+The game has 2 modes for input — scanning and select.
+
+The scanning mode works using a single input. The game will scan through each option one by one, allowing the user to select the highlighted option by pressing their input.
+
+The select mode works using 4 separate inputs. Each input will correspond to a specific slot, which will be selected by pressing the corresponsing input.
+
+All the user inputs are connected using a 3.5mm mono audio jack, which is a common interface for assistive switches, allowing the user to easily swap to using their own input methods.
 
 ### User buttons
 
@@ -64,6 +94,18 @@ If the a button is changed to one with a different value when active, the debug 
 | 4      | 23  |
 
 ## Stimuli/feedback
+
+In each round, the game will present 3 or 4 options to the user (based on what the gamemaster chooses). Of which, one of the options will be different from the others. These options can be visual, audio, or tactile, or even with multiple senses at once depending on what the gamemaster chooses.
+
+The visual stimuli are shapes on slot machine style wheels which are controlled by stepper motors. There are 3 different features of the shapes which can differ — the shape, colour, and size.
+
+The audio stimuli are audio files played from an SD card and have 4 features — the pitch, loudness, timbre, and panning (L/R).
+
+For the visual and audio stimuli, each option is represented by an index. Each feature has 2 possible values, and these values are used to generate the index. The game will first random generate an index to use as the odd one out, then based on the game options, toggle certain features to generate the index used for all the other options.
+
+The tactile stimuli are physically passed to the user by the gamemaster. The game does not know about the features of the tactile stimuli, and will only tell the gamemaster which is the odd one out option.
+
+At the end of each round, the game will provide feedback to the user on whether their answer is correct or wrong using the speakers, LED strips, and a vibration motor. It will also display the score to the gamemaster with the option to allow the user to retry if their answer is wrong.
 
 ### Steppers
 
