@@ -12,6 +12,10 @@ inline const char* OPTS_ON_OFF[] = { "off", "on" };
 // this is meant to accomodate up to the stimuli with the most features
 // TODO [ux] does it make sense for manual to come first? 
 inline const char* OPTS_DIFFS[] = { "off", "manual", "1 diff", "2 diff", "3 diff", "4 diff" };
+inline const char* OPTS_VOLUME[] = { "low", "medium", "high" };
+inline const uint8_t VOLUME_VALUES[] = { 10, 20, 30 };
+inline const char* OPTS_SCAN_SPEED[] = { "2s", "5s", "10s" };
+inline const int SCAN_SPEED_VALUES[] = { 2000, 5000, 10000 };
 
 inline const char* OPTS_SLOTS[] = { "3", "4" };
 inline const int MIN_SLOTS = 3;
@@ -57,8 +61,10 @@ public:
     
     uint8_t rounds = 0;
     uint8_t inputMode = 0;
+    uint8_t scanSpeed = 0;
     uint8_t slotsCount = 0;
     uint8_t retries = 1;
+    uint8_t volume = 2;
 
     uint8_t visual = 0;
     uint8_t visualOptions[VISUAL_FEATS_COUNT] = { 0 };

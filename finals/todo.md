@@ -14,8 +14,8 @@ should we use github issues & milestones instead
 ### Gamemaster
 - [ ] ~~Show options for tactile on gamemaster screen~~
 - [ ] ~~Check/validate options (eg no diffs selected)~~
-- [ ] customizable scanning speed
-- [ ] customizable audio volume
+- [x] customizable scanning speed
+- [x] customizable audio volume
 - [x] show answer slot
 - [x] collapse tactile options
 

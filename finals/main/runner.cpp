@@ -140,11 +140,17 @@ void GameRunner::update()
         }
     } else if (gameStage_.is(GameStage::STARTING)) {
         if (options_.enabled) {
+            Serial.println("Game starting...");
             delete round_;
             round_ = new GameRound(options_);
-            // maybe play some info audio first?
-            Serial.println("Game starting...");
             printGameRound(round_);
+
+            uint8_t vol = VOLUME_VALUES[options_.volume];
+            Serial.print("Setting volume to ");
+            Serial.println(vol);
+            hardware_.audio.setVolume(vol);
+            // maybe play some info audio first?
+
             gameStage_.set(GameStage::SPINNING);
         } else {
             Serial.println("[ERR] Game stage set to STARTING without setting options");
@@ -163,7 +169,11 @@ void GameRunner::update()
     } else if (gameStage_.is(GameStage::SELECTION)) {
         if (gameStage_.changed()) {
             if (!round_->isNullRound && round_->inputMode == INPUT_MODE_SCANNING || round_->hasAudio) {
-                scanningRunner_.startScanning(round_);
+                int dur = SCAN_SPEED_VALUES[options_.scanSpeed];
+                Serial.print("Starting scanning with duration of ");
+                Serial.print(dur);
+                Serial.println("ms");
+                scanningRunner_.startScanning(round_, dur);
             }
         }
         scanningRunner_.update();
@@ -279,10 +289,11 @@ ScanningRunner::ScanningRunner(const GameHardware &hardware):
     scanStage_.set(ScanStage::STOPPED);
 }
 
-void ScanningRunner::startScanning(GameRound *round)
+void ScanningRunner::startScanning(GameRound *round, int scanDuration)
 {
     slot_ = 0;
     round_ = round;
+    scanDuration_ = scanDuration;
     scanStage_.set(ScanStage::SLOT_START);
 }
 
@@ -315,6 +326,7 @@ void ScanningRunner::update()
             scanStage_.set(waitNext_);
         }
     } else if (scanStage_.is(ScanStage::SLOT_START)) {
+        slotStart_ = millis();
         Serial.print("Scanning slot ");
         Serial.println(slot_);
         // turn on the arrow light for the slot
@@ -323,31 +335,22 @@ void ScanningRunner::update()
         scanStage_.set(ScanStage::INITIAL_AUDIO);
     } else if (scanStage_.is(ScanStage::INITIAL_AUDIO)) {
         if (scanStage_.changed()) {
-            // if enabled, play audio
+            // TODO play audio or else go to AUDIO stage
             // hardware_.audio.play(1, slot_ + 1);
         } else if (!hardware_.audio.playing()) {
-            if (round_->hasAudio) {
-                wait(500, ScanStage::AUDIO);
-            } else {
-                wait(2000, ScanStage::SLOT_END);
-            }
+            wait(300, ScanStage::AUDIO);
         }
     } else if (scanStage_.is(ScanStage::AUDIO)) {
         if (scanStage_.changed()) {
-            // play audio
+            // play audio if any
             if (!SIMULATION && round_->audio[slot_] > 0) {
                 Serial.print("Playing audio ");
                 Serial.println(round_->audio[slot_]);
                 hardware_.audio.play(1, round_->audio[slot_]);
             }
         } else if (!hardware_.audio.playing()) {
-            Serial.println("audio completed!");
-            long dur = millis() - scanStage_.since();
-            if (dur < 2000) {
-                wait(2000 - dur, ScanStage::SLOT_END);
-            } else {
-                scanStage_.set(ScanStage::SLOT_END);
-            }
+            Serial.println("waiting...");
+            wait(scanDuration_ - (millis() - slotStart_), ScanStage::SLOT_END);
         }
     } else if (scanStage_.is(ScanStage::SLOT_END)) {
         // turn off led

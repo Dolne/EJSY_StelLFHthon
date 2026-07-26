@@ -22,7 +22,6 @@ Adafruit_MCP23X17 expander;
 // YX5300 serial MP3 player on Serial2
 const uint8_t MP3_RX = 16; // ESP RX2 connected to YX5300 TX
 const uint8_t MP3_TX = 17; // ESP TX2 connected to YX5300 RX
-const uint8_t AUDIO_VOLUME = 10; // max is 30, reduced to 10 for testing at night
 
 // LCD HD44780 display over I2C
 const int LCD_ADDR = 0x27;
@@ -154,19 +153,19 @@ bool audioSubMenuHidden() {
     return options.audio != 1;
 }
 
-// tactile stimuli only works if input mode is "select"
-bool tactileHidden() {
-    return options.inputMode != 1;
-}
-
 // menu for changing game options and starting the game
 // the game options does not actually know/care what each option within a stimuli is
 // so that means it is only defined by the order in the submenu
 MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.rounds, "rounds", OPTS_ROUNDS, 4),
     new MenuOptionRow(menuHardware, &options.slotsCount, "slots", OPTS_SLOTS, 2),
+
     new MenuOptionRow(menuHardware, &options.inputMode, "input mode", OPTS_INPUT_MODE, 2),
+    // scanning speed, only shown when input mode is "scanning"
+    new MenuOptionRow(menuHardware, &options.scanSpeed, "scan speed", OPTS_SCAN_SPEED, 3, [] () { return options.inputMode != 0; }),
+
     new MenuOptionRow(menuHardware, &options.retries, "retries", OPTS_ON_OFF, 2),
+    new MenuOptionRow(menuHardware, &options.volume, "volume", OPTS_VOLUME, 3),
 
     new MenuOptionRow(menuHardware, &options.visual, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
     new MenuOptionRow(menuHardware, &options.visualOptions[0], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
@@ -179,7 +178,8 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.audioOptions[2], "  timbre", OPTS_ON_OFF, 2, audioSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[3], "  L/R", OPTS_ON_OFF, 2, audioSubMenuHidden), // or "panning"
 
-    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, tactileHidden),
+    // tactile options only shown when input mode is "select"
+    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, [] () { return options.inputMode != 0; }),
     
     new MenuActionRow(menuHardware, "Start game", startGame),
 };
@@ -254,7 +254,8 @@ void setup() {
     tasks.begin();
     steppers.begin();
     audio.begin();
-    audio.setVolume(AUDIO_VOLUME);
+    // set volume to the default option value
+    audio.setVolume(VOLUME_VALUES[options.volume]);
 
     lcd.begin();
 }

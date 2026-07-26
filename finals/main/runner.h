@@ -23,7 +23,7 @@ class ScanningRunner: public Task
 {
 public:
     ScanningRunner(const GameHardware& hardware);
-    void startScanning(GameRound* round);
+    void startScanning(GameRound* round, int scanDuration);
     void stop();
     void begin();
     void update();
@@ -35,6 +35,8 @@ private:
     State<ScanStage> scanStage_{};
     GameRound* round_{};
     uint8_t slot_{};
+    long slotStart_{};
+    int scanDuration_ = 2000;
     long waitDuration_{};
     ScanStage waitNext_{};
 };
