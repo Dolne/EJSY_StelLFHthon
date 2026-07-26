@@ -24,7 +24,7 @@ bool hasFeatures(uint8_t* features, uint8_t featuresCount) {
     return false;
 }
 
-bool generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uint8_t enabled, uint8_t* features, uint8_t featuresCount)
+bool generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uint8_t enabled, uint8_t* features, uint8_t featuresCount, uint8_t offset)
 {
     if (enabled == 0) {
         // need to do anything? eg set slots to all NONE
@@ -46,11 +46,12 @@ bool generateSlots(uint8_t slots[4], uint8_t slotCount, uint8_t odd1OutSlot, uin
     }
     for (int i = 0; i < MAX_SLOTS; i++) {
         if (i < slotCount) {
-            // add 2 to the index value generated as 0 represents null and 1 is the slot number display
+            // add to the index value generated as 0 represents null
+            // for visual 1 is also a special display slot
             if (i == odd1OutSlot) {
-                slots[i] = odd1Out + VISUAL_VALUE_OFFSET;
+                slots[i] = odd1Out + offset;
             } else {
-                slots[i] = other + VISUAL_VALUE_OFFSET;
+                slots[i] = other + offset;
             }
         } else {
             slots[i] = 0;
@@ -68,27 +69,30 @@ GameRound::GameRound(GameOptions opts):
     hasTactile(opts.tactile > 0 && opts.inputMode == 1) // tactile can only be active if input mode is "select"
 {
     if (hasVisual) {
-        hasVisual = generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT);
+        hasVisual = generateSlots(visual, slotsCount, odd1OutSlot, opts.visual, opts.visualOptions, VISUAL_FEATS_COUNT, VISUAL_VALUE_OFFSET);
     }
 
     if (hasAudio) {
-        hasAudio = generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT);
+        hasAudio = generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT, AUDIO_VALUE_OFFSET);
     }
 
     isNullRound = !hasVisual && !hasAudio && !hasTactile;
 }
 
 
-void printSlots(uint8_t slots[4], uint8_t digits) {
+void printSlots(uint8_t slots[4], uint8_t digits, uint8_t offset) {
     Serial.print(" [");
     for (int i = 0; i < 4; i++) {
         Serial.print(slots[i]);
-        Serial.print(" (");
-        uint8_t val = slots[i] - VISUAL_VALUE_OFFSET;
-        for (int j = digits - 1; j >= 0; j--) {
-            Serial.print(bitRead(val, j));
+        Serial.print(" ");
+        if (slots[i] >= offset) {
+            Serial.print("(");
+            uint8_t val = slots[i] - offset;
+            for (int j = digits - 1; j >= 0; j--) {
+                Serial.print(bitRead(val, j));
+            }
+            Serial.print(") ");
         }
-        Serial.print(") ");
     }
     Serial.println("]");
 }
@@ -106,11 +110,11 @@ void printGameRound(GameRound* gameRound)
 
     Serial.print("visual: ");
     Serial.print(gameRound->hasVisual);
-    printSlots(gameRound->visual, VISUAL_FEATS_COUNT);
+    printSlots(gameRound->visual, VISUAL_FEATS_COUNT, VISUAL_VALUE_OFFSET);
 
     Serial.print("audio: ");
     Serial.print(gameRound->hasAudio);
-    printSlots(gameRound->audio, AUDIO_FEATS_COUNT);
+    printSlots(gameRound->audio, AUDIO_FEATS_COUNT, AUDIO_VALUE_OFFSET);
 
     Serial.print("tactile: ");
     Serial.println(gameRound->hasTactile);

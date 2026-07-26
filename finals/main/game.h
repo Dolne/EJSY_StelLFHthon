@@ -31,6 +31,7 @@ inline const int VISUAL_FEATS_COUNT = 3;  // shape colour size
 inline const int VISUAL_VALUE_OFFSET = 2;
 inline const int VISUAL_TOTAL_VALUES = (1 << VISUAL_FEATS_COUNT) + VISUAL_VALUE_OFFSET;
 inline const int AUDIO_FEATS_COUNT = 4;   // loudness pitch timbre L/R
+inline const int AUDIO_VALUE_OFFSET = 1;
 
 inline const int MAX_SLOTS = 4;
 
