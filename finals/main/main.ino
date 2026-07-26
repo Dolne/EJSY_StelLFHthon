@@ -149,8 +149,11 @@ void startGame() {
 bool visualSubMenuHidden() {
     return options.visual != 1;
 }
+bool audioMenuHidden() {
+    return options.inputMode != 0;
+}
 bool audioSubMenuHidden() {
-    return options.audio != 1;
+    return audioMenuHidden() || options.audio != 1;
 }
 
 // menu for changing game options and starting the game
@@ -162,7 +165,7 @@ MenuRow* configRows[] = {
 
     new MenuOptionRow(menuHardware, &options.inputMode, "input mode", OPTS_INPUT_MODE, 2),
     // scanning speed, only shown when input mode is "scanning"
-    new MenuOptionRow(menuHardware, &options.scanSpeed, "scan speed", OPTS_SCAN_SPEED, 3, [] () { return options.inputMode != 0; }),
+    new MenuOptionRow(menuHardware, &options.scanSpeed, "  duration", OPTS_SCAN_SPEED, 3, [] () { return options.inputMode != 0; }),
 
     new MenuOptionRow(menuHardware, &options.retries, "retries", OPTS_ON_OFF, 2),
     new MenuOptionRow(menuHardware, &options.volume, "volume", OPTS_VOLUME, 3),
@@ -172,14 +175,14 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.visualOptions[1], "  colour", OPTS_ON_OFF, 2, visualSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.visualOptions[2], "  size", OPTS_ON_OFF, 2, visualSubMenuHidden),
 
-    new MenuOptionRow(menuHardware, &options.audio, "audio", OPTS_DIFFS, AUDIO_FEATS_COUNT + 2),
+    new MenuOptionRow(menuHardware, &options.audio, "audio", OPTS_DIFFS, AUDIO_FEATS_COUNT + 2, audioMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[0], "  loudness", OPTS_ON_OFF, 2, audioSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[1], "  pitch", OPTS_ON_OFF, 2, audioSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[2], "  timbre", OPTS_ON_OFF, 2, audioSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[3], "  L/R", OPTS_ON_OFF, 2, audioSubMenuHidden), // or "panning"
 
     // tactile options only shown when input mode is "select"
-    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, [] () { return options.inputMode != 0; }),
+    new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, [] () { return options.inputMode != 1; }),
     
     new MenuActionRow(menuHardware, "Start game", startGame),
 };

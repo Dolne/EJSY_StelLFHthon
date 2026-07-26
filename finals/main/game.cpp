@@ -64,7 +64,7 @@ GameRound::GameRound(GameOptions opts):
     inputMode(opts.inputMode),
     odd1OutSlot(random(slotsCount)),
     hasVisual(opts.visual > 0),
-    hasAudio(opts.audio > 0),
+    hasAudio(opts.audio > 0 && opts.inputMode == 0), // audio can only be active if input mode is "scanning"
     hasTactile(opts.tactile > 0 && opts.inputMode == 1) // tactile can only be active if input mode is "select"
 {
     if (hasVisual) {

@@ -2,6 +2,8 @@
 
 #include "runner.h"
 
+const uint32_t SCAN_COLOUR = Adafruit_NeoPixel::Color(255, 255, 0);
+
 void successAnimation(long start, Adafruit_NeoPixel& strip)
 {
     static const int DURATION = 2000;
@@ -167,13 +169,17 @@ void GameRunner::update()
             }
         }
     } else if (gameStage_.is(GameStage::SELECTION)) {
-        if (gameStage_.changed()) {
-            if (!round_->isNullRound && round_->inputMode == INPUT_MODE_SCANNING || round_->hasAudio) {
+        if (gameStage_.changed() && !round_->isNullRound) {
+            if (round_->inputMode == INPUT_MODE_SCANNING) {
                 int dur = SCAN_SPEED_VALUES[options_.scanSpeed];
                 Serial.print("Starting scanning with duration of ");
                 Serial.print(dur);
                 Serial.println("ms");
                 scanningRunner_.startScanning(round_, dur);
+            } else if (round_->hasVisual) {
+                // illuminate all visual options in select mode
+                hardware_.scanningStrip.fill(SCAN_COLOUR, 0, round_->slotsCount);
+                hardware_.scanningStrip.show();
             }
         }
         scanningRunner_.update();
@@ -203,6 +209,10 @@ void GameRunner::update()
             gameStage_.set(GameStage::SELECTION);
         }
         if (gameStage_.changed()) {
+            hardware_.scanningStrip.clear();
+            hardware_.scanningStrip.show();
+            // TODO maybe show some animation with scanning strip also
+
             Serial.print("Slot selected: ");
             Serial.print(round_->answer);
             Serial.print(", Answer: ");
@@ -330,7 +340,7 @@ void ScanningRunner::update()
         Serial.print("Scanning slot ");
         Serial.println(slot_);
         // turn on the arrow light for the slot
-        hardware_.scanningStrip.setPixelColor(slot_, 255, 255, 0); // some colour idk
+        hardware_.scanningStrip.setPixelColor(slot_, SCAN_COLOUR);
         hardware_.scanningStrip.show();
         scanStage_.set(ScanStage::INITIAL_AUDIO);
     } else if (scanStage_.is(ScanStage::INITIAL_AUDIO)) {
