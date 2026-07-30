@@ -7,7 +7,7 @@ should we use github issues & milestones instead
 ### Software ↔︎ Hardware
 - [x] YX5300 (Audio Player)
 - [x] validate audio ([validate_audio_alt](./validate_audio_alt/validate_audio_alt.ino)) and create audio files, then uncomment audio code
-- [ ] stepper homing sequence (light gates)
+- [ ] ~~stepper homing sequence (light gates)~~
 - [x] bring steppers to 0 at end of game or before turning off
 - [x] periodically refresh entire screen
 
@@ -38,7 +38,7 @@ should we use github issues & milestones instead
 ### Option stimuli
 - [x] Individual neopixels / make some
 - [x] YX5300 ~~& Logic Level Shifter (on breadboard) (don't seem to need the LLC actl, and it seems to make the YX TX --> ESP RX data not work)~~
-- [ ] LightGate - might forgo for now since no time
+- [ ] ~~LightGate - forgo for now since no time~~
 - [x] Overlays
 - [x] Wheels
 - [x] Stepper mount
@@ -56,18 +56,33 @@ should we use github issues & milestones instead
 
 ### Others
 - [x] Masking tape labels on the wires
-- [ ] The white button might hv some issues, check it
-- [ ] solder one more F 3.5mm jack
-- [ ] Cover up the visual icons that aren't being shown
+- [x] ~~solder one more F 3.5mm jack --> just use the screw one~~
+- [ ] ~~Velcro for icons on the wheel --> just use double sided tape actually works~~
+
+### In order of importance
+#### High Effort High Impact
 - [ ] Box for each wheel
+    - [ ] Cover up the visual icons that aren't being shown
 - [ ] Box for electronics
-- [ ] Velcro for icons on the wheel
-- [ ] For audio decide if they change lesson by changing SD Card or by pressing in gamemaster controls
-- [ ] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module)
-- [ ] Give the wheel box and button the same number with the same text colour
+- [ ] Give the wheel box and button the same number with the same text colour (just 2d print)
+- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
 - [ ] Gamemaster guide
-- [ ] Prepare the strip for the wheel
-- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) 
+- [ ] Our actual presentation
+
+#### Low Effort High Impact
+- [ ] The white button might hv some issues, check it
+- [ ] Win ("Yaay") /lose ("Please try again") audio
 - [ ] Rigid strip to mount feedback LED strip on
-- [ ] Wiring / electronics box
+
+#### Low Effort Low Impact
+- [ ] Prepare the strip for the wheel
+
+#### High Effort Low Impact
+
+### Done
+- [x] For audio decide if they change lesson by changing SD Card or by pressing in gamemaster controls --> Change via software
+
+- [ ] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module)
 - [ ] Add star icon to replace number icon on wheel
+
+
