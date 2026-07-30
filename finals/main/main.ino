@@ -171,9 +171,9 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.volume, "volume", OPTS_VOLUME, 3),
 
     new MenuOptionRow(menuHardware, &options.visual, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
-    new MenuOptionRow(menuHardware, &options.visualOptions[0], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.visualOptions[0], "  size", OPTS_ON_OFF, 2, visualSubMenuHidden),
     new MenuOptionRow(menuHardware, &options.visualOptions[1], "  colour", OPTS_ON_OFF, 2, visualSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.visualOptions[2], "  size", OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.visualOptions[2], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
 
     new MenuOptionRow(menuHardware, &options.audio, "audio", OPTS_DIFFS, AUDIO_FEATS_COUNT + 2, audioMenuHidden),
     new MenuOptionRow(menuHardware, &options.audioOptions[0], "  loudness", OPTS_ON_OFF, 2, audioSubMenuHidden),
