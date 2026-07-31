@@ -128,6 +128,9 @@ The acceleration and max speed of the steppers must be limited in software to pr
 | C       | 32   | 14  | 36               |
 | D       | 33   | 15  | 39               |
 
+#### Sequence for Visual
+For our current set up, Shape A 
+
 ### MP3 Module
 
 Audio is played using a YX5300 serial MP3 player from an inserted microSD card.
@@ -147,6 +150,9 @@ The code relies on receiving the unsolicted FILE_END status response from the YX
 | ------ | -------- |
 | RX     | 16 (TX2) |
 | TX     | 17 (RX2) |
+
+#### Sequence for Audio
+
 
 ### LED light strips
 
