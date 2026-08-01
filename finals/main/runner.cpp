@@ -177,28 +177,17 @@ void GameRunner::update()
             hardware_.steppers.allDirectTo(0);
             hardware_.audio.stop();
         }
-        else
-        {
-            // wait until hardware is stopped before going to STOPPED stage
-            if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing())
-            {
-                gameStage_.set(GameStage::STOPPED);
-            }
-        }
-    }
-
-    // when reset is called, and after all hardware has stopped
-    else if (gameStage_.is(GameStage::STOPPED))
-    {
-        // startGame will set game options but also call reset first
+        
         if (options_.enabled)
         {
-            // once everything from previous game has been reset, start the new game
-            gameStage_.set(GameStage::STARTING);
+            // wait until hardware is stopped before starting a new game
+            if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing())
+            {
+                gameStage_.set(GameStage::STARTING);
+            }
         }
         else
         {
-            // go back to game options menu after a normal reset
             gameStage_.set(GameStage::CONFIG);
         }
     }

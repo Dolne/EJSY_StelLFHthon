@@ -137,13 +137,10 @@ enum class GameStage
     FEEDBACK,
     /**
      * stop the game.
-     * this stage will remain until everything (particularly the steppers) have fully stopped.
+     * this stage will either immediately go to CONFIG stage after instructing all hardware to stop,
+     * or will wait until everything is stopped to go to the STARTING stage if new game options have been provided
      */
     STOPPING,
-    /**
-     * game is stopped
-     */
-    STOPPED
 };
 
 class GameRunner : public Task
