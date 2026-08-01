@@ -14,6 +14,7 @@
 #include "menu.h"
 #include "game.h"
 #include "runner.h"
+#include "demo.h"
 
 // MCP23017 I2C GPIO expander
 const uint8_t MCP_ADDR = 0x20;
@@ -132,9 +133,13 @@ GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanni
 
 GameRunner runner(gameHardware);
 
+DemoRunner demoRunner(gameHardware);
+
+uint8_t demoModeEnabled = 0;
+
 // tasks to run at TICKRATE
 // the order of tasks should be inputs -> runner -> outputs
-Task* taskList[] = { &configButtons, &inputButtons, &buttonBoot, &runner, &vibration };
+Task* taskList[] = { &configButtons, &inputButtons, &buttonBoot, &runner, &demoRunner, &vibration };
 TaskGroup tasks(taskList, 5);
 
 // gamemaster hardware
@@ -142,6 +147,11 @@ MenuHardware menuHardware(lcd, buttonUp, buttonAction, buttonDown);
 
 void startGame() {
     runner.startGame(options);
+}
+void startDemo() {
+    if (runner.stage().is(GameStage::CONFIG)) {
+        demoRunner.start();
+    }
 }
 
 // callbacks to control whether the submenu for "manual" diffs for each stimuli is shown
@@ -185,6 +195,8 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, [] () { return options.inputMode != 1; }),
     
     new MenuActionRow(menuHardware, "Start game", startGame),
+
+    new MenuActionRow(menuHardware, "Enter demo mode", startDemo, [] () { return !demoModeEnabled; }),
 };
 Menu configMenu(menuHardware, configRows, sizeof(configRows) / sizeof(configRows[0]));
 
@@ -214,6 +226,14 @@ MenuRow* feedbackRows[] = {
 };
 Menu feedbackMenu(menuHardware, feedbackRows, sizeof(feedbackRows) / sizeof(feedbackRows[0]), 4);
 
+MenuRow* demoRows[] = {
+    new MenuInfoRow(menuHardware, demoRunner.currName, []() { return demoRunner.currNameChanged(); }),
+    new MenuActionRow(menuHardware, "Next", [] () { demoRunner.next(); }),
+    new MenuActionRow(menuHardware, "Reshuffle", [] () { demoRunner.reshuffle(); }),
+    new MenuActionRow(menuHardware, "Exit", [] () { demoRunner.end(); }),
+};
+Menu demoMenu(menuHardware, demoRows, sizeof(demoRows) / sizeof(demoRows[0]), 1);
+
 char configButtonsInfo[21] = "";
 char inputButtonsInfo[21] = "";
 
@@ -231,6 +251,7 @@ MenuRow *debugRows[] = {
     new MenuInfoRow(menuHardware, "User buttons:"),
     new MenuInfoRow(menuHardware, inputButtonsInfo, inputButtonsUpdated),
     new MenuActionRow(menuHardware, "Reset user buttons", [] () { inputButtons.resetActiveValues(false); }),
+    new MenuOptionRow(menuHardware, &demoModeEnabled, "Demo mode", OPTS_ON_OFF, 2),
 };
 Menu debugMenu(menuHardware, debugRows, sizeof(debugRows) / sizeof(debugRows[0]), 0);
 
@@ -250,6 +271,8 @@ bool timeForNextUpdate() {
 
 void setup() {
     Serial.begin(9600);
+    lcd.begin();
+    lcd.print(1, 8, 4, "EJSY");
     expander.begin_I2C(MCP_ADDR);
 
     // the buttons will use the pin value at setup as the inactive value
@@ -260,7 +283,6 @@ void setup() {
     // set volume to the default option value
     audio.setVolume(VOLUME_VALUES[options.volume]);
 
-    lcd.begin();
 }
 void loop() {
     static bool selected = false;
@@ -280,7 +302,11 @@ void loop() {
             }
             menus.use(&debugMenu);
         } else if (runner.stage().is(GameStage::CONFIG)) {
-            menus.use(&configMenu);
+            if (demoRunner.isActive()) {
+                menus.use(&demoMenu);
+            } else {
+                menus.use(&configMenu);
+            }
         } else if (runner.stage().is(GameStage::SPINNING) || runner.stage().is(GameStage::SELECTION)) {
             if (runner.stage().changed()) {
                 // update round number and answer strings BEFORE menu is shown

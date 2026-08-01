@@ -36,6 +36,10 @@ inline const int VISUAL_TOTAL_VALUES = (1 << VISUAL_FEATS_COUNT) + VISUAL_VALUE_
 inline const int AUDIO_FEATS_COUNT = 4; // loudness pitch timbre L/R
 inline const int AUDIO_VALUE_OFFSET = 1; // null
 
+// option labels to show in menu
+inline const char *VISUAL_FEATS_NAMES[VISUAL_FEATS_COUNT] = { "  size", "  colour", "  shape" };
+inline const char *AUDIO_FEATS_NAMES[AUDIO_FEATS_COUNT] = { "  loudness", "  pitch", "  timbre", "  L/R" };
+
 inline const int MAX_SLOTS = 4;
 
 class GameHardware

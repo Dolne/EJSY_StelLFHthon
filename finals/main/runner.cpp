@@ -2,8 +2,6 @@
 
 #include "runner.h"
 
-const uint32_t SCAN_COLOUR = Adafruit_NeoPixel::Color(255, 255, 0);
-
 void successAnimation(long start, Adafruit_NeoPixel &strip)
 {
     static const int DURATION = 2000;
@@ -450,11 +448,13 @@ void ScanningRunner::startScanning(GameRound *round, int scanDuration)
     slot_ = 0;
     round_ = round;
     scanDuration_ = scanDuration;
-    scanStage_.set(ScanStage::SLOT_START);
+    // go to STOPPED stage first to reset everything before starting
+    scanStage_.set(ScanStage::STOPPED);
 }
 
 void ScanningRunner::stop()
 {
+    round_ = nullptr;
     scanStage_.set(ScanStage::STOPPED);
 }
 
@@ -466,6 +466,11 @@ void ScanningRunner::update()
 {
     scanStage_.update();
 
+    if (round_ == nullptr && !scanStage_.is(ScanStage::STOPPED)) {
+        scanStage_.set(ScanStage::STOPPED);
+        return;
+    }
+
     // when runner is stopped externally
     // this is the default state when the runner is not running
     if (scanStage_.is(ScanStage::STOPPED))
@@ -476,6 +481,9 @@ void ScanningRunner::update()
             hardware_.audio.stop();
             hardware_.scanningStrip.clear();
             hardware_.scanningStrip.show();
+        }
+        if (round_ != nullptr) {
+            scanStage_.set(ScanStage::SLOT_START);
         }
     }
 
@@ -528,11 +536,15 @@ void ScanningRunner::update()
         if (scanStage_.changed())
         {
             // play audio if any
-            if (!SIMULATION && round_->audio[slot_] > 0)
+            if (round_->audio[slot_] > 0)
             {
                 Serial.print("Playing audio ");
                 Serial.println(round_->audio[slot_]);
-                hardware_.audio.play(1, round_->audio[slot_]);
+                if (SIMULATION) {
+                    Serial.println("(simulated)");
+                } else {
+                    hardware_.audio.play(1, round_->audio[slot_]);
+                }
             }
         }
         // once audio finishes playing, or audio didnt play at all

@@ -10,6 +10,8 @@
 #include "game.h"
 #include "state.h"
 
+const uint32_t SCAN_COLOUR = Adafruit_NeoPixel::Color(255, 255, 0);
+
 enum class ScanStage
 {
     /**

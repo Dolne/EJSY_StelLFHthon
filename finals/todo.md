@@ -18,6 +18,7 @@ should we use github issues & milestones instead
 - [x] customizable audio volume
 - [x] show answer slot
 - [x] collapse tactile options
+- [x] demo mode
 
 ### User Controls
 - [x] Individually addressable RGB for scanning
