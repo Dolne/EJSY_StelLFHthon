@@ -8,6 +8,9 @@ const uint8_t LABEL_WIDTH = 12;
 const int BLINK_INTERVAL = 500;
 const int REFRESH_INTERVAL = 20000;
 
+const int PRESS_HOLD_DELAY = 500;
+const int PRESS_HOLD_INTERVAL = 500;
+
 MenuHardware::MenuHardware(LCD& lcd, const Button& upButton, const Button& toggleButton, const Button& downButton): 
     lcd(lcd),
     upButton(upButton),
@@ -51,6 +54,27 @@ bool MenuRow::rowChanged()
     return row_ != prevRow_;
 }
 
+bool buttonTriggered(const Button &button, long lastUpdated) {
+    if (button.toggled(true)) {
+        return true;
+    }
+    if (button.isActive()) {
+        long dur = millis() - button.lastToggled();
+        
+        // only start press and hold triggering after certain delay
+        if (dur >= PRESS_HOLD_DELAY) {
+            // round down the duration to the nearest PRESS_HOLD_INTERVAL
+            long lastTriggerTime = (dur - PRESS_HOLD_DELAY) / PRESS_HOLD_INTERVAL * PRESS_HOLD_INTERVAL + PRESS_HOLD_DELAY;
+
+            // if just passed the trigger time, button has been triggered
+            if (lastUpdated - button.lastToggled() < lastTriggerTime) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 Menu::Menu(const MenuHardware& hardware, MenuRow* rows[], uint8_t rowCount):
     Menu(hardware, rows, rowCount, 0)
 {}
@@ -89,7 +113,7 @@ void Menu::update()
     // if selOk is not set to true it means there are no selectable (ie visible) rows
 
     // handle button clicks to update selected row and scroll
-    if (selOk && selected_ > 0 && getHardware().upButton.toggled(true)) {
+    if (selOk && selected_ > 0 && buttonTriggered(getHardware().upButton, lastUpdated_)) {
         // select the visible row above
         for (uint8_t sel = selected_ - 1; sel >= 0; sel--) {
             if (visibleRowIndex[sel] != ROW_NONE) {
@@ -98,7 +122,7 @@ void Menu::update()
             }
         }
     }
-    if (selOk && selected_ < rowCount_ - 1 && getHardware().downButton.toggled(true)) {
+    if (selOk && selected_ < rowCount_ - 1 && buttonTriggered(getHardware().downButton, lastUpdated_)) {
         // select the visible row below
         for (uint8_t sel = selected_ + 1; sel < rowCount_; sel++) {
             if (visibleRowIndex[sel] != ROW_NONE) {
@@ -144,6 +168,8 @@ void Menu::update()
         int selected = selected_ == i && selOk;
         rows_[i]->update(row, selected);
     }
+
+    lastUpdated_ = millis();
 }
 
 void Menu::disable()

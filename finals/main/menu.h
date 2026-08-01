@@ -70,6 +70,7 @@ private:
      */
     uint8_t selected_ = 0;
     uint8_t scroll_ = 0;
+    long lastUpdated_ = 0;
 };
 
 // TODO can this be done without using Menu* (rather using Menu&)
