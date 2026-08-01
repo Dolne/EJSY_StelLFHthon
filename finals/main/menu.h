@@ -103,6 +103,7 @@ private:
     uint8_t optionsLen_;
     long nextBlinkTime_ = 2147483647L;
     bool blinkHide_ = false;
+    long lastUpdated_ = 0;
 
     void printLabel_();
     void printOption_();
