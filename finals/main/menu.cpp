@@ -113,20 +113,42 @@ void Menu::update()
     // if selOk is not set to true it means there are no selectable (ie visible) rows
 
     // handle button clicks to update selected row and scroll
-    if (selOk && selected_ > 0 && buttonTriggered(getHardware().upButton, lastUpdated_)) {
-        // select the visible row above
-        for (uint8_t sel = selected_ - 1; sel >= 0; sel--) {
+    if (selOk && buttonTriggered(getHardware().upButton, lastUpdated_)) {
+        uint8_t sel = selected_;
+        while (true) {
+            if (sel == 0) {
+                // loop around to bottom if at top
+                sel = rowCount_ - 1;
+            } else {
+                sel--;
+            }
+            // select the row above if visible
             if (visibleRowIndex[sel] != ROW_NONE) {
                 selected_ = sel;
                 break;
             }
+            // stop if looped back around to the current selection
+            if (sel == selected_) {
+                break;
+            }
         }
     }
-    if (selOk && selected_ < rowCount_ - 1 && buttonTriggered(getHardware().downButton, lastUpdated_)) {
-        // select the visible row below
-        for (uint8_t sel = selected_ + 1; sel < rowCount_; sel++) {
+    if (selOk && buttonTriggered(getHardware().downButton, lastUpdated_)) {
+        uint8_t sel = selected_;
+        while (true) {
+            if (sel >= rowCount_ - 1) {
+                // loop around to top if at bottom
+                sel = 0;
+            } else {
+                sel++;
+            }
+            // select the row above if visible
             if (visibleRowIndex[sel] != ROW_NONE) {
                 selected_ = sel;
+                break;
+            }
+            // stop if looped back around to the current selection
+            if (sel == selected_) {
                 break;
             }
         }
