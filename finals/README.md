@@ -129,7 +129,32 @@ The acceleration and max speed of the steppers must be limited in software to pr
 | D       | 33   | 15  | 39               |
 
 #### Sequence for Visual
-For our current set up, Shape A 
+For our current set up
+- Shape
+    - Shape A is a circle
+    - Shape B is a square
+- Colour
+    - Colour A is Blue
+    - Colour B is Green
+- Size
+    - Size A is small
+    - Size B is large
+
+
+| Index | Shape  | Colour | Size  |
+|------:|--------|--------|-------|
+| 0     | blank  |        |       |
+| 1     | star   |        |       |
+| 2     | circle | blue   | small |
+| 3     | circle | blue   | large |
+| 4     | circle | green  | small |
+| 5     | circle | green  | large |
+| 6     | square | blue   | small |
+| 7     | square | blue   | large |
+| 8     | square | green  | small |
+| 9     | square | green  | large |
+|
+
 
 ### MP3 Module
 
@@ -151,7 +176,65 @@ The code relies on receiving the unsolicted FILE_END status response from the YX
 | RX     | 16 (TX2) |
 | TX     | 17 (RX2) |
 
-#### Sequence for Audio
+#### Current sequence for Audio
+| Filename | LR    | Timbre | Pitch | Loudness |
+|---------:|-------|--------|-------|----------|
+| 001      | left  | piano  | low   | soft     |
+| 002      | left  | piano  | low   | loud     |
+| 003      | left  | piano  | high  | soft     |
+| 004      | left  | piano  | high  | loud     |
+| 005      | left  | flute  | low   | soft     |
+| 006      | left  | flute  | low   | loud     |
+| 007      | left  | flute  | high  | soft     |
+| 008      | left  | flute  | high  | loud     |
+| 009      | right | piano  | low   | soft     |
+| 010      | right | piano  | low   | loud     |
+| 011      | right | piano  | high  | soft     |
+| 012      | right | piano  | high  | loud     |
+| 013      | right | flute  | low   | soft     |
+| 014      | right | flute  | low   | loud     |
+| 015      | right | flute  | high  | soft     |
+| 016      | right | flute  | high  | loud     |
+
+##### Piano vs Drums
+| Filename | LR    | Timbre | Pitch | Loudness |
+|---------:|-------|--------|-------|----------|
+| 001      | left  | piano  | low   | soft     |
+| 002      | left  | piano  | low   | loud     |
+| 003      | left  | piano  | high  | soft     |
+| 004      | left  | piano  | high  | loud     |
+| 005      | left  | drum   | low   | soft     |
+| 006      | left  | drum   | low   | loud     |
+| 007      | left  | drum   | high  | soft     |
+| 008      | left  | drum   | high  | loud     |
+| 009      | right | piano  | low   | soft     |
+| 010      | right | piano  | low   | loud     |
+| 011      | right | piano  | high  | soft     |
+| 012      | right | piano  | high  | loud     |
+| 013      | right | drum   | low   | soft     |
+| 014      | right | drum   | low   | loud     |
+| 015      | right | drum   | high  | soft     |
+| 016      | right | drum   | high  | loud     |
+
+##### Dog vs Cat
+| Filename | LR    | Timbre | Pitch | Loudness |
+|---------:|-------|--------|-------|----------|
+| 001      | left  | dog    | low   | soft     |
+| 002      | left  | dog    | low   | loud     |
+| 003      | left  | dog    | high  | soft     |
+| 004      | left  | dog    | high  | loud     |
+| 005      | left  | cat    | low   | soft     |
+| 006      | left  | cat    | low   | loud     |
+| 007      | left  | cat    | high  | soft     |
+| 008      | left  | cat    | high  | loud     |
+| 009      | right | dog    | low   | soft     |
+| 010      | right | dog    | low   | loud     |
+| 011      | right | dog    | high  | soft     |
+| 012      | right | dog    | high  | loud     |
+| 013      | right | cat    | low   | soft     |
+| 014      | right | cat    | low   | loud     |
+| 015      | right | cat    | high  | soft     |
+| 016      | right | cat    | high  | loud     |
 
 
 ### LED light strips
