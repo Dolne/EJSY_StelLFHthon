@@ -6,24 +6,23 @@
 #include <AccelStepper.h>
 #include <Adafruit_MCP23XXX.h>
 #include <MD_YX5300.h>
-#include <Adafruit_NeoPixel.h>
 
 #include "task.h"
 
 inline const int STEPPER_STEPS = 1600;
 
-class Pin
+class HardwarePin
 {
 public:
     /** 
      * represents a GPIO on the ESP32.
      * this is a converting constructor.
      */
-    Pin(uint8_t pin);
+    HardwarePin(uint8_t pin);
     /**
      * 
      */
-    Pin(uint8_t pin, Adafruit_MCP23XXX* expander);
+    HardwarePin(uint8_t pin, Adafruit_MCP23XXX* expander);
     void pinMode(uint8_t mode);
     uint8_t digitalRead();
     void digitalWrite(uint8_t val);
@@ -108,14 +107,14 @@ private:
 class OutputController: public Task
 {
 public:
-    OutputController(Pin pin);
+    OutputController(HardwarePin pin);
     void begin();
     void update();
     void enable();
     void startSequence(const int seq[], int seqLen);
     void disable();
 private:
-    Pin pin_;
+    HardwarePin pin_;
     const int *seq_ = nullptr;
     int seqLen_ = 0;
     int seqDuration_ = 0;

@@ -194,17 +194,17 @@ Stepper* StepperGroup::get(int i) const
     return i < n_ ? steppers_[i] : nullptr;
 }
 
-Pin::Pin(uint8_t pin):
+HardwarePin::HardwarePin(uint8_t pin):
     pin_(pin)
 {
 }
 
-Pin::Pin(uint8_t pin, Adafruit_MCP23XXX *expander):
+HardwarePin::HardwarePin(uint8_t pin, Adafruit_MCP23XXX *expander):
     pin_(pin), expander_(expander)
 {
 }
 
-void Pin::pinMode(uint8_t mode)
+void HardwarePin::pinMode(uint8_t mode)
 {
     if (expander_ == nullptr) {
         ::pinMode(pin_, mode);
@@ -213,7 +213,7 @@ void Pin::pinMode(uint8_t mode)
     }
 }
 
-uint8_t Pin::digitalRead() {
+uint8_t HardwarePin::digitalRead() {
     if (expander_ == nullptr) {
         return ::digitalRead(pin_);
     } else {
@@ -221,7 +221,7 @@ uint8_t Pin::digitalRead() {
     }
 }
 
-void Pin::digitalWrite(uint8_t val)
+void HardwarePin::digitalWrite(uint8_t val)
 {
     if (expander_ == nullptr) {
         ::digitalWrite(pin_, val);
@@ -299,7 +299,7 @@ void AudioPlayer::handleStatus_(const MD_YX5300::cbData *data)
     }
 }
 
-OutputController::OutputController(Pin pin):
+OutputController::OutputController(HardwarePin pin):
     pin_(pin)
 {}
 void OutputController::begin()

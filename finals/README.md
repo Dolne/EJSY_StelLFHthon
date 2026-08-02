@@ -243,7 +243,7 @@ There are 2 NeoPixel (WS2812?) LED light strips, with one used for feedback (ans
 
 The feedback light strip has 30 LEDs, while the scanning light strip consists of 4 separate NeoPixels wired together.
 
-The light strips are controlled using the [Adafruit NeoPixel library](https://adafruit.github.io/Adafruit_NeoPixel/html/class_adafruit___neo_pixel.html).
+The light strips are controlled using the [FastLED library](https://github.com/FastLED/FastLED).
 
 | Light strip | Pin |
 | ----------- | --- |

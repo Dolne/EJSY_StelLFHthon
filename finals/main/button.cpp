@@ -1,6 +1,6 @@
 #include "button.h"
 
-Button::Button(Pin pin, uint8_t mode):
+Button::Button(HardwarePin pin, uint8_t mode):
     prevState_(false),
     currState_(false),
     pin_(pin),
@@ -9,7 +9,7 @@ Button::Button(Pin pin, uint8_t mode):
     since_(millis())
 {
 }
-Button::Button(Pin pin): Button(pin, INPUT_PULLUP)
+Button::Button(HardwarePin pin): Button(pin, INPUT_PULLUP)
 {
 }
 

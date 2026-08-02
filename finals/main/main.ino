@@ -2,7 +2,7 @@
 #include <Wire.h>
 
 #include <Adafruit_MCP23X17.h>
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 
 #ifndef SIMULATION // SIMULATION is defined as 1 in the simulation compiler config 
 #define SIMULATION 0
@@ -38,9 +38,9 @@ const uint8_t BUTTON_BOOT_PIN = 0;
     const uint8_t BUTTON_DOWN_PIN = 39;
 #else
     // connected to MCP23017 for actual
-    const Pin BUTTON_UP_PIN = Pin(0, &expander);
-    const Pin BUTTON_ACTION_PIN = Pin(1, &expander);
-    const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
+    const HardwarePin BUTTON_UP_PIN = HardwarePin(0, &expander);
+    const HardwarePin BUTTON_ACTION_PIN = HardwarePin(1, &expander);
+    const HardwarePin BUTTON_DOWN_PIN = HardwarePin(2, &expander);
 #endif
 
 // user control buttons/switches (via 3.5mm mono audio jack)
@@ -58,7 +58,8 @@ const int VIBRATION_FAIL[] = {2500, 500};
 const int VIBRATION_FAIL_LEN = 2;
 
 // NeoPixel led strips for scanning and feedback
-const uint8_t SCANNING_LED_PIN = 4; // scanning strip length is MAX_SLOTS
+const uint8_t SCANNING_LED_PIN = 4;
+const uint8_t SCANNING_LED_COUNT = MAX_SLOTS;
 const uint8_t FEEDBACK_LED_PIN = 25;
 const uint8_t FEEDBACK_LED_COUNT = 30;
 
@@ -109,8 +110,13 @@ Button button4(BUTTON_4_PIN);
 Button* inputButtonList[] = { &button1, &button2, &button3, &button4 };
 ButtonGroup inputButtons(inputButtonList, MAX_SLOTS);
 
-Adafruit_NeoPixel scanningStrip(MAX_SLOTS, SCANNING_LED_PIN); // TODO led type
-Adafruit_NeoPixel feedbackStrip(FEEDBACK_LED_COUNT, FEEDBACK_LED_PIN); // TODO led type
+CRGB scanningLeds[SCANNING_LED_COUNT];
+CRGB feedbackLeds[FEEDBACK_LED_COUNT];
+
+void initLeds() {
+    FastLED.addLeds<WS2812B, SCANNING_LED_PIN, GRB>(scanningLeds, SCANNING_LED_COUNT);
+    FastLED.addLeds<WS2812B, FEEDBACK_LED_PIN, GRB>(feedbackLeds, FEEDBACK_LED_COUNT);
+}
 
 OutputController vibration(VIBRATION_PIN);
 
@@ -129,7 +135,7 @@ LCD lcd(LCD_ADDR);
 GameOptions options{};
 
 // wrapper to pass all the hardware to game runner
-GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
+GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanningLeds, SCANNING_LED_COUNT, feedbackLeds, FEEDBACK_LED_COUNT, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 
@@ -275,6 +281,8 @@ void setup() {
     lcd.print(1, 8, 4, "EJSY");
     expander.begin_I2C(MCP_ADDR);
 
+    initLeds();
+
     // the buttons will use the pin value at setup as the inactive value
     // as such all buttons must not be pressed on setup
     tasks.begin();
@@ -329,6 +337,8 @@ void loop() {
             // blank screen
             menus.use(nullptr);
         }
+
+        FastLED.show();
     }
 
     // steppers must be able to step in every loop

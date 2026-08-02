@@ -34,6 +34,9 @@ void DemoRunner::reshuffle()
     round_ = new GameRound(opts);
     printGameRound(round_);
 
+    runner_.stop();
+    fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
+
     // visual
     if (currStimuli_ == 0)
     {
@@ -74,6 +77,8 @@ void DemoRunner::start()
 
 void DemoRunner::end()
 {
+    runner_.stop();
+    fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
     delete round_;
     round_ = nullptr;
     currStimuli_ = DEMO_MAX_FEAT;
@@ -95,9 +100,6 @@ void DemoRunner::update()
     nameChanged_ = false;
     if (stateChanged_)
     {
-        runner_.stop();
-        hardware_.scanningStrip.clear();
-        hardware_.scanningStrip.show();
         if (currStimuli_ != 0)
         {
             hardware_.steppers.allDirectTo(0);
@@ -121,8 +123,7 @@ void DemoRunner::update()
     if (currStimuli_ == 0 && !hardware_.steppers.anyRunning())
     {
         // turn on the scanning LEDs when steppers stop spinning
-        hardware_.scanningStrip.fill(SCAN_COLOUR);
-        hardware_.scanningStrip.show();
+        fill_solid(hardware_.scanningLeds, round_->slotsCount, SCAN_COLOUR);
     }
 }
 
