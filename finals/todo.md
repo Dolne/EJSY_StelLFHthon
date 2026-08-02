@@ -27,13 +27,14 @@ should we use github issues & milestones instead
 - [x] let user try again if they get the ans wrong
 - [x] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
 - [x] "null" gameplay if no diffs selected
+- [ ] change scanning neopixel colour to white
 
 ### Feedback
 - [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
 - [ ] Win ("Yaay") /lose ("Please try again") audio --> Folder 10
-- [ ] wheels "success icon" --> Code in
+- [x] wheels "success icon"
 
 ## Hardware
 
@@ -101,7 +102,7 @@ should we use github issues & milestones instead
     - [ ] Folder 4-8: Custom
 - [ ] Change scanning neopixel colour to white
 - [ ] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
-- [ ] wheels "success icon" --> Code in
+- [x] wheels "success icon"
 
 - [ ] Gamemaster guide
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)

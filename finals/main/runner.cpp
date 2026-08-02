@@ -341,6 +341,10 @@ void GameRunner::update()
             {
                 Serial.println("Correct answer!");
                 score_++;
+                // show success icon
+                for (int i = 0; i < round_->slotsCount; i++) {
+                    hardware_.steppers.get(i)->directTo(1.0f / VISUAL_TOTAL_VALUES);
+                }
                 // hardware_.audio.play(25);
                 hardware_.vibration.startSequence(hardware_.vibrationSeqSuccess, hardware_.vibrationSeqSuccessLen);
             }
@@ -356,6 +360,10 @@ void GameRunner::update()
         if (round_->answer == round_->odd1OutSlot)
         {
             successAnimation(gameStage_.since(), hardware_.feedbackStrip);
+            if (!hardware_.steppers.anyRunning()) {
+                hardware_.scanningStrip.fill(SCAN_COLOUR, 0, round_->slotsCount);
+                hardware_.scanningStrip.show();
+            }
         }
         else
         {
