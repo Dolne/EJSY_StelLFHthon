@@ -19,9 +19,10 @@ should we use github issues & milestones instead
 - [x] show answer slot
 - [x] collapse tactile options
 - [x] demo mode
-- [ ] disable lcd if steppers running
+- [x] disable lcd if steppers running
 - [x] demo mode volume
 - [x] customizable audio folder
+- [ ] show error if audio not found?
 
 ### User Controls
 - [x] Individually addressable RGB for scanning

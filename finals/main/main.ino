@@ -116,6 +116,8 @@ CRGB feedbackLeds[FEEDBACK_LED_COUNT];
 void initLeds() {
     FastLED.addLeds<WS2812B, SCANNING_LED_PIN, GRB>(scanningLeds, SCANNING_LED_COUNT);
     FastLED.addLeds<WS2812B, FEEDBACK_LED_PIN, GRB>(feedbackLeds, FEEDBACK_LED_COUNT);
+    // flush out any stale state
+    FastLED.show();
 }
 
 OutputController vibration(VIBRATION_PIN);
@@ -300,6 +302,10 @@ void loop() {
     if (timeForNextUpdate()) {
         // run things at TICKRATE
         tasks.update();
+
+        // disable the LCD menus if steppers are running
+        // sending updates to the LCD screen is blocking and can thus cause issue with the steppers
+        menus.setEnabled(!steppers.anyRunning());
 
         // set the setting displayed menu using the menu controller based on game stage
         if (runner.stage().is(GameStage::DEBUG_MENU)) {

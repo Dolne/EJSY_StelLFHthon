@@ -418,7 +418,22 @@ void MenuController::use(Menu *menu)
         prevMenu_ = menu;
         lcd_.clear();
     }
-    if (menu != nullptr) {
+    if (prevEnabled_ != enabled_) {
+        if (!enabled_) {
+            if (menu) {
+                menu->disable();
+            }
+            Serial.println("disabled lcd to wait for steppers");
+            lcd_.clear();
+        }
+        prevEnabled_ = enabled_;
+    }
+    if (menu != nullptr && enabled_) {
         menu->update();
     }
+}
+
+void MenuController::setEnabled(bool enabled)
+{
+    enabled_ = enabled;
 }

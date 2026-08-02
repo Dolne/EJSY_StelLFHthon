@@ -73,15 +73,17 @@ private:
     long lastUpdated_ = 0;
 };
 
-// TODO can this be done without using Menu* (rather using Menu&)
 class MenuController
 {
 public:
     MenuController(LCD& lcd);
     void use(Menu* menu);
+    void setEnabled(bool enabled);
 private:
     Menu* prevMenu_ = nullptr;
     LCD& lcd_;
+    bool enabled_ = true;
+    bool prevEnabled_ = true;
 };
 
 class MenuOptionRow: public MenuRow
