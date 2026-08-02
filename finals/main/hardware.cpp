@@ -75,136 +75,17 @@ void LCD::clear()
     lcd_.clear();
 }
 
-int posMod(long num, int by) {
-    int val = num % by;
-    if (val < 0) {
-        return val + by;
-    }
-    return val;
-}
-
-Stepper::Stepper(uint8_t stepPin, uint8_t dirPin, int stepsPerRotation, float maxSpeed, float acceleration):
-    stepper_(AccelStepper::DRIVER, stepPin, dirPin),
-    stepsPerRotation_(stepsPerRotation),
-    maxSpeed_(maxSpeed),
-    acceleration_(acceleration)
-{}
-
-void Stepper::begin()
-{
-    stepper_.setMaxSpeed(maxSpeed_);
-    stepper_.setAcceleration(acceleration_);
-}
-
-void Stepper::update()
-{
-    stepper_.run();
-}
-
-// this may not work very well if stepper is moving
-void Stepper::directTo(float rotation)
-{
-    stepper_.stop(); // use this to get the minimum distance will stepper must go if it is moving
-    long startAbs = stepper_.targetPosition();
-    int start = posMod(startAbs, stepsPerRotation_);
-    int diff1 = posMod(long(rotation * stepsPerRotation_), stepsPerRotation_) - start;
-    int diff2 = diff1 < 0 ? diff1 + stepsPerRotation_ : diff1 - stepsPerRotation_;
-
-    // move the shorter distance to the target rotation
-    Serial.print("direct to ");
-    if (abs(diff1) <= abs(diff2)) {
-        Serial.println(startAbs + diff1);
-        stepper_.moveTo(startAbs + diff1);
-    } else {
-        Serial.println(startAbs + diff2);
-        stepper_.moveTo(startAbs + diff2);
-    }
-}
-
-// this may not work very well if stepper is moving
-void Stepper::spinTo(float rotation, int extraRounds)
-{
-    int diff = posMod(long(rotation * stepsPerRotation_) - currentRotation(), stepsPerRotation_);
-    Serial.print("spin ");
-    Serial.print(diff);
-    Serial.print("  ");
-    Serial.println(diff + stepsPerRotation_ * extraRounds);
-    stepper_.move(diff + stepsPerRotation_ * extraRounds);
-}
-
-void Stepper::stop()
-{
-    stepper_.stop();
-}
-
-bool Stepper::running()
-{
-    return stepper_.isRunning();
-}
-
-long Stepper::currentPosition()
-{
-    return stepper_.currentPosition();
-}
-int Stepper::currentRotation()
-{
-    return posMod(currentPosition(), stepsPerRotation_);
-}
-
-StepperGroup::StepperGroup(Stepper *steppers[], int n):
-    steppers_(steppers), n_(n)
-{
-}
-
-void StepperGroup::begin()
-{
-    for (int i = 0; i < n_; i++) {
-        steppers_[i]->begin();
-    }
-}
-void StepperGroup::update()
-{
-    for (int i = 0; i < n_; i++) {
-        steppers_[i]->update();
-    }
-}
-void StepperGroup::allDirectTo(float rotation)
-{
-    for (int i = 0; i < n_; i++) {
-        steppers_[i]->directTo(rotation);
-    }
-}
-void StepperGroup::stopAll()
-{
-    for (int i = 0; i < n_; i++) {
-        steppers_[i]->stop();
-    }
-}
-bool StepperGroup::anyRunning() const
-{
-    for (int i = 0; i < n_; i++) {
-        if (steppers_[i]->running()) {
-            return true;
-        }
-    }
-    return false;
-}
-Stepper* StepperGroup::get(int i) const
-{
-    return i < n_ ? steppers_[i] : nullptr;
-}
-
-Pin::Pin(uint8_t pin):
+HardwarePin::HardwarePin(uint8_t pin):
     pin_(pin)
 {
 }
 
-Pin::Pin(uint8_t pin, Adafruit_MCP23XXX *expander):
+HardwarePin::HardwarePin(uint8_t pin, Adafruit_MCP23XXX *expander):
     pin_(pin), expander_(expander)
 {
 }
 
-void Pin::pinMode(uint8_t mode)
+void HardwarePin::pinMode(uint8_t mode)
 {
     if (expander_ == nullptr) {
         ::pinMode(pin_, mode);
@@ -213,7 +94,7 @@ void Pin::pinMode(uint8_t mode)
     }
 }
 
-uint8_t Pin::digitalRead() {
+uint8_t HardwarePin::digitalRead() {
     if (expander_ == nullptr) {
         return ::digitalRead(pin_);
     } else {
@@ -221,7 +102,7 @@ uint8_t Pin::digitalRead() {
     }
 }
 
-void Pin::digitalWrite(uint8_t val)
+void HardwarePin::digitalWrite(uint8_t val)
 {
     if (expander_ == nullptr) {
         ::digitalWrite(pin_, val);
@@ -299,7 +180,7 @@ void AudioPlayer::handleStatus_(const MD_YX5300::cbData *data)
     }
 }
 
-OutputController::OutputController(Pin pin):
+OutputController::OutputController(HardwarePin pin):
     pin_(pin)
 {}
 void OutputController::begin()

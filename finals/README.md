@@ -115,7 +115,7 @@ The steppers control the visual stimuli of the game, each spinning a wheel with 
   - The second of which is the corresponding wheel's number (index 1)
   - Images = all the faces from the third to the last one (index 2–9)
 
-The [AccelStepper library](https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html) is used to control multiple steppers at once with smooth acceleration and deccelration.
+The [FastAccelStepper library](https://github.com/gin66/FastAccelStepper) is used to control multiple steppers at once with smooth acceleration and deccelration.
 
 The acceleration and max speed of the steppers must be limited in software to prevent drawing too much current.
 
@@ -243,7 +243,7 @@ There are 2 NeoPixel (WS2812?) LED light strips, with one used for feedback (ans
 
 The feedback light strip has 30 LEDs, while the scanning light strip consists of 4 separate NeoPixels wired together.
 
-The light strips are controlled using the [Adafruit NeoPixel library](https://adafruit.github.io/Adafruit_NeoPixel/html/class_adafruit___neo_pixel.html).
+The light strips are controlled using the [FastLED library](https://github.com/FastLED/FastLED/).
 
 | Light strip | Pin |
 | ----------- | --- |

@@ -6,11 +6,12 @@
 #endif
 
 #include <Arduino.h>
+#include <FastLED.h>
 #include "task.h"
 #include "game.h"
 #include "state.h"
 
-const uint32_t SCAN_COLOUR = Adafruit_NeoPixel::Color(255, 255, 0);
+const uint32_t SCAN_COLOUR = CRGB::Yellow;
 
 enum class ScanStage
 {
