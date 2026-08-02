@@ -12,7 +12,7 @@ public:
     DemoRunner(GameHardware &hardware);
     char currName[21] = "";
     bool currNameChanged();
-    void start();
+    void start(uint8_t volume);
     void end();
     void reshuffle();
     void next();
@@ -28,6 +28,7 @@ private:
     uint8_t currFeat_ = 0;
     bool stateChanged_ = false;
     bool nameChanged_ = false;
+    uint8_t volume_ = 0;
 };
 
 #endif

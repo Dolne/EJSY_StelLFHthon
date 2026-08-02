@@ -156,7 +156,7 @@ void startGame() {
 }
 void startDemo() {
     if (runner.stage().is(GameStage::CONFIG)) {
-        demoRunner.start();
+        demoRunner.start(options.volume);
     }
 }
 

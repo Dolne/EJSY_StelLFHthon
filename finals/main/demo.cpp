@@ -15,7 +15,7 @@ void DemoRunner::reshuffle()
     GameOptions opts{};
 
     opts.slotsCount = 1;
-    // opts.volume
+    opts.volume = volume_;
 
     // visual
     if (currStimuli_ == 0)
@@ -68,11 +68,12 @@ void DemoRunner::next()
     stateChanged_ = true;
 }
 
-void DemoRunner::start()
+void DemoRunner::start(uint8_t volume)
 {
     currStimuli_ = 0;
     currFeat_ = 0;
     stateChanged_ = true;
+    volume_ = volume;
 }
 
 void DemoRunner::end()
