@@ -92,8 +92,8 @@ should we use github issues & milestones instead
     - [ ] Add star icon to replace number icon on wheel
 
 ### Buy/acquire
-- [ ] M3 Nuts
-- [ ] 50cm ruler
+- [x] M3 Nuts
+- [ ] 50cm ruler --> replace with two 30cm rulers
 - [ ] plywood board for tmr
 
 ### Basically Done
