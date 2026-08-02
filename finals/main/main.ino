@@ -2,7 +2,7 @@
 #include <Wire.h>
 
 #include <Adafruit_MCP23X17.h>
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 
 #ifndef SIMULATION // SIMULATION is defined as 1 in the simulation compiler config 
 #define SIMULATION 0
@@ -10,6 +10,7 @@
 
 #include "task.h"
 #include "hardware.h"
+#include "stepper.h"
 #include "button.h"
 #include "menu.h"
 #include "game.h"
@@ -38,9 +39,9 @@ const uint8_t BUTTON_BOOT_PIN = 0;
     const uint8_t BUTTON_DOWN_PIN = 39;
 #else
     // connected to MCP23017 for actual
-    const Pin BUTTON_UP_PIN = Pin(0, &expander);
-    const Pin BUTTON_ACTION_PIN = Pin(1, &expander);
-    const Pin BUTTON_DOWN_PIN = Pin(2, &expander);
+    const HardwarePin BUTTON_UP_PIN(0, &expander);
+    const HardwarePin BUTTON_ACTION_PIN(1, &expander);
+    const HardwarePin BUTTON_DOWN_PIN(2, &expander);
 #endif
 
 // user control buttons/switches (via 3.5mm mono audio jack)
@@ -109,16 +110,31 @@ Button button4(BUTTON_4_PIN);
 Button* inputButtonList[] = { &button1, &button2, &button3, &button4 };
 ButtonGroup inputButtons(inputButtonList, MAX_SLOTS);
 
-Adafruit_NeoPixel scanningStrip(MAX_SLOTS, SCANNING_LED_PIN); // TODO led type
-Adafruit_NeoPixel feedbackStrip(FEEDBACK_LED_COUNT, FEEDBACK_LED_PIN); // TODO led type
+CRGB scanningLeds[MAX_SLOTS];
+CRGB feedbackLeds[FEEDBACK_LED_COUNT];
+
+void initLeds() {
+    FastLED.addLeds<WS2812B, SCANNING_LED_PIN, GRB>(scanningLeds, MAX_SLOTS);
+    FastLED.addLeds<WS2812B, FEEDBACK_LED_PIN, GRB>(feedbackLeds, FEEDBACK_LED_COUNT);
+}
 
 OutputController vibration(VIBRATION_PIN);
 
-Stepper stepper1(STEPPER_1_STEP, STEPPER_1_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
-Stepper stepper2(STEPPER_2_STEP, STEPPER_2_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
-Stepper stepper3(STEPPER_3_STEP, STEPPER_3_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
-Stepper stepper4(STEPPER_4_STEP, STEPPER_4_DIR, STEPS_PER_ROTATION, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+Stepper stepper1(STEPS_PER_ROTATION);
+Stepper stepper2(STEPS_PER_ROTATION);
+Stepper stepper3(STEPS_PER_ROTATION);
+Stepper stepper4(STEPS_PER_ROTATION);
 Stepper* stepperList[MAX_SLOTS] = { &stepper1, &stepper2, &stepper3, &stepper4 };
+
+void initSteppers() {
+    // stepperEngine is defined in hardware.h/cpp
+    stepperEngine.init();
+
+    stepper1.begin(stepperEngine, STEPPER_1_STEP, STEPPER_1_DIR, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+    stepper2.begin(stepperEngine, STEPPER_2_STEP, STEPPER_2_DIR, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+    stepper3.begin(stepperEngine, STEPPER_3_STEP, STEPPER_3_DIR, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+    stepper4.begin(stepperEngine, STEPPER_4_STEP, STEPPER_4_DIR, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);
+}
 
 StepperGroup steppers(stepperList, MAX_SLOTS);
 
@@ -129,7 +145,7 @@ LCD lcd(LCD_ADDR);
 GameOptions options{};
 
 // wrapper to pass all the hardware to game runner
-GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanningStrip, feedbackStrip, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
+GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanningLeds, MAX_SLOTS, feedbackLeds, FEEDBACK_LED_COUNT, vibration, VIBRATION_SUCCESS, VIBRATION_SUCCESS_LEN, VIBRATION_FAIL, VIBRATION_FAIL_LEN);
 
 GameRunner runner(gameHardware);
 
@@ -140,7 +156,7 @@ uint8_t demoModeEnabled = 0;
 // tasks to run at TICKRATE
 // the order of tasks should be inputs -> runner -> outputs
 Task* taskList[] = { &configButtons, &inputButtons, &buttonBoot, &runner, &demoRunner, &vibration };
-TaskGroup tasks(taskList, 5);
+TaskGroup tasks(taskList, sizeof(taskList) / sizeof(taskList[0]));
 
 // gamemaster hardware
 MenuHardware menuHardware(lcd, buttonUp, buttonAction, buttonDown);
@@ -271,14 +287,18 @@ bool timeForNextUpdate() {
 
 void setup() {
     Serial.begin(9600);
+    Serial.printf("arduino-esp32 v%s\r\n", ESP.getCoreVersion());
+    Serial.printf("esp-idf %s\r\n", esp_get_idf_version());
     lcd.begin();
     lcd.print(1, 8, 4, "EJSY");
     expander.begin_I2C(MCP_ADDR);
 
+    initSteppers();
+    initLeds();
+
     // the buttons will use the pin value at setup as the inactive value
     // as such all buttons must not be pressed on setup
     tasks.begin();
-    steppers.begin();
     audio.begin();
     // set volume to the default option value
     audio.setVolume(VOLUME_VALUES[options.volume]);
@@ -329,10 +349,9 @@ void loop() {
             // blank screen
             menus.use(nullptr);
         }
-    }
 
-    // steppers must be able to step in every loop
-    steppers.update();
+        FastLED.show();
+    }
 
     // check for response from mp3 module as frequently as possible
     audio.update();

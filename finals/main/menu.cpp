@@ -224,7 +224,7 @@ void MenuOptionRow::updateInternal(bool refresh)
         return;
     }
 
-    if (isSelected() && hardware_.toggleButton.toggled(true)) {
+    if (isSelected() && buttonTriggered(hardware_.toggleButton, lastUpdated_)) {
         *value_ = (*value_ + 1) % optionsLen_;
     }
     
@@ -263,6 +263,8 @@ void MenuOptionRow::updateInternal(bool refresh)
         printLabel_();
         printOption_();
     }
+
+    lastUpdated_ = millis();
 }
 
 void MenuOptionRow::printLabel_() {

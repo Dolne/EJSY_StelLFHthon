@@ -1,16 +1,13 @@
-#include <Adafruit_NeoPixel.h>
-
 #include "runner.h"
 
-void successAnimation(long start, Adafruit_NeoPixel &strip)
+void successAnimation(long start, CRGB *leds, int n)
 {
     static const int DURATION = 2000;
-    float t = (millis() - start) % DURATION / (float)DURATION;
-    strip.rainbow(0xFFFF * t, 1);
-    strip.show();
+    int s = (millis() - start) % DURATION * 255 / DURATION;
+    fill_rainbow(leds, n, s, 255 / n);
 }
 
-void failAnimation(long start, Adafruit_NeoPixel &strip)
+void failAnimation(long start, CRGB *leds, int n)
 {
     static const int DURATION = 2000;
     float t = (millis() - start) % DURATION / (float)DURATION * 2;
@@ -18,8 +15,7 @@ void failAnimation(long start, Adafruit_NeoPixel &strip)
     {
         t = 2 - t;
     }
-    strip.fill(strip.Color(255 * t, 0, 0));
-    strip.show();
+    fill_solid(leds, n, CRGB(255 * t, 0, 0));
 }
 
 GameRunner::GameRunner(const GameHardware &hardware) : hardware_(hardware),
@@ -152,8 +148,7 @@ void GameRunner::update()
     {
         hardware_.vibration.disable();
         // hide led animation
-        hardware_.feedbackStrip.clear();
-        hardware_.feedbackStrip.show();
+        fill_solid(hardware_.feedbackLeds, hardware_.feedbackLedCount, CRGB::Black);
     }
 
     // ensure scanning runner is stopped if not in selection stage
@@ -162,8 +157,7 @@ void GameRunner::update()
     {
         scanningRunner_.stop();
         scanningRunner_.update();
-        hardware_.scanningStrip.clear();
-        hardware_.scanningStrip.show();
+        fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
     }
 
     // when reset is called
@@ -177,28 +171,17 @@ void GameRunner::update()
             hardware_.steppers.allDirectTo(0);
             hardware_.audio.stop();
         }
-        else
-        {
-            // wait until hardware is stopped before going to STOPPED stage
-            if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing())
-            {
-                gameStage_.set(GameStage::STOPPED);
-            }
-        }
-    }
 
-    // when reset is called, and after all hardware has stopped
-    else if (gameStage_.is(GameStage::STOPPED))
-    {
-        // startGame will set game options but also call reset first
         if (options_.enabled)
         {
-            // once everything from previous game has been reset, start the new game
-            gameStage_.set(GameStage::STARTING);
+            // wait until hardware is stopped before starting a new game
+            if (!hardware_.steppers.anyRunning() && !hardware_.audio.playing())
+            {
+                gameStage_.set(GameStage::STARTING);
+            }
         }
         else
         {
-            // go back to game options menu after a normal reset
             gameStage_.set(GameStage::CONFIG);
         }
     }
@@ -250,7 +233,7 @@ void GameRunner::update()
             spinSteppers();
         }
         else
-        { 
+        {
             // wait for steppers to stop, then go to user selection
             if (!hardware_.steppers.anyRunning())
             {
@@ -277,8 +260,7 @@ void GameRunner::update()
             else if (round_->hasVisual)
             {
                 // illuminate all visual options in select mode
-                hardware_.scanningStrip.fill(SCAN_COLOUR, 0, round_->slotsCount);
-                hardware_.scanningStrip.show();
+                fill_solid(hardware_.scanningLeds, round_->slotsCount, SCAN_COLOUR);
             }
         }
 
@@ -366,11 +348,11 @@ void GameRunner::update()
         // run led animation
         if (round_->answer == round_->odd1OutSlot)
         {
-            successAnimation(gameStage_.since(), hardware_.feedbackStrip);
+            successAnimation(gameStage_.since(), hardware_.feedbackLeds, hardware_.feedbackLedCount);
         }
         else
         {
-            failAnimation(gameStage_.since(), hardware_.feedbackStrip);
+            failAnimation(gameStage_.since(), hardware_.feedbackLeds, hardware_.feedbackLedCount);
         }
     }
 }
@@ -412,7 +394,6 @@ bool GameRunner::canRetry()
     return gameStage_.is(GameStage::FEEDBACK) && options_.enabled && options_.retries && round_->answer != round_->odd1OutSlot;
 }
 
-
 void GameRunner::retry()
 {
     if (canRetry())
@@ -422,7 +403,6 @@ void GameRunner::retry()
         gameStage_.set(GameStage::SELECTION);
     }
 }
-
 
 void GameRunner::enterDebug()
 {
@@ -466,7 +446,8 @@ void ScanningRunner::update()
 {
     scanStage_.update();
 
-    if (round_ == nullptr && !scanStage_.is(ScanStage::STOPPED)) {
+    if (round_ == nullptr && !scanStage_.is(ScanStage::STOPPED))
+    {
         scanStage_.set(ScanStage::STOPPED);
         return;
     }
@@ -479,10 +460,10 @@ void ScanningRunner::update()
         {
             slot_ = 0;
             hardware_.audio.stop();
-            hardware_.scanningStrip.clear();
-            hardware_.scanningStrip.show();
+            fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
         }
-        if (round_ != nullptr) {
+        if (round_ != nullptr)
+        {
             scanStage_.set(ScanStage::SLOT_START);
         }
     }
@@ -509,8 +490,7 @@ void ScanningRunner::update()
         Serial.print("Scanning slot ");
         Serial.println(slot_);
         // turn on the arrow light for the slot
-        hardware_.scanningStrip.setPixelColor(slot_, SCAN_COLOUR);
-        hardware_.scanningStrip.show();
+        hardware_.scanningLeds[slot_] = SCAN_COLOUR;
         scanStage_.set(ScanStage::INITIAL_AUDIO);
     }
 
@@ -540,9 +520,12 @@ void ScanningRunner::update()
             {
                 Serial.print("Playing audio ");
                 Serial.println(round_->audio[slot_]);
-                if (SIMULATION) {
+                if (SIMULATION)
+                {
                     Serial.println("(simulated)");
-                } else {
+                }
+                else
+                {
                     hardware_.audio.play(1, round_->audio[slot_]);
                 }
             }
@@ -560,8 +543,7 @@ void ScanningRunner::update()
     else if (scanStage_.is(ScanStage::SLOT_END))
     {
         // turn off led
-        hardware_.scanningStrip.clear();
-        hardware_.scanningStrip.show();
+        fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
 
         // increment to the next slot or wrap over back to the first slot
         if (round_->slotsCount <= MAX_SLOTS && slot_ < round_->slotsCount - 1)

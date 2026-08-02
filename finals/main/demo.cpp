@@ -96,8 +96,7 @@ void DemoRunner::update()
     if (stateChanged_)
     {
         runner_.stop();
-        hardware_.scanningStrip.clear();
-        hardware_.scanningStrip.show();
+        fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
         if (currStimuli_ != 0)
         {
             hardware_.steppers.allDirectTo(0);
@@ -121,8 +120,7 @@ void DemoRunner::update()
     if (currStimuli_ == 0 && !hardware_.steppers.anyRunning())
     {
         // turn on the scanning LEDs when steppers stop spinning
-        hardware_.scanningStrip.fill(SCAN_COLOUR);
-        hardware_.scanningStrip.show();
+        fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, SCAN_COLOUR);
     }
 }
 

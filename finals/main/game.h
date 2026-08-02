@@ -2,9 +2,9 @@
 #define game_h
 
 #include <Arduino.h>
-#include <AccelStepper.h>
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 #include "hardware.h"
+#include "stepper.h"
 #include "button.h"
 #include "state.h"
 
@@ -45,14 +45,16 @@ inline const int MAX_SLOTS = 4;
 class GameHardware
 {
 public:
-    GameHardware(LCD &lcd, const ButtonGroup &inputButtons, const Button &debugButton, StepperGroup &steppers, AudioPlayer &audio, Adafruit_NeoPixel &scanningStrip, Adafruit_NeoPixel &feedbackStrip, OutputController &vibration, const int *v1, int l1, const int *v2, int l2);
+    GameHardware(LCD &lcd, const ButtonGroup &inputButtons, const Button &debugButton, StepperGroup &steppers, AudioPlayer &audio, CRGB *scanningLeds, int scanningLedCount, CRGB *feedbackLeds, int feedbackLedCount, OutputController &vibration, const int *v1, int l1, const int *v2, int l2);
     LCD &lcd;
     const ButtonGroup &inputButtons;
     const Button &debugButton;
     StepperGroup &steppers;
     AudioPlayer &audio;
-    Adafruit_NeoPixel &scanningStrip;
-    Adafruit_NeoPixel &feedbackStrip;
+    CRGB *scanningLeds;
+    int scanningLedCount;
+    CRGB *feedbackLeds;
+    int feedbackLedCount;
     OutputController &vibration;
     const int *vibrationSeqSuccess;
     int vibrationSeqSuccessLen;

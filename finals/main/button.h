@@ -7,8 +7,8 @@
 class Button: public Task
 {
 public:
-    Button(Pin pin);
-    Button(Pin pin, uint8_t mode);
+    Button(HardwarePin pin);
+    Button(HardwarePin pin, uint8_t mode);
     void begin();
     void update();
     bool toggled() const; //Both if button pressed/released
@@ -18,7 +18,7 @@ public:
     void resetActiveValue(bool active);
     long lastToggled() const; //Last time button was toggled
 private:
-    Pin pin_;
+    HardwarePin pin_;
     uint8_t mode_;
     bool prevState_;
     bool currState_;

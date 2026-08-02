@@ -6,11 +6,12 @@
 #endif
 
 #include <Arduino.h>
+#include <FastLED.h>
 #include "task.h"
 #include "game.h"
 #include "state.h"
 
-const uint32_t SCAN_COLOUR = Adafruit_NeoPixel::Color(255, 255, 0);
+const uint32_t SCAN_COLOUR = CRGB::Yellow;
 
 enum class ScanStage
 {
@@ -137,13 +138,10 @@ enum class GameStage
     FEEDBACK,
     /**
      * stop the game.
-     * this stage will remain until everything (particularly the steppers) have fully stopped.
+     * this stage will either immediately go to CONFIG stage after instructing all hardware to stop,
+     * or will wait until everything is stopped to go to the STARTING stage if new game options have been provided
      */
     STOPPING,
-    /**
-     * game is stopped
-     */
-    STOPPED
 };
 
 class GameRunner : public Task
