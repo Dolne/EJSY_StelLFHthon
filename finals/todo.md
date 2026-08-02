@@ -20,7 +20,8 @@ should we use github issues & milestones instead
 - [x] collapse tactile options
 - [x] demo mode
 - [ ] disable lcd if steppers running
-- [ ] demo mode volume
+- [x] demo mode volume
+- [x] customizable audio folder
 
 ### User Controls
 - [x] Individually addressable RGB for scanning
@@ -95,7 +96,7 @@ should we use github issues & milestones instead
     - [ ] Add star icon to replace number icon on wheel
 
 ### Eu Ler
-- [ ] Other lessons
+- [x] Other lessons
     - In the menu just select between the numbers 1 to 8
     - [ ] Folder 1: Piano Vs Flute
     - [ ] Folder 2: Drums Vs Flute

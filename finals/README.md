@@ -33,7 +33,7 @@ The screen displays a menu, which is navigated using the 3 buttons — up, actio
 
 There are 3 different kinds of menu rows:
 
-1.  Info rows which just display some text. 
+1.  Info rows which just display some text.
 
     Pressing the action button does nothing when these rows are selected.
 
@@ -45,7 +45,7 @@ There are 3 different kinds of menu rows:
 
     Pressing the action button will cycle through the possible values for that option. Each option row is linked to a specific game option.
 
-If there is something interactive, either an action row or value for an option row, it will blink on the screen to indicate that the action button can be pressed to do something. 
+If there is something interactive, either an action row or value for an option row, it will blink on the screen to indicate that the action button can be pressed to do something.
 
 ### Gamemaster LCD
 
@@ -110,6 +110,7 @@ At the end of each round, the game will provide feedback to the user on whether 
 ### Steppers
 
 The steppers control the visual stimuli of the game, each spinning a wheel with 10 faces
+
 - Icon = the 10 faces of a wheel
   - The first of which is blank (index 0)
   - The second of which is the corresponding wheel's number (index 1)
@@ -128,33 +129,34 @@ The acceleration and max speed of the steppers must be limited in software to pr
 | C       | 32   | 14  | 36               |
 | D       | 33   | 15  | 39               |
 
-#### Sequence for Visual
-For our current set up
-- Shape
-    - Shape A is a circle
-    - Shape B is a square
-- Colour
-    - Colour A is Blue
-    - Colour B is Green
-- Size
-    - Size A is small
-    - Size B is large
+### Sequence for Visual
 
+For our current set up
+
+- Shape
+  - Shape A is a circle
+  - Shape B is a square
+- Colour
+  - Colour A is Blue
+  - Colour B is Green
+- Size
+  - Size A is small
+  - Size B is large
 
 | Index | Shape  | Colour | Size  |
-|------:|--------|--------|-------|
-| 0     | blank  |        |       |
-| 1     | star   |        |       |
-| 2     | circle | blue   | small |
-| 3     | circle | blue   | large |
-| 4     | circle | green  | small |
-| 5     | circle | green  | large |
-| 6     | square | blue   | small |
-| 7     | square | blue   | large |
-| 8     | square | green  | small |
-| 9     | square | green  | large |
-|
+| ----: | ------ | ------ | ----- |
+|     0 | blank  |        |       |
+|     1 | star   |        |       |
+|     2 | circle | blue   | small |
+|     3 | circle | blue   | large |
+|     4 | circle | green  | small |
+|     5 | circle | green  | large |
+|     6 | square | blue   | small |
+|     7 | square | blue   | large |
+|     8 | square | green  | small |
+|     9 | square | green  | large |
 
+This can be customized by replacing the icons on the wheel, provided it follows a similar ordering based on the shape, colour, and size.
 
 ### MP3 Module
 
@@ -176,66 +178,83 @@ The code relies on receiving the unsolicted FILE_END status response from the YX
 | RX     | 16 (TX2) |
 | TX     | 17 (RX2) |
 
-#### Current sequence for Audio
-| Filename | LR    | Timbre | Pitch | Loudness |
-|---------:|-------|--------|-------|----------|
-| 001      | left  | piano  | low   | soft     |
-| 002      | left  | piano  | low   | loud     |
-| 003      | left  | piano  | high  | soft     |
-| 004      | left  | piano  | high  | loud     |
-| 005      | left  | flute  | low   | soft     |
-| 006      | left  | flute  | low   | loud     |
-| 007      | left  | flute  | high  | soft     |
-| 008      | left  | flute  | high  | loud     |
-| 009      | right | piano  | low   | soft     |
-| 010      | right | piano  | low   | loud     |
-| 011      | right | piano  | high  | soft     |
-| 012      | right | piano  | high  | loud     |
-| 013      | right | flute  | low   | soft     |
-| 014      | right | flute  | low   | loud     |
-| 015      | right | flute  | high  | soft     |
-| 016      | right | flute  | high  | loud     |
+### Sequence for Audio
 
-##### Piano vs Drums
-| Filename | LR    | Timbre | Pitch | Loudness |
-|---------:|-------|--------|-------|----------|
-| 001      | left  | piano  | low   | soft     |
-| 002      | left  | piano  | low   | loud     |
-| 003      | left  | piano  | high  | soft     |
-| 004      | left  | piano  | high  | loud     |
-| 005      | left  | drum   | low   | soft     |
-| 006      | left  | drum   | low   | loud     |
-| 007      | left  | drum   | high  | soft     |
-| 008      | left  | drum   | high  | loud     |
-| 009      | right | piano  | low   | soft     |
-| 010      | right | piano  | low   | loud     |
-| 011      | right | piano  | high  | soft     |
-| 012      | right | piano  | high  | loud     |
-| 013      | right | drum   | low   | soft     |
-| 014      | right | drum   | low   | loud     |
-| 015      | right | drum   | high  | soft     |
-| 016      | right | drum   | high  | loud     |
+By default, there are 3 folders of different audio the gamemaster can choose from.
 
-##### Dog vs Cat
-| Filename | LR    | Timbre | Pitch | Loudness |
-|---------:|-------|--------|-------|----------|
-| 001      | left  | dog    | low   | soft     |
-| 002      | left  | dog    | low   | loud     |
-| 003      | left  | dog    | high  | soft     |
-| 004      | left  | dog    | high  | loud     |
-| 005      | left  | cat    | low   | soft     |
-| 006      | left  | cat    | low   | loud     |
-| 007      | left  | cat    | high  | soft     |
-| 008      | left  | cat    | high  | loud     |
-| 009      | right | dog    | low   | soft     |
-| 010      | right | dog    | low   | loud     |
-| 011      | right | dog    | high  | soft     |
-| 012      | right | dog    | high  | loud     |
-| 013      | right | cat    | low   | soft     |
-| 014      | right | cat    | low   | loud     |
-| 015      | right | cat    | high  | soft     |
-| 016      | right | cat    | high  | loud     |
+Additionally, the gamemaster can add up to 5 custom folders numbered 04 to 08 in the SD card. The audio must follow the same order shown below — based on the panning (L/R), timbre, pitch, and loudness.
 
+#### 01. Piano vs Flute
+
+| Filename | LR    | Timbre | Pitch | Loudness |
+| -------: | ----- | ------ | ----- | -------- |
+|      001 | left  | piano  | low   | soft     |
+|      002 | left  | piano  | low   | loud     |
+|      003 | left  | piano  | high  | soft     |
+|      004 | left  | piano  | high  | loud     |
+|      005 | left  | flute  | low   | soft     |
+|      006 | left  | flute  | low   | loud     |
+|      007 | left  | flute  | high  | soft     |
+|      008 | left  | flute  | high  | loud     |
+|      009 | right | piano  | low   | soft     |
+|      010 | right | piano  | low   | loud     |
+|      011 | right | piano  | high  | soft     |
+|      012 | right | piano  | high  | loud     |
+|      013 | right | flute  | low   | soft     |
+|      014 | right | flute  | low   | loud     |
+|      015 | right | flute  | high  | soft     |
+|      016 | right | flute  | high  | loud     |
+
+#### 02. Piano vs Drums
+
+| Filename | LR    | Timbre | Pitch | Loudness |
+| -------: | ----- | ------ | ----- | -------- |
+|      001 | left  | piano  | low   | soft     |
+|      002 | left  | piano  | low   | loud     |
+|      003 | left  | piano  | high  | soft     |
+|      004 | left  | piano  | high  | loud     |
+|      005 | left  | drum   | low   | soft     |
+|      006 | left  | drum   | low   | loud     |
+|      007 | left  | drum   | high  | soft     |
+|      008 | left  | drum   | high  | loud     |
+|      009 | right | piano  | low   | soft     |
+|      010 | right | piano  | low   | loud     |
+|      011 | right | piano  | high  | soft     |
+|      012 | right | piano  | high  | loud     |
+|      013 | right | drum   | low   | soft     |
+|      014 | right | drum   | low   | loud     |
+|      015 | right | drum   | high  | soft     |
+|      016 | right | drum   | high  | loud     |
+
+#### 03. Dog vs Cat
+
+| Filename | LR    | Timbre | Pitch | Loudness |
+| -------: | ----- | ------ | ----- | -------- |
+|      001 | left  | dog    | low   | soft     |
+|      002 | left  | dog    | low   | loud     |
+|      003 | left  | dog    | high  | soft     |
+|      004 | left  | dog    | high  | loud     |
+|      005 | left  | cat    | low   | soft     |
+|      006 | left  | cat    | low   | loud     |
+|      007 | left  | cat    | high  | soft     |
+|      008 | left  | cat    | high  | loud     |
+|      009 | right | dog    | low   | soft     |
+|      010 | right | dog    | low   | loud     |
+|      011 | right | dog    | high  | soft     |
+|      012 | right | dog    | high  | loud     |
+|      013 | right | cat    | low   | soft     |
+|      014 | right | cat    | low   | loud     |
+|      015 | right | cat    | high  | soft     |
+|      016 | right | cat    | high  | loud     |
+
+#### System Audio
+
+There is also some system audio in folder 10. Currently it contains the audio to play as part of the feedback after the user inputs an answer.
+
+| Filename | Audio          |
+| -------: | -------------- |
+|       01 | Success        |
+|       02 | Fail/try again |
 
 ### LED light strips
 
@@ -264,7 +283,7 @@ The vibration motor is enabled/disabled via a relay.
 
 - The connectors are usually bunched up with masking tape
 - The pins that each wire corresponds to is either written on the female/male end of the wire, or it matches the order of the connections written on the masking tape
-(e.g. Gnd, 3.3V, Pin 5 next to Red, Green, Blue colour wire means Red=Gnd, Green=3.3V, Blue=Pin5)
+  (e.g. Gnd, 3.3V, Pin 5 next to Red, Green, Blue colour wire means Red=Gnd, Green=3.3V, Blue=Pin5)
 
 ### ESP32 Pin Overview
 

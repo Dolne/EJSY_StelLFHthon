@@ -2,7 +2,7 @@
 
 #define DEMO_MAX_FEAT 2;
 
-DemoRunner::DemoRunner(GameHardware &hardware) : hardware_(hardware), runner_(hardware_)
+DemoRunner::DemoRunner(GameHardware &hardware, const GameOptions &gameOpts) : hardware_(hardware), runner_(hardware_), gameOpts_(gameOpts)
 {
 }
 
@@ -15,7 +15,9 @@ void DemoRunner::reshuffle()
     GameOptions opts{};
 
     opts.slotsCount = 1;
-    opts.volume = volume_;
+
+    // copy some options from the actual game options
+    opts.audioFolder = gameOpts_.audioFolder;
 
     // visual
     if (currStimuli_ == 0)
@@ -50,7 +52,7 @@ void DemoRunner::reshuffle()
     // audio
     else if (currStimuli_ == 1)
     {
-        runner_.startScanning(round_, 2000);
+        runner_.startScanning(round_, SCAN_SPEED_VALUES[gameOpts_.scanSpeed]);
     }
 }
 
@@ -68,12 +70,17 @@ void DemoRunner::next()
     stateChanged_ = true;
 }
 
-void DemoRunner::start(uint8_t volume)
+void DemoRunner::start()
 {
     currStimuli_ = 0;
     currFeat_ = 0;
     stateChanged_ = true;
-    volume_ = volume;
+
+    // set audio volume
+    uint8_t vol = VOLUME_VALUES[gameOpts_.volume];
+    Serial.print("Setting volume to ");
+    Serial.println(vol);
+    hardware_.audio.setVolume(vol);
 }
 
 void DemoRunner::end()

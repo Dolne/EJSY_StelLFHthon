@@ -531,17 +531,17 @@ void ScanningRunner::update()
         if (scanStage_.changed())
         {
             // play audio if any
-            if (round_->audio[slot_] > 0)
+            if (round_->audio[slot_] > 0 && round_->audioFolder > 0)
             {
-                Serial.print("Playing audio ");
-                Serial.println(round_->audio[slot_]);
+                Serial.printf("Playing audio (%02d, %03d)", round_->audioFolder, round_->audio[slot_]);
+                Serial.println();
                 if (SIMULATION)
                 {
                     Serial.println("(simulated)");
                 }
                 else
                 {
-                    hardware_.audio.play(1, round_->audio[slot_]);
+                    hardware_.audio.play(round_->audioFolder, round_->audio[slot_]);
                 }
             }
         }

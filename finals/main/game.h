@@ -23,7 +23,7 @@ inline const int SCAN_SPEED_VALUES[] = {2000, 5000, 10000};
 inline const char *OPTS_SLOTS[] = {"3", "4"};
 inline const int MIN_SLOTS = 3;
 
-inline const char *OPTS_ROUNDS[] = {"1", "2", "3", "4"};
+inline const char *OPTS_NUMBER[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
 inline const int MIN_ROUNDS = 1;
 
 inline const char *OPTS_INPUT_MODE[] = {"scanning", "select"};
@@ -79,6 +79,7 @@ public:
     uint8_t visualOptions[VISUAL_FEATS_COUNT] = {0};
     uint8_t audio = 0;
     uint8_t audioOptions[AUDIO_FEATS_COUNT] = {0};
+    uint8_t audioFolder = 0;
     uint8_t tactile = 0;
 };
 
@@ -127,6 +128,12 @@ public:
      * any unused slot will have a value of 0
      */
     uint8_t audio[MAX_SLOTS] = {0};
+
+    /**
+     * the index of the folder of audio to play
+     * this will be 0 if there is no audio
+     */
+    uint8_t audioFolder = 0;
 
     /**
      * whether there is any tactile stimuli for the round

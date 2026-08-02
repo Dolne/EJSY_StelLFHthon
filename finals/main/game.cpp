@@ -112,6 +112,7 @@ GameRound::GameRound(GameOptions opts) : slotsCount(opts.slotsCount + MIN_SLOTS)
     if (hasAudio)
     {
         hasAudio = generateSlots(audio, slotsCount, odd1OutSlot, opts.audio, opts.audioOptions, AUDIO_FEATS_COUNT, AUDIO_VALUE_OFFSET);
+        audioFolder = opts.audioFolder + 1;
     }
 
     // if there are no features enabled at all, it means it will be in the "null" gameplay mode

@@ -139,7 +139,7 @@ GameHardware gameHardware(lcd, inputButtons, buttonBoot, steppers, audio, scanni
 
 GameRunner runner(gameHardware);
 
-DemoRunner demoRunner(gameHardware);
+DemoRunner demoRunner(gameHardware, options);
 
 uint8_t demoModeEnabled = 0;
 
@@ -156,7 +156,7 @@ void startGame() {
 }
 void startDemo() {
     if (runner.stage().is(GameStage::CONFIG)) {
-        demoRunner.start(options.volume);
+        demoRunner.start();
     }
 }
 
@@ -176,7 +176,7 @@ bool audioSubMenuHidden() {
 // the game options does not actually know/care what each option within a stimuli is
 // so that means it is only defined by the order in the submenu
 MenuRow* configRows[] = {
-    new MenuOptionRow(menuHardware, &options.rounds, "rounds", OPTS_ROUNDS, 4),
+    new MenuOptionRow(menuHardware, &options.rounds, "rounds", OPTS_NUMBER, 4),
     new MenuOptionRow(menuHardware, &options.slotsCount, "slots", OPTS_SLOTS, 2),
 
     new MenuOptionRow(menuHardware, &options.inputMode, "input mode", OPTS_INPUT_MODE, 2),
@@ -187,15 +187,16 @@ MenuRow* configRows[] = {
     new MenuOptionRow(menuHardware, &options.volume, "volume", OPTS_VOLUME, 3),
 
     new MenuOptionRow(menuHardware, &options.visual, "visual", OPTS_DIFFS, VISUAL_FEATS_COUNT + 2),
-    new MenuOptionRow(menuHardware, &options.visualOptions[0], "  size", OPTS_ON_OFF, 2, visualSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.visualOptions[1], "  colour", OPTS_ON_OFF, 2, visualSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.visualOptions[2], "  shape", OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.visualOptions[0], VISUAL_FEATS_NAMES[0], OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.visualOptions[1], VISUAL_FEATS_NAMES[1], OPTS_ON_OFF, 2, visualSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.visualOptions[2], VISUAL_FEATS_NAMES[2], OPTS_ON_OFF, 2, visualSubMenuHidden),
 
     new MenuOptionRow(menuHardware, &options.audio, "audio", OPTS_DIFFS, AUDIO_FEATS_COUNT + 2, audioMenuHidden),
-    new MenuOptionRow(menuHardware, &options.audioOptions[0], "  loudness", OPTS_ON_OFF, 2, audioSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.audioOptions[1], "  pitch", OPTS_ON_OFF, 2, audioSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.audioOptions[2], "  timbre", OPTS_ON_OFF, 2, audioSubMenuHidden),
-    new MenuOptionRow(menuHardware, &options.audioOptions[3], "  L/R", OPTS_ON_OFF, 2, audioSubMenuHidden), // or "panning"
+    new MenuOptionRow(menuHardware, &options.audioOptions[0], AUDIO_FEATS_NAMES[0], OPTS_ON_OFF, 2, audioSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.audioOptions[1], AUDIO_FEATS_NAMES[1], OPTS_ON_OFF, 2, audioSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.audioOptions[2], AUDIO_FEATS_NAMES[2], OPTS_ON_OFF, 2, audioSubMenuHidden),
+    new MenuOptionRow(menuHardware, &options.audioOptions[3], AUDIO_FEATS_NAMES[3], OPTS_ON_OFF, 2, audioSubMenuHidden), // or "panning"
+    new MenuOptionRow(menuHardware, &options.audioFolder, "  folder", OPTS_NUMBER, 8, [] () { return audioMenuHidden() || options.audio == 0; }),
 
     // tactile options only shown when input mode is "select"
     new MenuOptionRow(menuHardware, &options.tactile, "tactile", OPTS_ON_OFF, 2, [] () { return options.inputMode != 1; }),

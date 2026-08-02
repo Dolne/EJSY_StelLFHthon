@@ -9,10 +9,10 @@
 class DemoRunner : public Task
 {
 public:
-    DemoRunner(GameHardware &hardware);
+    DemoRunner(GameHardware &hardware, const GameOptions &gameOpts);
     char currName[21] = "";
     bool currNameChanged();
-    void start(uint8_t volume);
+    void start();
     void end();
     void reshuffle();
     void next();
@@ -28,7 +28,7 @@ private:
     uint8_t currFeat_ = 0;
     bool stateChanged_ = false;
     bool nameChanged_ = false;
-    uint8_t volume_ = 0;
+    const GameOptions &gameOpts_;
 };
 
 #endif
