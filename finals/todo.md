@@ -62,40 +62,49 @@ should we use github issues & milestones instead
 
 ### In order of importance
 #### High Effort High Impact
-- [ ] Box for each wheel --> Designed, Printing In Progress
-    - [x] Cover up the visual icons that aren't being shown
 - [ ] Box for electronics --> Designing
-- [x] Give the wheel box and button the same number with the same text colour (just 2d print) --> 2D Printed
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
 - [ ] Gamemaster guide
 - [ ] Our actual presentation
+    - [ ] John
+    - [ ] Bingyu
+    - [ ] Yu Rou
+- [ ] timeline --> John
+- [ ] Go through the 2nd visit to cpass again
+
 
 #### Low Effort High Impact
-- [x] The white button might hv some issues, check it
 - [ ] Win ("Yaay") /lose ("Please try again") audio --> Audio found, not uploaded onto the SD Card yet
 - [ ] Rigid strip to mount feedback LED strip on --> 50cm ruler
-- [ ] hv u verified if the names/numbers within the folders must also be unique for the whole card
+- [ ] Audio files for drum and cat Vs dog --> Bingyu
+- [ ] extend wires
 
 #### Low Effort Low Impact
 - [ ] Prepare the strip for the wheel --> Bingyu
     - [ ] Add star icon to replace number icon on wheel
 
 #### High Effort Low Impact
-
-### Done
-- [x] For audio decide if they change lesson by changing SD Card or by pressing in gamemaster controls --> Change via software
-- [x] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module) --> Tell dont do
-
-### 31 Jul
-- [x] come up w what additional stuff kiwi already has at his office that we want --> just the long stepper
-- [ ] timeline --> John
-- [ ] overall structure of presentation & split up who makes which part
-- [ ] Audio files for drum and cat Vs dog --> Bingyu
-- [ ] Go through the 2nd visit to cpass again
-- [ ] extend wires
-- [x] hv u verified if the names/numbers within the folders must also be unique for the whole card --> dont need be unique
+- NIL
 
 ### Bingyu
 - [ ] Audio files for drum and cat Vs dog --> Bingyu
 - [ ] Prepare the strip for the wheel --> Bingyu
     - [ ] Add star icon to replace number icon on wheel
+
+### Buy/acquire
+- [ ] M3 Nuts
+- [ ] 50cm ruler
+- [ ] plywood board for tmr
+
+### Basically Done
+- [ ] Box for each wheel --> Designed, Printing In Progress
+    - [x] Cover up the visual icons that aren't being shown
+
+### Done
+- [x] The white button might hv some issues, check it
+- [x] Give the wheel box and button the same number with the same text colour (just 2d print) --> 2D Printed
+- [x] overall structure of presentation & split up who makes which part
+- [x] For audio decide if they change lesson by changing SD Card or by pressing in gamemaster controls --> Change via software
+- [x] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module) --> Tell dont do
+- [x] hv u verified if the names/numbers within the folders must also be unique for the whole card --> dont need be unique
+- [x] come up w what additional stuff kiwi already has at his office that we want --> just the long stepper
