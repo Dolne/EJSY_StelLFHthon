@@ -31,8 +31,8 @@ should we use github issues & milestones instead
 - [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
-- [ ] Win ("Yaay") /lose ("Please try again") audio
-- [ ] wheels "success icon"
+- [ ] Win ("Yaay") /lose ("Please try again") audio --> Folder 10
+- [ ] wheels "success icon" --> Code in
 
 ## Hardware
 
@@ -63,8 +63,8 @@ should we use github issues & milestones instead
 ### In order of importance
 #### High Effort High Impact
 - [ ] Box for electronics --> Designing
-- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
-- [ ] Gamemaster guide
+- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler
+- [ ] Gamemaster guide --> Eu Ler
 - [ ] Our actual presentation
     - [ ] John
     - [ ] Bingyu
@@ -90,6 +90,20 @@ should we use github issues & milestones instead
 - [ ] Audio files for drum and cat Vs dog --> Bingyu
 - [ ] Prepare the strip for the wheel --> Bingyu
     - [ ] Add star icon to replace number icon on wheel
+
+### Eu Ler
+- [ ] Other lessons
+    - In the menu just select between the numbers 1 to 8
+    - [ ] Folder 1: Piano Vs Flute
+    - [ ] Folder 2: Drums Vs Flute
+    - [ ] Folder 3: Dog Vs Cat
+    - [ ] Folder 4-8: Custom
+- [ ] Change scanning neopixel colour to white
+- [ ] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
+- [ ] wheels "success icon" --> Code in
+
+- [ ] Gamemaster guide
+- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
 
 ### Buy/acquire
 - [x] M3 Nuts
