@@ -127,7 +127,7 @@ Stepper stepper4(STEPS_PER_ROTATION);
 Stepper* stepperList[MAX_SLOTS] = { &stepper1, &stepper2, &stepper3, &stepper4 };
 
 void initSteppers() {
-    // stepperEngine is defined in hardware.h/cpp
+    // stepperEngine is defined in stepper.h/cpp
     stepperEngine.init();
 
     stepper1.begin(stepperEngine, STEPPER_1_STEP, STEPPER_1_DIR, STEPPER_MAX_SPEED, STEPPER_ACCELERATION);

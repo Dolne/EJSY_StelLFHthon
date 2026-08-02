@@ -8,7 +8,7 @@ int posMod(long num, int by) {
     return val;
 }
 
-FastAccelStepperEngine stepperEngine = FastAccelStepperEngine();
+FastAccelStepperEngine stepperEngine;
 
 Stepper::Stepper(int stepsPerRotation):
     stepsPerRotation_(stepsPerRotation)
