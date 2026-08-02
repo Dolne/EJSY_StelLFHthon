@@ -1,5 +1,9 @@
 #include "runner.h"
 
+const uint8_t SYSTEM_AUDIO_FOLDER = 10;
+const uint8_t SUCCESS_AUDIO_INDEX = 1;
+const uint8_t FAIL_AUDIO_INDEX = 2;
+
 void successAnimation(long start, CRGB *leds, int n)
 {
     static const int DURATION = 2000;
@@ -338,13 +342,17 @@ void GameRunner::update()
                 for (int i = 0; i < round_->slotsCount; i++) {
                     hardware_.steppers.get(i)->directTo(1.0f / VISUAL_TOTAL_VALUES);
                 }
-                // hardware_.audio.play(25);
+                // play audio for success
+                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, SUCCESS_AUDIO_INDEX);
+                // start vibration
                 hardware_.vibration.startSequence(hardware_.vibrationSeqSuccess, hardware_.vibrationSeqSuccessLen);
             }
             else
             {
                 Serial.println("Wrong answer :(");
-                // hardware_.audio.play(26);
+                // play audio for fail
+                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, FAIL_AUDIO_INDEX);
+                // start vibration
                 hardware_.vibration.startSequence(hardware_.vibrationSeqFail, hardware_.vibrationSeqFailLen);
             }
         }
@@ -506,7 +514,7 @@ void ScanningRunner::update()
     {
         if (scanStage_.changed())
         {
-            // TODO play audio or else go to AUDIO stage
+            // TODO play audio (maybe not)
             // hardware_.audio.play(1, slot_ + 1);
         }
         else if (!hardware_.audio.playing())

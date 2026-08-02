@@ -34,7 +34,7 @@ should we use github issues & milestones instead
 - [x] Individually addressable RGB for feedback
 - [x] Vibration Motor
 - [x] Round / Score messages
-- [ ] Win ("Yaay") /lose ("Please try again") audio --> Folder 10
+- [x] Win ("Yaay") /lose ("Please try again") audio --> Folder 10
 - [x] wheels "success icon"
 
 ## Hardware
@@ -102,7 +102,7 @@ should we use github issues & milestones instead
     - [ ] Folder 3: Dog Vs Cat
     - [ ] Folder 4-8: Custom
 - [x] Change scanning neopixel colour to white
-- [ ] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
+- [x] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
 - [x] wheels "success icon"
 
 - [ ] Gamemaster guide
