@@ -98,7 +98,7 @@ should we use github issues & milestones instead
 ### Bingyu
 - [ ] Audio files for drum and cat Vs dog --> Bingyu
 - [ ] Prepare the strip for the wheel --> Bingyu
-    - [ ] Add star icon to replace number icon on wheel
+    - [ ] Add star icon to replace number icon on wheel --> Bumped
 
 ### Eu Ler
 - [x] Other lessons
