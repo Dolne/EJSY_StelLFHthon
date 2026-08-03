@@ -34,6 +34,10 @@ should we use github issues & milestones instead
 
 ### Feedback
 - [x] Individually addressable RGB for feedback
+- [x] small delay between slots when scanning
+- [x] let user try again if they get the ans wrong
+- [x] if doing audio only, dont need show the "1" "2" "3" "4", but still need to light up each wheel
+- [x] "null" gameplay if no diffs selected
 - [x] Vibration Motor
 - [x] Round / Score messages
 - [x] Win ("Yaay") /lose ("Please try again") audio --> Folder 10
