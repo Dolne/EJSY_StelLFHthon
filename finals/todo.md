@@ -48,7 +48,6 @@ should we use github issues & milestones instead
 ### Option stimuli
 - [x] Individual neopixels / make some
 - [x] YX5300 ~~& Logic Level Shifter (on breadboard) (don't seem to need the LLC actl, and it seems to make the YX TX --> ESP RX data not work)~~
-- [ ] ~~LightGate - forgo for now since no time~~
 - [x] Overlays
 - [x] Wheels
 - [x] Stepper mount
@@ -73,22 +72,12 @@ should we use github issues & milestones instead
 
 ### In order of importance
 #### High Effort High Impact
-- [ ] Box for electronics --> Printing
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler
 - [ ] Gamemaster guide --> Eu Ler
-- [ ] Our actual presentation
-    - [ ] John
-    - [ ] Bingyu
-    - [ ] Yu Rou
-- [ ] timeline --> John
-- [ ] Go through the 2nd visit to cpass again
-
 
 #### Low Effort High Impact
 - [ ] Win ("Yaay") /lose ("Please try again") audio --> some issues with playback
-- [ ] Rigid strip to mount feedback LED strip on --> 50cm ruler
 - [x] Audio files for drum and cat Vs dog --> Bingyu
-- [ ] extend wires
 
 #### Low Effort Low Impact
 - [x] Prepare the strip for the wheel --> Bingyu
@@ -100,16 +89,15 @@ should we use github issues & milestones instead
 ### Eu Ler
 - [x] Other lessons
     - In the menu just select between the numbers 1 to 8
-    - [ ] Folder 1: Piano Vs Flute
+    - [x] Folder 1: Piano Vs Flute
     - [ ] Folder 2: Drums Vs Flute
-    - [ ] Folder 3: Dog Vs Cat
+    - [x] Folder 3: Dog Vs Cat
     - [ ] Folder 4-8: Custom
 - [ ] Gamemaster guide
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
 
 ### Buy/acquire
 - [x] M3 Nuts
-- [ ] 50cm ruler --> replace with two 30cm rulers
 
 ### Done
 - [x] Box for each wheel --> Designed, Printing In Progress
@@ -121,3 +109,23 @@ should we use github issues & milestones instead
 - [x] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module) --> Tell dont do
 - [x] hv u verified if the names/numbers within the folders must also be unique for the whole card --> dont need be unique
 - [x] come up w what additional stuff kiwi already has at his office that we want --> just the long stepper
+
+
+## 3 Aug
+### YR House
+- [ ] Rigid strip to mount feedback LED strip on --> 50cm ruler
+
+### OTW Home
+- [ ] timeline --> John
+- [ ] Go through the 2nd visit to cpass again
+
+### @ Home
+- [ ] Print strip --> John
+
+## 4 Aug
+- [ ] Box for electronics --> Printing
+- [ ] extend wires
+- [ ] Our actual presentation
+    - [ ] John
+    - [ ] Bingyu
+    - [ ] Yu Rou
