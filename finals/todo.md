@@ -59,6 +59,8 @@ should we use github issues & milestones instead
 ### Feedback
 - [x] Vibration Motor & Relay
 - [x] Feedback Lightstrip - have the LEDs, havent connected
+- [x] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
+- [x] wheels "success icon"
 
 ### Power
 - [x] Power Solution
@@ -71,7 +73,7 @@ should we use github issues & milestones instead
 
 ### In order of importance
 #### High Effort High Impact
-- [ ] Box for electronics --> Designing
+- [ ] Box for electronics --> Printing
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler
 - [ ] Gamemaster guide --> Eu Ler
 - [ ] Our actual presentation
@@ -83,22 +85,17 @@ should we use github issues & milestones instead
 
 
 #### Low Effort High Impact
-- [ ] Win ("Yaay") /lose ("Please try again") audio --> Audio found, not uploaded onto the SD Card yet
+- [ ] Win ("Yaay") /lose ("Please try again") audio --> some issues with playback
 - [ ] Rigid strip to mount feedback LED strip on --> 50cm ruler
-- [ ] Audio files for drum and cat Vs dog --> Bingyu
+- [x] Audio files for drum and cat Vs dog --> Bingyu
 - [ ] extend wires
 
 #### Low Effort Low Impact
-- [ ] Prepare the strip for the wheel --> Bingyu
+- [x] Prepare the strip for the wheel --> Bingyu
     - [ ] Add star icon to replace number icon on wheel
 
 #### High Effort Low Impact
 - NIL
-
-### Bingyu
-- [ ] Audio files for drum and cat Vs dog --> Bingyu
-- [ ] Prepare the strip for the wheel --> Bingyu
-    - [ ] Add star icon to replace number icon on wheel --> Bumped
 
 ### Eu Ler
 - [x] Other lessons
@@ -107,23 +104,16 @@ should we use github issues & milestones instead
     - [ ] Folder 2: Drums Vs Flute
     - [ ] Folder 3: Dog Vs Cat
     - [ ] Folder 4-8: Custom
-- [x] Change scanning neopixel colour to white
-- [x] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
-- [x] wheels "success icon"
-
 - [ ] Gamemaster guide
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
 
 ### Buy/acquire
 - [x] M3 Nuts
 - [ ] 50cm ruler --> replace with two 30cm rulers
-- [ ] plywood board for tmr
-
-### Basically Done
-- [ ] Box for each wheel --> Designed, Printing In Progress
-    - [x] Cover up the visual icons that aren't being shown
 
 ### Done
+- [x] Box for each wheel --> Designed, Printing In Progress
+    - [x] Cover up the visual icons that aren't being shown
 - [x] The white button might hv some issues, check it
 - [x] Give the wheel box and button the same number with the same text colour (just 2d print) --> 2D Printed
 - [x] overall structure of presentation & split up who makes which part
