@@ -1,8 +1,8 @@
 #include "runner.h"
 
 const uint8_t SYSTEM_AUDIO_FOLDER = 10;
-const uint8_t SUCCESS_AUDIO_INDEX = 1;
-const uint8_t FAIL_AUDIO_INDEX = 2;
+const uint8_t SUCCESS_AUDIO_INDEX = 151;
+const uint8_t FAIL_AUDIO_INDEX = 152;
 
 void successAnimation(long start, CRGB *leds, int n)
 {
