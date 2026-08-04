@@ -14,9 +14,8 @@ void DemoRunner::reshuffle()
     }
     GameOptions opts{};
 
-    opts.slotsCount = 1;
-
     // copy some options from the actual game options
+    opts.slotsCount = gameOpts_.slotsCount;
     opts.audioFolder = gameOpts_.audioFolder;
 
     // visual
