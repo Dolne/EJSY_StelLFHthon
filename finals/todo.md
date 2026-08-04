@@ -90,7 +90,7 @@ should we use github issues & milestones instead
 - [x] Other lessons
     - In the menu just select between the numbers 1 to 8
     - [x] Folder 1: Piano Vs Flute
-    - [ ] Folder 2: Drums Vs Flute
+    - [ ] Folder 2: Drums Vs Flute --> hung on this once
     - [x] Folder 3: Dog Vs Cat
     - [ ] Folder 4-8: Custom
 - [ ] Gamemaster guide
@@ -113,19 +113,20 @@ should we use github issues & milestones instead
 
 ## 3 Aug
 ### YR House
-- [ ] Rigid strip to mount feedback LED strip on --> 50cm ruler
+- [x] Rigid strip to mount feedback LED strip on --> 50cm ruler
 
 ### OTW Home
 - [ ] timeline --> John
 - [ ] Go through the 2nd visit to cpass again
 
 ### @ Home
-- [ ] Print strip --> John
+- [x] Print strip & button labels --> John printed
 
 ## 4 Aug
-- [ ] Box for electronics --> Printing
+- [ ] Box for electronics --> Assembly wip
 - [ ] extend wires
 - [ ] Our actual presentation
     - [ ] John
     - [ ] Bingyu
     - [ ] Yu Rou
+- [ ] Consider: headphone jack come out of box
