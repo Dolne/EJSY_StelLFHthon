@@ -148,7 +148,7 @@ uint8_t demoModeEnabled = 0;
 // tasks to run at TICKRATE
 // the order of tasks should be inputs -> runner -> outputs
 Task* taskList[] = { &configButtons, &inputButtons, &buttonBoot, &runner, &demoRunner, &vibration };
-TaskGroup tasks(taskList, 5);
+TaskGroup tasks(taskList, 6);
 
 // gamemaster hardware
 MenuHardware menuHardware(lcd, buttonUp, buttonAction, buttonDown);
