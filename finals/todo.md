@@ -58,7 +58,7 @@ should we use github issues & milestones instead
 ### Feedback
 - [x] Vibration Motor & Relay
 - [x] Feedback Lightstrip - have the LEDs, havent connected
-- [x] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 001 and lose as 002
+- [x] Win ("Yaay") /lose ("Please try again") audio in Folder 10, Win as 151 and lose as 152
 - [x] wheels "success icon"
 
 ### Power
@@ -68,23 +68,20 @@ should we use github issues & milestones instead
 ### Others
 - [x] Masking tape labels on the wires
 - [x] ~~solder one more F 3.5mm jack --> just use the screw one~~
-- [ ] ~~Velcro for icons on the wheel --> just use double sided tape actually works~~
 
 ### In order of importance
+#### Low Effort High Impact
+
 #### High Effort High Impact
 - [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler
 - [ ] Gamemaster guide --> Eu Ler
-
-#### Low Effort High Impact
-- [ ] Win ("Yaay") /lose ("Please try again") audio --> some issues with playback
-- [x] Audio files for drum and cat Vs dog --> Bingyu
 
 #### Low Effort Low Impact
 - [x] Prepare the strip for the wheel --> Bingyu
     - [ ] Add star icon to replace number icon on wheel
 
 #### High Effort Low Impact
-- NIL
+- [ ] ~~Velcro for icons on the wheel --> just use double sided tape actually works~~
 
 ### Eu Ler
 - [x] Other lessons
@@ -109,7 +106,7 @@ should we use github issues & milestones instead
 - [x] For audio decide if we will tell them the volume and left/right channel difference can be done by hardware (e.g. relays and change vol command to MP3 module) --> Tell dont do
 - [x] hv u verified if the names/numbers within the folders must also be unique for the whole card --> dont need be unique
 - [x] come up w what additional stuff kiwi already has at his office that we want --> just the long stepper
-
+- [x] Audio files for drum and cat Vs dog --> Bingyu
 
 ## 3 Aug
 ### YR House
@@ -117,13 +114,14 @@ should we use github issues & milestones instead
 
 ### OTW Home
 - [ ] timeline --> John
-- [ ] Go through the 2nd visit to cpass again
+- [x] Go through the 2nd visit to cpass again
 
 ### @ Home
 - [x] Print strip & button labels --> John printed
 
 ## 4 Aug
 - [ ] Box for electronics --> Assembly wip
+- [ ] Win ("Yaay") /lose ("Please try again") audio --> some issues with playback
 - [ ] extend wires
 - [ ] Our actual presentation
     - [ ] John
