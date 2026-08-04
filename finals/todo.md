@@ -1,6 +1,9 @@
-# TODO list
+# TODO list - use gsheet instead
+# https://docs.google.com/spreadsheets/d/1Bvp_hyOxbOQx53LTjsyWwT9itj7Wp8dl5T7ewWUdP4Y/edit?usp=drivesdk
 
 should we use github issues & milestones instead
+
+**transferred to gsheet**
 
 ## Software
 
@@ -22,7 +25,7 @@ should we use github issues & milestones instead
 - [x] disable lcd if steppers running
 - [x] demo mode volume
 - [x] customizable audio folder
-- [ ] show error if audio not found?
+- [ ] **show error if audio not found?**
 
 ### User Controls
 - [x] Individually addressable RGB for scanning
@@ -73,12 +76,12 @@ should we use github issues & milestones instead
 #### Low Effort High Impact
 
 #### High Effort High Impact
-- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler
-- [ ] Gamemaster guide --> Eu Ler
+- [ ] **Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card) --> Eu Ler**
+- [ ] **Gamemaster guide --> Eu Ler**
 
 #### Low Effort Low Impact
 - [x] Prepare the strip for the wheel --> Bingyu
-    - [ ] Add star icon to replace number icon on wheel
+    - [x] Add star icon to replace number icon on wheel
 
 #### High Effort Low Impact
 - [ ] ~~Velcro for icons on the wheel --> just use double sided tape actually works~~
@@ -87,11 +90,11 @@ should we use github issues & milestones instead
 - [x] Other lessons
     - In the menu just select between the numbers 1 to 8
     - [x] Folder 1: Piano Vs Flute
-    - [ ] Folder 2: Drums Vs Flute --> hung on this once
+    - [ ] **Folder 2: Drums Vs Flute --> hung on this once**
     - [x] Folder 3: Dog Vs Cat
     - [ ] Folder 4-8: Custom
-- [ ] Gamemaster guide
-- [ ] Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)
+- [ ] **Gamemaster guide**
+- [ ] **Technical guide for AT staff on how to change visual (create strip of icons) and audio (Add MP3 files to SD Card)**
 
 ### Buy/acquire
 - [x] M3 Nuts
@@ -113,18 +116,18 @@ should we use github issues & milestones instead
 - [x] Rigid strip to mount feedback LED strip on --> 50cm ruler
 
 ### OTW Home
-- [ ] timeline --> John
+- [ ] **timeline --> John**
 - [x] Go through the 2nd visit to cpass again
 
 ### @ Home
 - [x] Print strip & button labels --> John printed
 
 ## 4 Aug
-- [ ] Box for electronics --> Assembly wip
-- [ ] Win ("Yaay") /lose ("Please try again") audio --> some issues with playback
-- [ ] extend wires
+- [ ] **Box for electronics --> Assembly wip**
+- [ ] **Win ("Yaay") /lose ("Please try again") audio --> some issues with playback**
+- [ ] **extend wires**
 - [ ] Our actual presentation
     - [ ] John
     - [ ] Bingyu
     - [ ] Yu Rou
-- [ ] Consider: headphone jack come out of box
+- [ ] **Consider: headphone jack come out of box**
