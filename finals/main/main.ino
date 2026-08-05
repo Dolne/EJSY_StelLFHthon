@@ -237,11 +237,12 @@ Menu feedbackMenu(menuHardware, feedbackRows, sizeof(feedbackRows) / sizeof(feed
 
 MenuRow* demoRows[] = {
     new MenuInfoRow(menuHardware, demoRunner.currName, []() { return demoRunner.currNameChanged(); }),
+    new MenuInfoRow(menuHardware, demoRunner.odd1Out, []() { return demoRunner.odd1OutChanged(); }),
     new MenuActionRow(menuHardware, "Next", [] () { demoRunner.next(); }),
     new MenuActionRow(menuHardware, "Reshuffle", [] () { demoRunner.reshuffle(); }),
     new MenuActionRow(menuHardware, "Exit", [] () { demoRunner.end(); }),
 };
-Menu demoMenu(menuHardware, demoRows, sizeof(demoRows) / sizeof(demoRows[0]), 1);
+Menu demoMenu(menuHardware, demoRows, sizeof(demoRows) / sizeof(demoRows[0]), 2);
 
 char configButtonsInfo[21] = "";
 char inputButtonsInfo[21] = "";

@@ -11,7 +11,9 @@ class DemoRunner : public Task
 public:
     DemoRunner(GameHardware &hardware, const GameOptions &gameOpts);
     char currName[21] = "";
+    char odd1Out[21] = "odd one out: ";
     bool currNameChanged();
+    bool odd1OutChanged();
     void start();
     void end();
     void reshuffle();
@@ -28,6 +30,8 @@ private:
     uint8_t currFeat_ = 0;
     bool stateChanged_ = false;
     bool nameChanged_ = false;
+    bool optionsChanged_ = false;
+    bool odd1OutChanged_ = false;
     const GameOptions &gameOpts_;
 };
 

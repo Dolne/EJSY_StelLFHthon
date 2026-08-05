@@ -35,6 +35,8 @@ void DemoRunner::reshuffle()
     round_ = new GameRound(opts);
     printGameRound(round_);
 
+    optionsChanged_ = true;
+
     runner_.stop();
     fill_solid(hardware_.scanningLeds, hardware_.scanningLedCount, CRGB::Black);
 
@@ -105,6 +107,7 @@ void DemoRunner::begin()
 void DemoRunner::update()
 {
     nameChanged_ = false;
+    odd1OutChanged_ = false;
     if (stateChanged_)
     {
         if (currStimuli_ != 0)
@@ -124,6 +127,13 @@ void DemoRunner::update()
         nameChanged_ = true;
         stateChanged_ = false;
     }
+    if (optionsChanged_)
+    {
+        sprintf(odd1Out, "odd one out: %d", round_->odd1OutSlot + 1);
+        Serial.println(odd1Out);
+        odd1OutChanged_ = true;
+        optionsChanged_ = false;
+    }
 
     runner_.update();
 
@@ -137,4 +147,9 @@ void DemoRunner::update()
 bool DemoRunner::currNameChanged()
 {
     return nameChanged_;
+}
+
+bool DemoRunner::odd1OutChanged()
+{
+    return odd1OutChanged_;
 }
