@@ -392,7 +392,11 @@ void GameRunner::update()
     else if (gameStage_.changed())
     {
         hardware_.vibration.disable();
-        hardware_.audio.stop();
+        // only tell audio player to stop if feedback audio stage just ended
+        if (gameStage_.changedFrom(GameStage::FEEDBACK_AUDIO) && hardware_.auduo.playing())
+        {
+            hardware_.audio.stop();
+        }
         // hide led animation
         fill_solid(hardware_.feedbackLeds, hardware_.feedbackLedCount, CRGB::Black);
     }
