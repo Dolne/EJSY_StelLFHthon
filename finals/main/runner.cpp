@@ -393,7 +393,7 @@ void GameRunner::update()
     {
         hardware_.vibration.disable();
         // only tell audio player to stop if feedback audio stage just ended
-        if (gameStage_.changedFrom(GameStage::FEEDBACK_AUDIO) && hardware_.auduo.playing())
+        if (gameStage_.changedFrom(GameStage::FEEDBACK_AUDIO) && hardware_.audio.playing())
         {
             hardware_.audio.stop();
         }
