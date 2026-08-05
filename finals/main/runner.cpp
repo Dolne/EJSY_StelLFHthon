@@ -147,14 +147,6 @@ void GameRunner::update()
         return;
     }
 
-    // disable feedback stage hardware if not in the feedback stage
-    if (!gameStage_.is(GameStage::FEEDBACK) && gameStage_.changed())
-    {
-        hardware_.vibration.disable();
-        // hide led animation
-        fill_solid(hardware_.feedbackLeds, hardware_.feedbackLedCount, CRGB::Black);
-    }
-
     // ensure scanning runner is stopped if not in selection stage
     // and turn off the scanning strip
     if (!gameStage_.is(GameStage::SELECTION) && gameStage_.changed())
@@ -326,8 +318,6 @@ void GameRunner::update()
 
         if (gameStage_.changed())
         {
-            // TODO maybe show some animation with scanning strip also
-
             Serial.print("Slot selected: ");
             Serial.print(round_->answer);
             Serial.print(", Answer: ");
@@ -342,21 +332,49 @@ void GameRunner::update()
                 for (int i = 0; i < round_->slotsCount; i++) {
                     hardware_.steppers.get(i)->directTo(1.0f / VISUAL_TOTAL_VALUES);
                 }
-                // play audio for success
-                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, SUCCESS_AUDIO_INDEX);
                 // start vibration
                 hardware_.vibration.startSequence(hardware_.vibrationSeqSuccess, hardware_.vibrationSeqSuccessLen);
             }
             else
             {
                 Serial.println("Wrong answer :(");
-                // play audio for fail
-                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, FAIL_AUDIO_INDEX);
                 // start vibration
                 hardware_.vibration.startSequence(hardware_.vibrationSeqFail, hardware_.vibrationSeqFailLen);
             }
         }
+        // once the steppers have stopped and delay has passed, play the audio
+        else if (!hardware_.steppers.anyRunning() && millis() - gameStage_.since() > 500)
+        {
+            gameStage_.set(GameStage::FEEDBACK_AUDIO);
+        }
+    }
 
+    // 6. play audio feedback based on user answer
+    // this is triggered after some delay or after the steppers stop moving
+    else if (gameStage_.is(GameStage::FEEDBACK_AUDIO))
+    {
+        if (gameStage_.changed())
+        {
+            if (round_->answer == round_->odd1OutSlot)
+            {
+                Serial.printf("Playing success audio (%02d, %03d)", SYSTEM_AUDIO_FOLDER, SUCCESS_AUDIO_INDEX);
+                Serial.println();
+                // play audio for success
+                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, SUCCESS_AUDIO_INDEX);
+            }
+            else
+            {
+                Serial.printf("Playing fail audio (%02d, %03d)", SYSTEM_AUDIO_FOLDER, FAIL_AUDIO_INDEX);
+                Serial.println();
+                // play audio for fail
+                hardware_.audio.play(SYSTEM_AUDIO_FOLDER, FAIL_AUDIO_INDEX);
+            }
+        }
+    }
+
+    // play the led animations bsaed on user answer
+    if (gameStage_.is(GameStage::FEEDBACK) || gameStage_.is(GameStage::FEEDBACK_AUDIO))
+    {
         // run led animation
         if (round_->answer == round_->odd1OutSlot)
         {
@@ -369,6 +387,14 @@ void GameRunner::update()
         {
             failAnimation(gameStage_.since(), hardware_.feedbackLeds, hardware_.feedbackLedCount);
         }
+    }
+    // disable feedback stage hardware if not in a feedback stage
+    else if (gameStage_.changed())
+    {
+        hardware_.vibration.disable();
+        hardware_.audio.stop();
+        // hide led animation
+        fill_solid(hardware_.feedbackLeds, hardware_.feedbackLedCount, CRGB::Black);
     }
 }
 
@@ -406,7 +432,7 @@ uint8_t GameRunner::roundAnswer()
 bool GameRunner::canRetry()
 {
     // can only retry from FEEDBACK stage and only if retries are on and answer is wrong
-    return gameStage_.is(GameStage::FEEDBACK) && options_.enabled && options_.retries && round_->answer != round_->odd1OutSlot;
+    return (gameStage_.is(GameStage::FEEDBACK) || gameStage_.is(GameStage::FEEDBACK_AUDIO)) && options_.enabled && options_.retries && round_->answer != round_->odd1OutSlot;
 }
 
 void GameRunner::retry()

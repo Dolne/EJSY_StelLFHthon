@@ -137,6 +137,10 @@ enum class GameStage
      */
     FEEDBACK,
     /**
+     * play yay or try again audio (after some delay)
+     */
+    FEEDBACK_AUDIO,
+    /**
      * stop the game.
      * this stage will either immediately go to CONFIG stage after instructing all hardware to stop,
      * or will wait until everything is stopped to go to the STARTING stage if new game options have been provided

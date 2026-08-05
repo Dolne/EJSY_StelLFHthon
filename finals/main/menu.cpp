@@ -190,6 +190,17 @@ void Menu::update()
         int selected = selected_ == i && selOk;
         rows_[i]->update(row, selected);
     }
+    // if there are less than 4 visible rows and there were more previously
+    // need to manually clear the remaining lines
+    if (visibleRowCount < 4 && visibleRowCount < prevVisibleRows_)
+    {
+        for (int i = visibleRowCount; i < 4; i++)
+        {
+            // print an empty row
+            hardware_.lcd.print(i, 0, 20, "");
+        }
+    }
+    prevVisibleRows_ = visibleRowCount;
 
     lastUpdated_ = millis();
 }

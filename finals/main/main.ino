@@ -221,8 +221,6 @@ MenuRow* roundRows[] = {
 };
 Menu roundMenu(menuHardware, roundRows, sizeof(roundRows) / sizeof(roundRows[0]));
 
-MenuActionRow retryRow(menuHardware, "Retry round", [] () { runner.retry(); }, [] () { return !runner.canRetry(); });
-
 char scoreInfo[21] = {};
 
 // menu shown at the end of each round with the current round number and score
@@ -340,6 +338,8 @@ void loop() {
                 sprintf(scoreInfo, "Total score: %d", runner.score());
             }
             
+            menus.use(&feedbackMenu);
+        } else if (runner.stage().is(GameStage::FEEDBACK_AUDIO)) {
             menus.use(&feedbackMenu);
         } else {
             // blank screen

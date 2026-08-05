@@ -64,6 +64,7 @@ private:
 
     MenuRow** rows_;
     uint8_t rowCount_;
+    uint8_t prevVisibleRows_ = 0;
     uint8_t initSelected_ = 0;
     /**
      * the currently selected row. controlled by `upButton_` and `downButton_`.
