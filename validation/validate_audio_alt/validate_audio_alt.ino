@@ -14,19 +14,40 @@
 
 MD_YX5300 mp3(Serial2);
 
+double startTime = 0;
+
 void setup() {
     Serial2.begin(MD_YX5300::SERIAL_BPS, SERIAL_8N1, 16, 17);
     Serial.begin(115200);
     mp3.begin();
     mp3.setSynchronous(false);
-    Serial.print("Maximum volume: ");
-    Serial.println(mp3.volumeMax());
-    mp3.volume(30);
+    //Serial.print("Maximum volume: ");
+    //Serial.println(mp3.volumeMax());
     delay(2000);
-    mp3.playSpecific(1, 1); //folder, file
+    mp3.volume(10);
+    delay(2000);
+    startTime = millis();
+    Serial.println("Folder 10, file 152");
+    mp3.playSpecific(10, 152); //folder, file
+    delay(5000);
+    Serial.println("Folder 10, file 151");
+    mp3.playSpecific(10, 151); //folder, file
 }
 
 void loop() {
+    if (((millis() - startTime) > 20000) && ((millis() - startTime) < 20000)) { //20s
+        Serial.println("Folder 10, file 152");
+        mp3.playSpecific(10, 152); //folder, file
+        delay(5000);
+    }
+
+    else if ((millis() - startTime) > 12000) { //12s
+        Serial.println("Folder 10, file 151");
+        mp3.playSpecific(10, 151); //folder, file
+        delay(9000);
+    }
+    
+
     if (mp3.check()) {
         switch(mp3.getStsCode()) {
             case MD_YX5300::STS_ACK_OK:
