@@ -1,7 +1,6 @@
 # finals
 
-TODO: more info on how to run code, simulation etc
-TODO: this should also explain stuff about the code
+This is the implementation of our game for the hackathon finals.
 
 ## ESP32
 

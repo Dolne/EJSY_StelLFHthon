@@ -22,4 +22,6 @@ There are two modes which the child can use to input their choice. Either select
 
 This repository contains the software for our game. There are 2 versions — the [finals](./finals/) and the [prototype](./prototype/).
 
+More information on our hardware and software implementation can be found in [finals/README.md](./finals/README.md).
+
 Separately, the [validation](./validation/) folder contains some sketches which we used to test our components and the libraries we used.
